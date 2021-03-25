@@ -4,6 +4,8 @@ import java.net.URI;
 
 /**
  * Exception for problems when accessing buckets or their contents in Exasol's BucketFS.
+ *
+ * @serial exclude
  */
 public class BucketAccessException extends Exception {
     private static final long serialVersionUID = -1002852289020779835L;
