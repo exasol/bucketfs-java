@@ -16,6 +16,6 @@ public interface BucketFsMonitor {
      * @throws InterruptedException  if an interrupt occurs while the object synchronization is being evaluated
      * @throws BucketAccessException if the object in the bucket is inaccessible
      */
-    public boolean isObjectSynchronized(final ReadEnabledBucket bucket, final String pathInBucket, final Instant afterUTC)
+    public boolean isObjectSynchronized(final ReadOnlyBucket bucket, final String pathInBucket, final Instant afterUTC)
             throws InterruptedException, BucketAccessException;
 }

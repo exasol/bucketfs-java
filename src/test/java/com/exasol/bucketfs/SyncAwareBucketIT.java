@@ -25,10 +25,10 @@ import com.exasol.config.BucketConfiguration;
 import com.exasol.containers.exec.ExitCode;
 
 @Tag("slow")
-class WriteEnabledBucketIT extends AbstractBucketIT {
-    private WriteEnabledBucket getDefaultBucket() {
+class SyncAwareBucketIT extends AbstractBucketIT {
+    private Bucket getDefaultBucket() {
         final BucketConfiguration bucketConfiguration = getDefaultBucketConfiguration();
-        return WriteEnabledBucket.builder()//
+        return SyncAwareBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
@@ -45,7 +45,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
             throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final String fileName = "test-uploaded.txt";
         final Path testFile = createTestFile(tempDir, fileName, 10000);
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         bucket.uploadFile(testFile, fileName);
         assertThat(bucket.listContents(), hasItem(fileName));
     }
@@ -64,7 +64,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
             throws BucketAccessException, InterruptedException, IOException, TimeoutException {
         final String fileName = "file.txt";
         final Path file = createTestFile(tempDir, fileName, 1);
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         bucket.uploadFile(file, pathInBucket);
         assertThat(getDefaultBucket().listContents(pathInBucket), contains(fileName));
     }
@@ -74,7 +74,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
     void testUploadStringContent() throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final String content = "Hello BucketFS!";
         final String pathInBucket = "string-uploaded.txt";
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         bucket.uploadStringContent(content, pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket.toString()));
     }
@@ -84,7 +84,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
     void testUploadInputStreamContent() throws BucketAccessException, InterruptedException, TimeoutException {
         final String content = "Hello BucketFS!";
         final String pathInBucket = "string-uploaded.txt";
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         bucket.uploadInputStream(() -> new ByteArrayInputStream(content.getBytes()), pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket));
     }
@@ -113,7 +113,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
     void testDownloadFile(@TempDir final Path tempDir)
             throws InterruptedException, BucketAccessException, TimeoutException, IOException {
         final String fileName = "read_me.txt";
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         final String content = "read me";
         bucket.uploadStringContent(content, fileName);
         final Path pathToFile = tempDir.resolve(fileName);
@@ -126,7 +126,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
             throws InterruptedException, BucketAccessException, TimeoutException {
         final Path pathToFile = tempDir.resolve("/this/path/does/not/exist");
         final String pathInBucket = "foo.txt";
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         bucket.uploadStringContent("some content", pathInBucket);
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
@@ -145,7 +145,7 @@ class WriteEnabledBucketIT extends AbstractBucketIT {
         final Path fileA = Files.writeString(tempDir.resolve("a.txt"), contentA.repeat(scaleContentSizeBy));
         final String contentB = "abcdeABCDE\n";
         final Path fileB = Files.writeString(tempDir.resolve("b.txt"), contentB.repeat(scaleContentSizeBy));
-        final WriteEnabledBucket bucket = getDefaultBucket();
+        final Bucket bucket = getDefaultBucket();
         for (int i = 1; i <= 10; ++i) {
             final boolean useA = (i % 2) == 1;
             final Path currentFile = useA ? fileA : fileB;

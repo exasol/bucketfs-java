@@ -24,9 +24,9 @@ import com.exasol.config.BucketConfiguration;
 class BucketContentSyncIT extends AbstractBucketIT {
     private static RandomFileGenerator GENERATOR = new RandomFileGenerator();
 
-    private WriteEnabledBucket getDefaultBucket() {
+    private Bucket getDefaultBucket() {
         final BucketConfiguration bucketConfiguration = getDefaultBucketConfiguration();
-        return WriteEnabledBucket.builder()//
+        return SyncAwareBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
@@ -48,8 +48,8 @@ class BucketContentSyncIT extends AbstractBucketIT {
         assertObjectSynchronized(tempFile, getDefaultBucket(), filename);
     }
 
-    private void assertObjectSynchronized(final Path tempFile, final WriteEnabledBucket bucket,
-            final String pathInBucket) throws BucketAccessException, InterruptedException, TimeoutException {
+    private void assertObjectSynchronized(final Path tempFile, final Bucket bucket, final String pathInBucket)
+            throws BucketAccessException, InterruptedException, TimeoutException {
         final Instant now = Instant.now();
         assertThat(bucket.isObjectSynchronized(pathInBucket, now), equalTo(false));
         bucket.uploadFile(tempFile, pathInBucket);

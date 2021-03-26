@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * Bucket that support read access like listing contents and downloading files.
  */
-public class ReadEnabledBucket {
+public class ReadEnabledBucket implements ReadOnlyBucket {
     protected static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
     protected final String bucketFsName;
@@ -25,7 +25,7 @@ public class ReadEnabledBucket {
     protected final HttpClient client = HttpClient.newBuilder().build();
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
 
-    protected ReadEnabledBucket(final Builder builder) {
+    protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
         this.bucketFsName = builder.bucketFsName;
         this.bucketName = builder.bucketName;
         this.ipAddress = builder.ipAddress;
@@ -36,6 +36,7 @@ public class ReadEnabledBucket {
     /**
      * @return name of the BucketFS filesystem this bucket belongs to
      */
+    @Override
     public String getBucketFsName() {
         return this.bucketFsName;
     }
@@ -43,6 +44,7 @@ public class ReadEnabledBucket {
     /**
      * @return name of the bucket
      */
+    @Override
     public String getBucketName() {
         return this.bucketName;
     }
@@ -52,6 +54,7 @@ public class ReadEnabledBucket {
      *
      * @return fully qualified name consisting of service name and bucket name
      */
+    @Override
     public String getFullyQualifiedBucketName() {
         return this.bucketFsName + BucketConstants.PATH_SEPARATOR + this.bucketName;
     }
@@ -61,6 +64,7 @@ public class ReadEnabledBucket {
      *
      * @return read password
      */
+    @Override
     public String getReadPassword() {
         return this.readPassword;
     }
@@ -72,6 +76,7 @@ public class ReadEnabledBucket {
      * @throws BucketAccessException if the contents are not accessible or the path is invalid
      * @throws InterruptedException  if the list request was interrupted
      */
+    @Override
     public List<String> listContents() throws BucketAccessException, InterruptedException {
         return listContents(BUCKET_ROOT);
     }
@@ -84,6 +89,7 @@ public class ReadEnabledBucket {
      * @throws BucketAccessException if the contents are not accessible or the path is invalid
      * @throws InterruptedException  if the list request was interrupted
      */
+    @Override
     public List<String> listContents(final String path) throws BucketAccessException, InterruptedException {
         final URI uri = createPublicReadURI(BUCKET_ROOT);
         LOGGER.fine(() -> "Listing contents of bucket under URI \"" + uri + "\"");
@@ -145,6 +151,7 @@ public class ReadEnabledBucket {
      * @throws InterruptedException  if the file download was interrupted
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
+    @Override
     public void downloadFile(final String pathInBucket, final Path localPath)
             throws InterruptedException, BucketAccessException {
         final URI uri = createPublicReadURI(pathInBucket);
@@ -264,7 +271,7 @@ public class ReadEnabledBucket {
          *
          * @return read-enabled bucket instance
          */
-        public ReadEnabledBucket build() {
+        public ReadOnlyBucket build() {
             return new ReadEnabledBucket(this);
         }
     }

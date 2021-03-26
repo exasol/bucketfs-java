@@ -21,7 +21,7 @@ import com.exasol.config.BucketConfiguration;
 // This allows uploading the expected file first. Otherwise the test would contain too much duplication.
 @Tag("slow")
 class ReadEnabledBucketIT extends AbstractBucketIT {
-    private ReadEnabledBucket getDefaultBucket() {
+    private ReadOnlyBucket getDefaultBucket() {
         final BucketConfiguration bucketConfiguration = getDefaultBucketConfiguration();
         return ReadEnabledBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
@@ -34,7 +34,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
 
     @Test
     void testGetDefaultBucket() {
-        final ReadEnabledBucket defaultBucket = getDefaultBucket();
+        final ReadOnlyBucket defaultBucket = getDefaultBucket();
         assertAll(() -> assertThat(defaultBucket.getBucketFsName(), equalTo(DEFAULT_BUCKETFS)),
                 () -> assertThat(defaultBucket.getBucketName(), equalTo(DEFAULT_BUCKET)));
     }
@@ -60,7 +60,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     void testDownloadFileThrowsExceptionOnIllegalPathInBucket(@TempDir final Path tempDir) {
         final Path pathToFile = tempDir.resolve("irrelevant");
         final String pathInBucket = "this/path/does/not/exist";
-        final ReadEnabledBucket bucket = getDefaultBucket();
+        final ReadOnlyBucket bucket = getDefaultBucket();
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
         assertThat(exception.getMessage(), startsWith("Unable to downolad file \"" + pathToFile));

@@ -57,7 +57,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         final BucketFsServiceConfiguration serviceConfiguration = this.serviceConfigurationProvider
                 .getBucketFsServiceConfiguration(serviceName);
         final BucketConfiguration bucketConfiguration = serviceConfiguration.getBucketConfiguration(bucketName);
-        this.bucketsCache.computeIfAbsent(cacheKey, bucket -> WriteEnabledBucket //
+        this.bucketsCache.computeIfAbsent(cacheKey, bucket -> SyncAwareBucket //
                 .builder() //
                 .monitor(this.monitor) //
                 .serviceName(serviceName) //
