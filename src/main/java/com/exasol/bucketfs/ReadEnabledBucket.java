@@ -198,7 +198,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      *
      * @param <T> type for self pointer to inheritable builder
      */
-    public static class Builder<T extends Builder<T>> extends AbstractBucketBuilder<Builder<T>> {
+    public static class Builder<T extends Builder<T>> {
         private String bucketFsName;
         private String bucketName;
         private String ipAddress;
@@ -206,7 +206,6 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         private String readPassword;
 
         @SuppressWarnings("unchecked")
-        @Override
         protected T self() {
             return (T) this;
         }
