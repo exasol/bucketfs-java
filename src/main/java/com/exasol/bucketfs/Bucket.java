@@ -14,8 +14,8 @@ public interface Bucket extends UnsynchronizedBucket {
      * @param pathInBucket path to the object inside the bucket
      * @param afterUTC     point in time after which the synchronization needs to happen.
      * @return {@code true} if the object is synchronized
-     * @throws InterruptedException
-     * @throws BucketAccessException
+     * @throws InterruptedException  if the check of the object synchronization is interrupted
+     * @throws BucketAccessException if the object at the reference does not exist or is inaccessible
      */
     boolean isObjectSynchronized(String pathInBucket, Instant afterUTC)
             throws InterruptedException, BucketAccessException;
