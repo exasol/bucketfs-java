@@ -38,7 +38,7 @@ class ClusterConfigurationBucketFactoryTest {
         when(serviceConfigurationProviderMock.getBucketFsServiceConfiguration(any())).thenReturn(serviceConfiguration);
         final BucketFactory factory = new ClusterConfigurationBucketFactory(null, ipAddress, serviceConfigurationProviderMock,
                 portMappings);
-        final Bucket bucket = factory.getBucket(serviceName, bucketName);
+        final WriteEnabledBucket bucket = factory.getBucket(serviceName, bucketName);
         assertAll(() -> assertThat(bucket.getReadPassword(), equalTo(readPassword)),
                 () -> assertThat(bucket.getWritePassword(), equalTo(writePassword)));
     }

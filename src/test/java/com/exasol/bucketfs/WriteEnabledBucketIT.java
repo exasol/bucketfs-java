@@ -4,7 +4,8 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,32 +21,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.testcontainers.containers.Container.ExecResult;
 
+import com.exasol.config.BucketConfiguration;
 import com.exasol.containers.exec.ExitCode;
 
 @Tag("slow")
-class BucketIT extends AbstractBucketIT {
-    @Test
-    void testGetDefaultBucket() {
-        final Bucket defaultBucket = getDefaultBucket();
-        assertAll(() -> assertThat(defaultBucket.getBucketFsName(), equalTo(DEFAULT_BUCKETFS)),
-                () -> assertThat(defaultBucket.getBucketName(), equalTo(DEFAULT_BUCKET)));
-    }
-
-    // [itest->dsn~bucket-lists-its-contents~1]
-    @Test
-    void testListBucketContentsWithRootPath() throws BucketAccessException, InterruptedException {
-        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS"));
-    }
-
-    // [itest->dsn~bucket-lists-its-contents~1]
-    @ValueSource(strings = { "EXAClusterOS/", "/EXAClusterOS/" })
-    @ParameterizedTest
-    void testListBucketContents(final String pathInBucket) throws BucketAccessException, InterruptedException {
-        assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
-    }
-
-    void testListBucketContentsOfIllegalPathThrowsException() {
-        assertThrows(BucketAccessException.class, () -> getDefaultBucket().listContents("illegal\\path"));
+class WriteEnabledBucketIT extends AbstractBucketIT {
+    private WriteEnabledBucket getDefaultBucket() {
+        final BucketConfiguration bucketConfiguration = getDefaultBucketConfiguration();
+        return WriteEnabledBucket.builder()//
+                .ipAddress(getContainerIpAddress()) //
+                .httpPort(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(DEFAULT_BUCKET) //
+                .readPassword(bucketConfiguration.getReadPassword()) //
+                .writePassword(bucketConfiguration.getWritePassword()) //
+                .monitor(createBucketMonitor()) //
+                .build();
     }
 
     // [itest->dsn~uploading-to-bucket~1]
@@ -54,7 +45,7 @@ class BucketIT extends AbstractBucketIT {
             throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final String fileName = "test-uploaded.txt";
         final Path testFile = createTestFile(tempDir, fileName, 10000);
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         bucket.uploadFile(testFile, fileName);
         assertThat(bucket.listContents(), hasItem(fileName));
     }
@@ -73,7 +64,7 @@ class BucketIT extends AbstractBucketIT {
             throws BucketAccessException, InterruptedException, IOException, TimeoutException {
         final String fileName = "file.txt";
         final Path file = createTestFile(tempDir, fileName, 1);
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         bucket.uploadFile(file, pathInBucket);
         assertThat(getDefaultBucket().listContents(pathInBucket), contains(fileName));
     }
@@ -83,7 +74,7 @@ class BucketIT extends AbstractBucketIT {
     void testUploadStringContent() throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final String content = "Hello BucketFS!";
         final String pathInBucket = "string-uploaded.txt";
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         bucket.uploadStringContent(content, pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket.toString()));
     }
@@ -93,7 +84,7 @@ class BucketIT extends AbstractBucketIT {
     void testUploadInputStreamContent() throws BucketAccessException, InterruptedException, TimeoutException {
         final String content = "Hello BucketFS!";
         final String pathInBucket = "string-uploaded.txt";
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         bucket.uploadInputStream(() -> new ByteArrayInputStream(content.getBytes()), pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket));
     }
@@ -122,7 +113,7 @@ class BucketIT extends AbstractBucketIT {
     void testDownloadFile(@TempDir final Path tempDir)
             throws InterruptedException, BucketAccessException, TimeoutException, IOException {
         final String fileName = "read_me.txt";
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         final String content = "read me";
         bucket.uploadStringContent(content, fileName);
         final Path pathToFile = tempDir.resolve(fileName);
@@ -131,21 +122,11 @@ class BucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testDownloadFileThrowsExceptionOnIllegalPathInBucket(@TempDir final Path tempDir) {
-        final Path pathToFile = tempDir.resolve("irrelevant");
-        final String pathInBucket = "this/path/does/not/exist";
-        final Bucket bucket = getDefaultBucket();
-        final BucketAccessException exception = assertThrows(BucketAccessException.class,
-                () -> bucket.downloadFile(pathInBucket, pathToFile));
-        assertThat(exception.getMessage(), startsWith("Unable to downolad file \"" + pathToFile));
-    }
-
-    @Test
     void testDownloadFileThrowsExceptionOnIllegalLocalPath(@TempDir final Path tempDir)
             throws InterruptedException, BucketAccessException, TimeoutException {
         final Path pathToFile = tempDir.resolve("/this/path/does/not/exist");
         final String pathInBucket = "foo.txt";
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         bucket.uploadStringContent("some content", pathInBucket);
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
@@ -164,7 +145,7 @@ class BucketIT extends AbstractBucketIT {
         final Path fileA = Files.writeString(tempDir.resolve("a.txt"), contentA.repeat(scaleContentSizeBy));
         final String contentB = "abcdeABCDE\n";
         final Path fileB = Files.writeString(tempDir.resolve("b.txt"), contentB.repeat(scaleContentSizeBy));
-        final Bucket bucket = getDefaultBucket();
+        final WriteEnabledBucket bucket = getDefaultBucket();
         for (int i = 1; i <= 10; ++i) {
             final boolean useA = (i % 2) == 1;
             final Path currentFile = useA ? fileA : fileB;

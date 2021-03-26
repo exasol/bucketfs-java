@@ -17,7 +17,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     }
 
     @Override
-    public boolean isObjectSynchronized(final Bucket bucket, final String pathInBucket, final Instant afterUTC)
+    public boolean isObjectSynchronized(final ReadEnabledBucket bucket, final String pathInBucket, final Instant afterUTC)
             throws InterruptedException, BucketAccessException {
         try {
             return createBucketLogPatternDetector(pathInBucket).isPatternPresentAfter(afterUTC);
@@ -33,7 +33,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
 
     private LogPatternDetector createBucketLogPatternDetector(final String pathInBucket) {
         final String pattern = pathInBucket + ".*"
-                + (Bucket.isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
+                + (WriteEnabledBucket.isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
         return this.detectorFactory.createLogPatternDetector(EXASOL_CORE_DAEMON_LOGS_PATH,
                 BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern);
     }

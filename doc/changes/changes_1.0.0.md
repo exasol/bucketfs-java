@@ -7,6 +7,7 @@ In version 1.0.0 we migrated the existing Bucket FS module from [`exasol-testcon
 ## Refactoring
 
 * #1: Migrated code from `exasol-testcontainers`
+
 ## Dependency Updates
 
 ### Test Dependency Updates

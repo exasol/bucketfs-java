@@ -1,5 +1,7 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -15,10 +17,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.exasol.config.BucketConfiguration;
+
 @Tag("slow")
 @Testcontainers
 class BucketContentSyncIT extends AbstractBucketIT {
     private static RandomFileGenerator GENERATOR = new RandomFileGenerator();
+
+    private WriteEnabledBucket getDefaultBucket() {
+        final BucketConfiguration bucketConfiguration = getDefaultBucketConfiguration();
+        return WriteEnabledBucket.builder()//
+                .ipAddress(getContainerIpAddress()) //
+                .httpPort(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(DEFAULT_BUCKET) //
+                .readPassword(bucketConfiguration.getReadPassword()) //
+                .writePassword(bucketConfiguration.getWritePassword()) //
+                .monitor(createBucketMonitor()) //
+                .build();
+    }
 
     // [itest->dsn~waiting-until-file-appears-in-target-directory~1]
     // [itest->dsn~validating-bucketfs-object-synchronization-via-the-bucketfs-log~1]
@@ -31,8 +48,8 @@ class BucketContentSyncIT extends AbstractBucketIT {
         assertObjectSynchronized(tempFile, getDefaultBucket(), filename);
     }
 
-    private void assertObjectSynchronized(final Path tempFile, final Bucket bucket, final String pathInBucket)
-            throws BucketAccessException, InterruptedException, TimeoutException {
+    private void assertObjectSynchronized(final Path tempFile, final WriteEnabledBucket bucket,
+            final String pathInBucket) throws BucketAccessException, InterruptedException, TimeoutException {
         final Instant now = Instant.now();
         assertThat(bucket.isObjectSynchronized(pathInBucket, now), equalTo(false));
         bucket.uploadFile(tempFile, pathInBucket);

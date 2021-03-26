@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class BucketTest {
     @Test
     void testIsObjectSynchronizedThrowsExceptionIfNoMonitorIsAvailable() {
-        final Bucket bucket = Bucket.builder() //
+        final Bucket bucket = WriteEnabledBucket.builder() //
                 .serviceName("the_service") //
                 .name("the_bucket") //
                 .ipAddress("localhost") //
