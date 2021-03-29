@@ -4,8 +4,7 @@ jdk:
   - openjdk11
 
 env:
-  - DOCKER_DB_VERSION=7.0.8
-  - DOCKER_DB_VERSION=6.2.14
+  - DOCKER_DB_VERSION=7.0.6
 
 addons:
   sonarcloud:
