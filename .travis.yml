@@ -9,6 +9,13 @@ addons:
     token:
        secure: "ZzQZRHNuOTi6E+XydSUBve7u82XCGFsOFJvWP8uvI99hfCmEzPUzMNBB8Mizakw+hHEMbljr22z4Gn3y3KPOs7sOt960eQfuSNvIBjqKYDT1X+yKgYmyNfNk4GM+WHNWp3kvtW1/h72lEcgNvrSUREKu9g3updnSwkSR2AJaHPniZAZHpjnnmHlra6I89pT+DDlTcZhvZt/hWSnhTUMBipIKbzA2PlLFzAmeJHamtUGVMKoTtotASxX51ymg3b5GvVEYNkNfKnR7hWBduhEZMIhGBsE+io8Pb708SkWqSmdlh344J/mrT+pCbWv+tyDWeYNbaA1KnElF/mGChKo06eciDY0/xQo61TsjCuwBGfU2koiPJGHQh36YWM01+UVQl6emVU6KtsiG7xhS6CCsZhbMOca5yUa17XpmcsJEA9J3/tfashUqNIc9kpBMusfDY2jGM+XO5K7uG09iRA1/kVl0LxwV/kUzjClXd5ZHiLD78PcdKCgNJQrCJrRT/9YX4YZ/lufkD7Igvze0oCnrtch8oBrc939yWvr32104lUe93ACtfs9cszswqNRGKIuUtY4IYFJCIVeW7bhTC+4TKvuK0POz1LZ0jeewt1/wJPvNkcTqhVOiCf+NwdIepHtmKZ6keMDFVmrDcPwY6LGw8yIA9kGtYXY7oBTgUs9g7as="
 
+# Create an empty Docker config to avoid error message about missing config.
+before_script:
+  - mkdir "$HOME"/.docker
+  - echo '{}' > "$HOME"/.docker/config.json
+  - echo 'docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy' > "$HOME"/.testcontainers.properties
+  - echo 'testcontainers.reuse.enable=true' >> "$HOME"/.testcontainers.properties
+
 install:
   - travis_retry mvn dependency:resolve
 
