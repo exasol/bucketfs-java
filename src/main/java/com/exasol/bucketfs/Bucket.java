@@ -37,7 +37,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      */
     // [impl->dsn~uploading-to-bucket~1]
-    void uploadFile(Path localPath, String pathInBucket)
+    void uploadFile(String localPath, String pathInBucket)
             throws InterruptedException, BucketAccessException, TimeoutException;
 
     /**
