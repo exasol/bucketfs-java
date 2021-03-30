@@ -23,16 +23,11 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         this.monitor = builder.monitor;
     }
 
-    // [impl->dsn~validating-bucketfs-object-synchronization-via-the-bucketfs-log~1]
+    // [impl->dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1]
     @Override
     public boolean isObjectSynchronized(final String pathInBucket, final Instant afterUTC)
             throws InterruptedException, BucketAccessException {
         return this.monitor.isObjectSynchronized(this, pathInBucket, afterUTC);
-    }
-
-    @Override
-    public boolean hasSynchronizationMonitor() {
-        return true;
     }
 
     // [impl->dsn~uploading-to-bucket~1]

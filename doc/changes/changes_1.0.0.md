@@ -2,11 +2,14 @@
 
 ## Code name: Migration from exasol-testcontainers
 
-In version 1.0.0 we migrated the existing Bucket FS module from [`exasol-testcontainers`](https://github.com/exasol/exasol-testcontainers/).
+In version 1.0.0 we migrated the existing Bucket FS module from [`exasol-testcontainers`](https://github.com/exasol/exasol-testcontainers/) (ETC).
+
+This allows developers to use the BucketFS library in their code without the additional dependencies that the ETC brings.
 
 ## Refactoring
 
 * #1: Migrated code from `exasol-testcontainers`
+* #3: Extracted and adapted system requirements and design
 
 ## Dependency Updates
 
@@ -38,6 +41,7 @@ In version 1.0.0 we migrated the existing Bucket FS module from [`exasol-testcon
 * Added `org.apache.maven.plugins:maven-source-plugin:3.2.1`
 * Added `org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M3`
 * Added `org.codehaus.mojo:versions-maven-plugin:2.7`
+* Added `org.itsallcode:openfasttrace-maven-plugin:1.0.0`
 * Added `org.jacoco:jacoco-maven-plugin:0.8.5`
 * Added `org.sonatype.ossindex.maven:ossindex-maven-plugin:3.1.0`
 * Added `org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8`

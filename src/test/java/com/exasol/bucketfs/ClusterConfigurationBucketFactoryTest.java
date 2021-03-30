@@ -20,7 +20,6 @@ import com.exasol.config.BucketFsServiceConfiguration;
 @Tag("fast")
 @ExtendWith(MockitoExtension.class)
 class ClusterConfigurationBucketFactoryTest {
-    // [utest->dsn~bucket-factory-injects-access-credentials~1]
     @Test
     void testGetBucketInjectsAccessCredentials(
             @Mock final BucketFsSerivceConfigurationProvider serviceConfigurationProviderMock) {
@@ -36,8 +35,8 @@ class ClusterConfigurationBucketFactoryTest {
         final BucketFsServiceConfiguration serviceConfiguration = BucketFsServiceConfiguration.builder()
                 .name(serviceName).httpPort(port).addBucketConfiguration(bucketConfiguration).build();
         when(serviceConfigurationProviderMock.getBucketFsServiceConfiguration(any())).thenReturn(serviceConfiguration);
-        final BucketFactory factory = new ClusterConfigurationBucketFactory(null, ipAddress, serviceConfigurationProviderMock,
-                portMappings);
+        final BucketFactory factory = new ClusterConfigurationBucketFactory(null, ipAddress,
+                serviceConfigurationProviderMock, portMappings);
         final WriteEnabledBucket bucket = factory.getBucket(serviceName, bucketName);
         assertAll(() -> assertThat(bucket.getReadPassword(), equalTo(readPassword)),
                 () -> assertThat(bucket.getWritePassword(), equalTo(writePassword)));

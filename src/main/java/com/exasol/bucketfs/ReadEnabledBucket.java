@@ -77,6 +77,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @throws InterruptedException  if the list request was interrupted
      */
     @Override
+    // [impl->dsn~bucket-lists-its-contents~1]
     public List<String> listContents() throws BucketAccessException, InterruptedException {
         return listContents(BUCKET_ROOT);
     }
@@ -151,6 +152,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @throws InterruptedException  if the file download was interrupted
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
+    // [impl->dsn~downloading-a-file-from-a-bucket~1]
     @Override
     public void downloadFile(final String pathInBucket, final Path localPath)
             throws InterruptedException, BucketAccessException {

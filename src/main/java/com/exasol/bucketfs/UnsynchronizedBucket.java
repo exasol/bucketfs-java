@@ -19,13 +19,6 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      */
     String getWritePassword();
 
-    /***
-     * Check if a synchronization monitor is registered for this Bucket.
-     *
-     * @return {@code true} if a monitor is available
-     */
-    boolean hasSynchronizationMonitor();
-
     /**
      * Upload a file to the bucket.
      * <p>

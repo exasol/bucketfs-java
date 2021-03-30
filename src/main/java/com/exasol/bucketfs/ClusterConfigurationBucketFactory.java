@@ -37,7 +37,6 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         return this.portMappings.get(internalPort);
     }
 
-    // [impl->dsn~bucket-factory-injects-access-credentials~1]
     @Override
     public synchronized WriteEnabledBucket getBucket(final String serviceName, final String bucketName) {
         final String cacheKey = getFullyQualifiedBucketName(serviceName, bucketName);
