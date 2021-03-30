@@ -22,7 +22,6 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
         try {
             return createBucketLogPatternDetector(pathInBucket).isPatternPresentAfter(afterUTC);
         } catch (
-
         final IOException exception) {
             throw new BucketAccessException(
                     "Unable to check if object \"" + pathInBucket + "\" is synchronized in bucket \""

@@ -46,7 +46,7 @@ Needs: req
 
 ## Functional Requirements
 
-In this section lists functional requirements from the user's perspective. The requirements are grouped by feature where they belong to a single feature.
+This section lists functional requirements from the user's perspective. The requirements are grouped by feature where they belong to a single feature.
 
 ### BucketFS Access
 
@@ -132,7 +132,7 @@ ETC handles the authentication against the buckets automatically.
 
 Rationale:
 
-Unless a test is about an 3rd-party software that accesses BucketFS from the outside, providing bucket credentials is unnecessary overhead in integration tests.
+Unless a test is about a 3rd-party software that accesses BucketFS from the outside, providing bucket credentials is unnecessary overhead in integration tests.
 
 Covers:
 
@@ -148,7 +148,7 @@ ETC allows integrators to wait for bucket contents to be synchronized on a singl
 
 Rationale:
 
-Files uploaded to Bucket FS are not immediately usable due to internal synchronization mechanisms. For integration tests it is necessary that integrators can rely on the file to be available in a bucket before running tests that depend on it.
+Files uploaded to BucketFS are not immediately usable due to internal synchronization mechanisms. For integration tests it is necessary that integrators can rely on the file to be available in a bucket before running tests that depend on it.
 
 Covers:
 

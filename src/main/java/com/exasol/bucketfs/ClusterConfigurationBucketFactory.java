@@ -17,7 +17,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
     private final BucketFsMonitor monitor;
 
     /**
-     * Create a new instance of a BucketFactory.
+     * Create a new instance of a {@link ClusterConfigurationBucketFactory}.
      *
      * @param monitor                      BucketFS synchronization monitor
      * @param ipAddress                    IP address of the the BucketFS service

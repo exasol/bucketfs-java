@@ -29,7 +29,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Upload a file to the bucket.
      * <p>
-     * Uploads a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
+     * Upload a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
      * that URI is interpreted as a directory inside the bucket and the original filename is appended.
      * </p>
      * <p>

@@ -107,7 +107,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private String removeLeadingSlash(final String path) {
-        if (path.startsWith("/")) {
+        if (path.startsWith(BucketConstants.PATH_SEPARATOR)) {
             return path.substring(1);
         } else {
             return path;
@@ -132,15 +132,15 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private String extractFirstPathComponent(final String path) {
-        if (path.contains("/")) {
-            return path.substring(0, path.indexOf('/'));
+        if (path.contains(BucketConstants.PATH_SEPARATOR)) {
+            return path.substring(0, path.indexOf(BucketConstants.PATH_SEPARATOR));
         } else {
             return path;
         }
     }
 
     protected String extendPathInBucketDownToFilename(final Path localPath, final String pathInBucket) {
-        return pathInBucket.endsWith("/") ? pathInBucket + localPath.getFileName() : pathInBucket;
+        return pathInBucket.endsWith(BucketConstants.PATH_SEPARATOR) ? pathInBucket + localPath.getFileName() : pathInBucket;
     }
 
     /**
