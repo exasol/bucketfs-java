@@ -40,7 +40,7 @@ Features are the highest level requirements in this document that describe the m
 ### BucketFS Access
 `feat~bucketfs-access~1`
 
-ETC provides access to the BucketFS service(s) of the Exasol database.
+BucketFS Java provides access to the BucketFS service(s) of the Exasol database.
 
 Needs: req
 
@@ -53,7 +53,7 @@ This section lists functional requirements from the user's perspective. The requ
 #### Bucket Content Listing
 `req~bucket-content-listing~1`
 
-ETC lists the contents of a bucket in BucketFS.
+BucketFS Java lists the contents of a bucket in BucketFS.
 
 Rationale:
 
@@ -68,7 +68,7 @@ Needs: dsn
 #### Uploading a File to BucketFS
 `req~uploading-a-file-to-bucketfs~1`
 
-ETC uploads a file from a locally accessible filesystem to a bucket.
+BucketFS Java uploads a file from a locally accessible filesystem to a bucket.
 
 Rationale:
 
@@ -83,7 +83,7 @@ Needs: dsn
 #### Uploading Text to a File in BucketFS
 `req~uploading-text-to-a-file-in-bucketfs~1`
 
-ETC uploads text (aka. a "string") to a file inside a bucket.
+BucketFS Java uploads text (aka. a "string") to a file inside a bucket.
 
 Rationale:
 
@@ -98,7 +98,7 @@ Needs: dsn
 #### Uploading InputStream to a File in BucketFS
 `req~uploading-input-stream-to-a-file-in-bucketfs~1`
 
-ETC uploads the contents of an InputStream to a file inside a bucket.
+BucketFS Java uploads the contents of an InputStream to a file inside a bucket.
 
 Rationale:
 
@@ -113,7 +113,7 @@ Needs: dsn
 #### Downloading a File from BucketFS
 `req~downloading-a-file-from-bucketfs~1`
 
-ETC downloads a file from a bucket to a locally accessible filesystem.
+BucketFS Java downloads a file from a bucket to a locally accessible filesystem.
 
 Rationale:
 
@@ -128,7 +128,7 @@ Needs: dsn
 #### Bucket Authentication
 `req~bucket-authentication~1`
 
-ETC handles the authentication against the buckets automatically.
+BucketFS Java handles the authentication against the buckets automatically.
 
 Rationale:
 
@@ -144,7 +144,7 @@ Needs: dsn
 #### Waiting for Bucket Content Synchronization
 `req~waiting-for-bucket-content-synchronization~1`
 
-ETC allows integrators to wait for bucket contents to be synchronized on a single node after uploading a file.
+BucketFS Java allows integrators to wait for bucket contents to be synchronized on a single node after uploading a file.
 
 Rationale:
 
