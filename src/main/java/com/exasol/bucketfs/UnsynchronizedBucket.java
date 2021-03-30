@@ -6,6 +6,15 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+/**
+ * Interface for write access to a bucket in Bucket FS.
+ *
+ * <p>
+ * Note that the methods in this interface provide no guarantee that the written objects are synchronized across the
+ * cluster when they return. If you require safe synchronization, use the {@link Bucket} interface and its
+ * implementations instead.
+ * </p>
+ */
 public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Types of archive that BucketFS can expand automatically.
@@ -18,13 +27,6 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @return write password.
      */
     String getWritePassword();
-
-    /***
-     * Check if a synchronization monitor is registered for this Bucket.
-     *
-     * @return {@code true} if a monitor is available
-     */
-    boolean hasSynchronizationMonitor();
 
     /**
      * Upload a file to the bucket.

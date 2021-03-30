@@ -37,7 +37,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      */
     // [impl->dsn~uploading-to-bucket~1]
-    void uploadFile(String localPath, String pathInBucket)
+    void uploadFile(Path localPath, String pathInBucket)
             throws InterruptedException, BucketAccessException, TimeoutException;
 
     /**
@@ -57,8 +57,12 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
+     *
+     * @deprecated Use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
+     *             instead.
      */
     // [impl->dsn~uploading-to-bucket~1]
+    @Deprecated(since = "1.0.0")
     void uploadFile(Path localPath, String pathInBucket, boolean blocking)
             throws InterruptedException, BucketAccessException, TimeoutException;
 
@@ -99,7 +103,11 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
+     *
+     * @deprecated use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
+     *             instead
      */
+    @Deprecated(since = "1.0.0")
     void uploadStringContent(String content, String pathInBucket, boolean blocking)
             throws InterruptedException, BucketAccessException, TimeoutException;
 }

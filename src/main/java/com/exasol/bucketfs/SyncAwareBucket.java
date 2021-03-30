@@ -30,11 +30,6 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         return this.monitor.isObjectSynchronized(this, pathInBucket, afterUTC);
     }
 
-    @Override
-    public boolean hasSynchronizationMonitor() {
-        return true;
-    }
-
     // [impl->dsn~uploading-to-bucket~1]
     @Override
     public void uploadFile(final Path localPath, final String pathInBucket)

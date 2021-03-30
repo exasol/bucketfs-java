@@ -30,11 +30,6 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         return this.writePassword;
     }
 
-    @Override
-    public boolean hasSynchronizationMonitor() {
-        return false;
-    }
-
     // [impl->dsn~uploading-to-bucket~1]
     @Override
     public void uploadFileNonBlocking(final Path localPath, final String pathInBucket)

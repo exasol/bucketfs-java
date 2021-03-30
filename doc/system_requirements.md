@@ -35,7 +35,7 @@ The following list gives you an overview of terms and abbreviations commonly use
 
 ## Features
 
-Features are the highest level requirements in this document that describe the main functionality of ETC.
+Features are the highest level requirements in this document that describe the main functionality of BucketFS Java.
 
 ### BucketFS Access
 `feat~bucketfs-access~1`

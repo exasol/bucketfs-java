@@ -10,7 +10,7 @@ import com.exasol.config.BucketFsServiceConfiguration;
  * Factory for objects abstracting buckets in Exasol's BucketFS.
  */
 public final class ClusterConfigurationBucketFactory implements BucketFactory {
-    private final Map<String, WriteEnabledBucket> bucketsCache = new HashMap<>();
+    private final Map<String, Bucket> bucketsCache = new HashMap<>();
     private final String ipAddress;
     private final BucketFsSerivceConfigurationProvider serviceConfigurationProvider;
     private final Map<Integer, Integer> portMappings;
@@ -39,7 +39,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
 
     // [impl->dsn~bucket-factory-injects-access-credentials~1]
     @Override
-    public synchronized WriteEnabledBucket getBucket(final String serviceName, final String bucketName) {
+    public synchronized Bucket getBucket(final String serviceName, final String bucketName) {
         final String cacheKey = getFullyQualifiedBucketName(serviceName, bucketName);
         updateBucketCache(serviceName, bucketName, cacheKey);
         return getBucketFromCache(cacheKey);
@@ -49,7 +49,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         return serviceName + BucketConstants.PATH_SEPARATOR + bucketName;
     }
 
-    public WriteEnabledBucket getBucketFromCache(final String cacheKey) {
+    public Bucket getBucketFromCache(final String cacheKey) {
         return this.bucketsCache.get(cacheKey);
     }
 
