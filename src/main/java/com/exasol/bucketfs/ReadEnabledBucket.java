@@ -33,63 +33,32 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         this.readPassword = builder.readPassword;
     }
 
-    /**
-     * @return name of the BucketFS filesystem this bucket belongs to
-     */
     @Override
     public String getBucketFsName() {
         return this.bucketFsName;
     }
 
-    /**
-     * @return name of the bucket
-     */
     @Override
     public String getBucketName() {
         return this.bucketName;
     }
 
-    /**
-     * Get the fully qualified name of the bucket.
-     *
-     * @return fully qualified name consisting of service name and bucket name
-     */
     @Override
     public String getFullyQualifiedBucketName() {
         return this.bucketFsName + BucketConstants.PATH_SEPARATOR + this.bucketName;
     }
 
-    /**
-     * Get the read password for the bucket.
-     *
-     * @return read password
-     */
     @Override
     public String getReadPassword() {
         return this.readPassword;
     }
 
-    /**
-     * List the contents of a bucket.
-     *
-     * @return bucket contents
-     * @throws BucketAccessException if the contents are not accessible or the path is invalid
-     * @throws InterruptedException  if the list request was interrupted
-     */
     @Override
     // [impl->dsn~bucket-lists-its-contents~1]
     public List<String> listContents() throws BucketAccessException, InterruptedException {
         return listContents(BUCKET_ROOT);
     }
 
-    /**
-     * List the contents of a path inside a bucket.
-     *
-     * @param path relative path from the bucket root
-     * @return list of file system entries
-     * @throws BucketAccessException if the contents are not accessible or the path is invalid
-     * @throws InterruptedException  if the list request was interrupted
-     */
     @Override
     public List<String> listContents(final String path) throws BucketAccessException, InterruptedException {
         final URI uri = createPublicReadURI(BUCKET_ROOT);
@@ -108,7 +77,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private String removeLeadingSlash(final String path) {
-        if (path.startsWith("/")) {
+        if (path.startsWith(BucketConstants.PATH_SEPARATOR)) {
             return path.substring(1);
         } else {
             return path;
@@ -133,25 +102,18 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private String extractFirstPathComponent(final String path) {
-        if (path.contains("/")) {
-            return path.substring(0, path.indexOf('/'));
+        if (path.contains(BucketConstants.PATH_SEPARATOR)) {
+            return path.substring(0, path.indexOf(BucketConstants.PATH_SEPARATOR));
         } else {
             return path;
         }
     }
 
     protected String extendPathInBucketDownToFilename(final Path localPath, final String pathInBucket) {
-        return pathInBucket.endsWith("/") ? pathInBucket + localPath.getFileName() : pathInBucket;
+        return pathInBucket.endsWith(BucketConstants.PATH_SEPARATOR) ? pathInBucket + localPath.getFileName()
+                : pathInBucket;
     }
 
-    /**
-     * Download a file from a bucket to a local filesystem.
-     *
-     * @param pathInBucket path of the file in BucketFS
-     * @param localPath    local path the file is downloaded to
-     * @throws InterruptedException  if the file download was interrupted
-     * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
-     */
     // [impl->dsn~downloading-a-file-from-a-bucket~1]
     @Override
     public void downloadFile(final String pathInBucket, final Path localPath)
@@ -185,11 +147,6 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         return "Basic " + Base64.getEncoder().encodeToString(("r:" + this.readPassword).getBytes());
     }
 
-    /**
-     * Create builder for a {@link WriteEnabledBucket}.
-     *
-     * @return builder
-     */
     @SuppressWarnings("squid:S1452")
     public static Builder<? extends Builder<?>> builder() {
         return new Builder<>();

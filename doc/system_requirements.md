@@ -35,18 +35,18 @@ The following list gives you an overview of terms and abbreviations commonly use
 
 ## Features
 
-Features are the highest level requirements in this document that describe the main functionality of ETC.
+Features are the highest level requirements in this document that describe the main functionality of BucketFS Java.
 
 ### BucketFS Access
 `feat~bucketfs-access~1`
 
-ETC provides access to the BucketFS service(s) of the Exasol database.
+BucketFS Java provides access to the BucketFS service(s) of the Exasol database.
 
 Needs: req
 
 ## Functional Requirements
 
-In this section lists functional requirements from the user's perspective. The requirements are grouped by feature where they belong to a single feature.
+This section lists functional requirements from the user's perspective. The requirements are grouped by feature where they belong to a single feature.
 
 ### BucketFS Access
 
@@ -132,7 +132,7 @@ BFSJ allows users to wait for bucket contents to be synchronized on a single nod
 
 Rationale:
 
-Files uploaded to Bucket FS are not immediately usable due to internal synchronization mechanisms. In case of automated scripts, immediately continuing without waiting until the files are properly synced can lead to race conditions.
+Files uploaded to BucketFS are not immediately usable due to internal synchronization mechanisms. In case of automated scripts, immediately continuing without waiting until the files are properly synced can lead to race conditions.
 
 Covers:
 
