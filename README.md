@@ -1,7 +1,5 @@
 # bucketfs-java
 
-<img alt="exasol-testcontainer logo" src="doc/images/bucketfs_java_128x128.png" style="float:left; padding:0px 10px 10px 10px;"/>
-
 [![Build Status](https://api.travis-ci.com/exasol/bucketfs-java.svg?branch=master)](https://travis-ci.org/exasol/bucketfs-java)
 [![Maven Central](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
 
