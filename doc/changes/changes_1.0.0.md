@@ -1,6 +1,6 @@
 # bucketfs-java 1.0.0, released 2021-03-31
 
-## Code name: Migration from exasol-testcontainers
+Code name: Migration from exasol-testcontainers
 
 In version 1.0.0 we migrated the existing Bucket FS module from [`exasol-testcontainers`](https://github.com/exasol/exasol-testcontainers/) (ETC).
 
