@@ -23,7 +23,7 @@ public interface Bucket extends UnsynchronizedBucket {
     /**
      * Upload a file to the bucket.
      * <p>
-     * Uploads a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
+     * Upload a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
      * that URI is interpreted as a directory inside the bucket and the original filename is appended.
      * </p>
      * <p>
@@ -57,8 +57,12 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
+     *
+     * @deprecated Use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
+     *             instead.
      */
     // [impl->dsn~uploading-to-bucket~1]
+    @Deprecated(since = "1.0.0")
     void uploadFile(Path localPath, String pathInBucket, boolean blocking)
             throws InterruptedException, BucketAccessException, TimeoutException;
 
@@ -99,7 +103,11 @@ public interface Bucket extends UnsynchronizedBucket {
      * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
+     *
+     * @deprecated use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
+     *             instead
      */
+    @Deprecated(since = "1.0.0")
     void uploadStringContent(String content, String pathInBucket, boolean blocking)
             throws InterruptedException, BucketAccessException, TimeoutException;
 }

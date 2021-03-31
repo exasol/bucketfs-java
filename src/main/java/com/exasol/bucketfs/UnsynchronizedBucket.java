@@ -6,6 +6,15 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+/**
+ * Interface for write access to a bucket in Bucket FS.
+ *
+ * <p>
+ * Note that the methods in this interface provide no guarantee that the written objects are synchronized across the
+ * cluster when they return. If you require safe synchronization, use the {@link Bucket} interface and its
+ * implementations instead.
+ * </p>
+ */
 public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Types of archive that BucketFS can expand automatically.
@@ -22,7 +31,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Upload a file to the bucket.
      * <p>
-     * Uploads a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
+     * Upload a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
      * that URI is interpreted as a directory inside the bucket and the original filename is appended.
      * </p>
      * <p>
