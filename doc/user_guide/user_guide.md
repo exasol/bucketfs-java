@@ -2,7 +2,7 @@
 
 Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm) is a distributed file system that automatically synchronizes files uploaded on one cluster node to all other nodes. It is intended for providing shared configuration, scripts and libraries used in [User Defined Functions](https://docs.exasol.com/database_concepts/udf_scripts.htm) (UDF) mainly.
 
-This project provides an library that abstracts access to Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm). That allows using BucketFS features programmatically without having to deal with the underlying protocol.
+This project provides a library that abstracts access to Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm). That allows using BucketFS features programmatically without having to deal with the underlying protocol.
 
 ## Notation Used in This Document
 
@@ -10,13 +10,15 @@ Syntax definitions in this document are written in [Augmented Backus-Naur Form (
 
 ## Getting BucketFS Java Into Your Project
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
+
 BucketFS Java is built using [Apache Maven](https://maven.apache.org/), so integrating the release packages into your project is easy with Maven.
 
 Please check out ["Introduction to the Dependency Mechanism"](http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html), if you want to learn about how maven handles dependencies and dependency scopes.
 
 We assume here that you are familiar with the basics.
 
-### Exasol Test Containers as Maven Dependency
+### BucketFs Java as Maven Dependency
 
 Just add the following dependency to add the Exasol test containers to your project.
 
@@ -141,7 +143,7 @@ The Exasol test container provides access to buckets in BucketFS. This is useful
 
 ### Understanding Bucket Contents
 
-One thing you need to know about buckets objects inside a bucket is that they are not stored in a hierarchical directory structure. Instead they are flat files that can have slashes in their names so that it looks like a directory structure at first glance.
+One thing you need to know about buckets objects inside a bucket is that they are not stored in a hierarchical directory structure. Instead they are flat files that can have slashes or colons in their names so that it looks like a directory structure at first glance.
 
 Since this internal detail deviates from what users are used to see, the bucket access methods implemented in this project simulate a regular structure.
 
@@ -149,7 +151,7 @@ Another thing worth noting is that if you store files in some selected archive f
 
 ### Specifying "Paths" Inside a Bucket
 
-Some bucket actions require a path inside the bucket as parameter. While those paths are always relative to the root of the bucket, the Exasol test container lets you treat them as absolute paths too.
+Some bucket actions require a path inside the bucket as parameter. While those paths are always relative to the root of the bucket, BucketFS Java lets you treat them as absolute paths too.
 
 That means that the following two paths are both relative to the bucket root:
 
@@ -158,23 +160,9 @@ EXAClusterOS/
 /EXAClusterOS/
 ```
 
-### Getting a Bucket Control Object
-
-You can get access to a bucket in BucketFS by requesting a `Bucket` control object from the container.
-
-```java
-final Bucket bucket = this.container.getBucket("mybucketfs", "mybucket");
-```
-
-If you just need access to the default bucket (i.e. the bucket which in a standard setup of Exasol always exists), use the following convenience method.
-
-```java
-final Bucket bucket = this.container.getDefaultBucket();
-```
-
 ### Listing Bucket Contents
 
-The following code lists the contents of a buckets root.
+The following code lists the contents of a buckets root:
 
 ```java
 final List<String> bucketContents = bucket.listContents();
@@ -184,7 +172,7 @@ You can also list the contents of a "path" within a bucket. "Path" is set in quo
 
 ### Uploading a File to BucketFS
 
-Especially when testing UDF scripts, this comes in handy. You can upload files from a local filesystem into a bucket as follows.
+Especially when testing UDF scripts, this comes in handy. You can upload files from a local filesystem into a bucket as follows:
 
 ```java
 bucket.uploadFile(source, destination);
@@ -210,7 +198,7 @@ In this case the `Bucket` treats the destination path in the bucket as if you wr
 
 It's a common use-case test scenarios to create small files of well-defined content and upload them to BucketFS. Most of the time those are configuration files.
 
-Use the following convenience method to write a string directly to a file in a bucket.
+Use the following convenience method to write a string directly to a file in a bucket:
 
 ```java
 bucket.uploadStringContent(content, destination); 
@@ -224,9 +212,9 @@ In integration tests you usually want reproducible test cases. This is why the s
 
 In rare cases you might want more control over that process, for example if you plan bulk-upload of a large number of small files and want to shift the check to the end of that operation.
 
-For those special occasions there is the method `uploadFileNonBlocking(source, destination)` where you can choose to upload in non-blocking fashion.
+For those special occasions there is the `uploadFileNonBlocking(source, destination)` method where you can choose to upload in non-blocking fashion.
 
-The same style of overloaded function exists for text content upload too in the method `upload(content, destination, blocking-flag)`.
+The same style of overloaded function exists for text content upload too in the `uploadStringContentNonBlocking(content, destination)` method.
 
 Unless you really need it and know exactly what you are doing, we recommend to stick to blocking operation for your tests.
 
@@ -242,4 +230,4 @@ Here the source is a path inside the bucket and destination is a path on a local
 
 ### Managing Buckets and Services
 
-Creating and deleting of buckets and BucketFS services is not yet supported by the BFSJ.
+Creating and deleting buckets and BucketFS services is not yet supported by the BFSJ.
