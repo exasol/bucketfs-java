@@ -201,4 +201,4 @@ Here the source is a path inside the bucket and destination is a path on a local
 
 ### Managing Buckets and Services
 
-Creating and deleting of buckets and BucketFS services is not yet supported by the Exasol test container.
+Creating and deleting of buckets and BucketFS services is not yet supported by the BFSJ.
