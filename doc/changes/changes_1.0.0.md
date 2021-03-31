@@ -11,6 +11,10 @@ This allows developers to use the BucketFS library in their code without the add
 * #1: Migrated code from `exasol-testcontainers`
 * #3: Extracted and adapted system requirements and design
 
+## Bugs
+
+* #11: Added missing project parameters for Maven release.
+
 ## Dependency Updates
 
 ### Test Dependency Updates
