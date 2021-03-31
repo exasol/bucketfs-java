@@ -27,6 +27,8 @@ This project provides a library that abstracts access to Exasol's [BucketFS](htt
 * Upload to a bucket
 * Download from a bucket
 
+For more details see the [System Requirement Specification](doc/system_requirements.md).
+
 ## Table of Contents
 
 ### Information for Users

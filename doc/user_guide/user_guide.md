@@ -42,7 +42,7 @@ An object has content and a path.
 The full path consists of:
 
 * name of IP or hostname of the machine on which the service runs
-* name of the service hosting the bucket
+* name of the service hosting the bucket (aka. "BucketFS name")
 * name of the bucket itself
 * relative path to the object inside the bucket
 
@@ -54,6 +54,8 @@ Note that to safely use the objects, you need to wait until that synchronization
 
 Additionally BucketFS automatically expands a limited number of archive formats. While this is a very convenient feature, it again takes some time. The expanded contents can only be safely used after extraction from the archive finished.
 
+BucketFS Java can help in both situation, provided that a synchronization monitor is available. Check section [Blocking vs. Non-Blocking Upload](#blocking-vs-non-blocking-upload) for details.
+
 ## The Bucket Interface
 
 There are three interfaces with different kind of feature support for accessing buckets. The most limited only is the `ReadOnlyBucket` which only allows listing contents of and downloading objects from buckets.
@@ -64,22 +66,26 @@ The main interface for interacting with BucketFS in this library is `Bucket`. It
 
 If you prefer asynchronous operation, you can use the non-blocking variants on combination with a separate sync check that `Bucket` provides.
 
+## Bucket Synchronization Monitor
+
+Without help, the BucketFS library is not able to tell whether or not synchronization is done. That is why it defines the interface `BucketFsMonitor`. Code using the library that needs synchronization must implement this interface and inject it when creating a `Bucket`.
+
 ## Creating Bucket Objects
 
-This Example demonstrates how to create a `ReadOnlyBucket`.
+This example demonstrates how to create a `ReadOnlyBucket`.
 
 ```java
 import com.exasol.bucketfs.ReadOnlyBucket;
 import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
-final ReadOnlyBucket = ReadEnabledBucket.builder()//
-                .ipAddress(ipAddress) //
-                .httpPort(port) //
-                .serviceName(serviceName) //
-                .name(bucketName) //
-                .readPassword(readPassword) //
-                .build();
+final ReadOnlyBucket bucket = ReadEnabledBucket.builder()//
+        .ipAddress(ipAddress) //
+        .httpPort(port) //
+        .serviceName(serviceName) //
+        .name(bucketName) //
+        .readPassword(readPassword) //
+        .build();
 ```
 
 As mentioned before, `ReadOnlyBucket` is an interface. `ReadEnabledBucket` is an implementation of this interface.
@@ -93,6 +99,41 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
 * `serviceName`: name of the service that hosts the bucket
 * `name`: name of the bucket
 * `readPassword`: in case the bucket is not public, this is the password that users need to supply in order to gain access (optional)
+
+If you need to write to a bucket, the analogous builder call looks like this:
+
+```java
+final UnsychronizedBucket bucket = WriteEnabledBucket.builder()//
+        .ipAddress(ipAddress()) //
+        .httpPort(port) //
+        .serviceName(serviceName) //
+        .name(bucketName) //
+        .readPassword(readPassword) //
+        .writePassword(writePassword) //
+        .build();
+```
+
+Compared to creating the read-only bucket we have an additional setter here:
+
+* `writePassword`: password required to write to the bucket
+
+As mentioned before, if you need a bucket that supports blocking calls, you need to inject a sync monitor.
+
+```java
+final Bucket bucket = SyncAwareBucket.builder()//
+        .ipAddress(ipAddress()) //
+        .httpPort(port) //
+        .serviceName(serviceName) //
+        .name(bucketName) //
+        .readPassword(readPassword) //
+        .writePassword(writePassword) //
+        .monitor(bucketFsMonitor) //
+        .build();
+```
+
+Which brings us to the last remaining builder setter:
+
+* `monitor`: monitor that allows checking object synchronization (an implementation of the `BucketFsMonitor` interface)
 
 ## Working with Buckets
 
@@ -183,7 +224,7 @@ In integration tests you usually want reproducible test cases. This is why the s
 
 In rare cases you might want more control over that process, for example if you plan bulk-upload of a large number of small files and want to shift the check to the end of that operation.
 
-For those special occasions there is an overloaded method `uploadFile(source, destination, blocking-flag)` where you can choose to upload in non-blocking fashion. 
+For those special occasions there is the method `uploadFileNonBlocking(source, destination)` where you can choose to upload in non-blocking fashion.
 
 The same style of overloaded function exists for text content upload too in the method `upload(content, destination, blocking-flag)`.
 
