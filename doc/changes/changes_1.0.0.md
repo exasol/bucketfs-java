@@ -1,4 +1,4 @@
-# bucketfs-java 1.0.0, released 2021-03-??
+# bucketfs-java 1.0.0, released 2021-03-31
 
 ## Code name: Migration from exasol-testcontainers
 
