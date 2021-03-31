@@ -42,6 +42,6 @@ This allows developers to use the BucketFS library in their code without the add
 * Added `org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M3`
 * Added `org.codehaus.mojo:versions-maven-plugin:2.7`
 * Added `org.itsallcode:openfasttrace-maven-plugin:1.0.0`
-* Added `org.jacoco:jacoco-maven-plugin:0.8.5`
+* Added `org.jacoco:jacoco-maven-plugin:0.8.6`
 * Added `org.sonatype.ossindex.maven:ossindex-maven-plugin:3.1.0`
 * Added `org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8`
