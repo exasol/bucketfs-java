@@ -1,9 +1,5 @@
 # Introduction
 
-## Acknowledgments
-
-This document's section structure is derived from the "[arc42](https://arc42.org/)" architectural template by Dr. Gernot Starke, Dr. Peter Hruschka.
-
 ## Terms and Abbreviations
 
 <dl>
@@ -148,7 +144,7 @@ In automated workflows, this is important, because reliable tests require object
 
 ### Decisions
 
-We decided to base define a monitoring interface that a software that uses the library needs to implement. This allows at least consumers with access to cluster internal information to provide an implementation of this interface.
+We decided to define a monitoring interface that a software that uses the library needs to implement. This allows at least consumers with access to cluster internal information to provide an implementation of this interface.
 
 Users have the option to instantiate Bucket objects with synchronization checking if they provide a monitoring implementation. Otherwise they need to fall back to non-blocking operation.
 
@@ -182,3 +178,7 @@ Needs: impl, itest
 # Quality Scenarios
 
 # Risks
+
+# Acknowledgments
+
+This document's section structure is derived from the "[arc42](https://arc42.org/)" architectural template by Dr. Gernot Starke, Dr. Peter Hruschka.
