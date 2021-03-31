@@ -20,7 +20,6 @@ import com.exasol.config.BucketFsServiceConfiguration;
 @Tag("fast")
 @ExtendWith(MockitoExtension.class)
 class ClusterConfigurationBucketFactoryTest {
-    // [utest->dsn~bucket-factory-injects-access-credentials~1]
     @Test
     void testGetBucketInjectsAccessCredentials(
             @Mock final BucketFsSerivceConfigurationProvider serviceConfigurationProviderMock) {

@@ -58,24 +58,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.exasol</groupId>
-                <artifactId>project-keeper-maven-plugin</artifactId>
-                <version>0.4.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <modules>
-                        <module>integration_tests</module>
-                        <module>maven_central</module>
-                    </modules>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire-and-failsafe.version}</version>
@@ -116,12 +98,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>prepare-agent-integration</id>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                    </execution>
+
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
@@ -129,13 +106,7 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>report-integration</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report-integration</goal>
-                        </goals>
-                    </execution>
+
                 </executions>
             </plugin>
             <plugin>
@@ -146,6 +117,19 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.itsallcode</groupId>
+                <artifactId>openfasttrace-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>trace-requirements</id>
+                        <goals>
+                            <goal>trace</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.exasol</groupId>
@@ -212,39 +196,6 @@
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M3</version>
-                <configuration>
-                    <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches in the 
-                        logging lambdas too. -->
-                    <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties ${argLine}</argLine>
-                    <excludes>
-                        <exclude>**IT.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

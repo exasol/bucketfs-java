@@ -53,11 +53,11 @@ This section lists functional requirements from the user's perspective. The requ
 #### Bucket Content Listing
 `req~bucket-content-listing~1`
 
-BucketFS Java lists the contents of a bucket in BucketFS.
+BFSJ lists the contents of a bucket in BucketFS.
 
 Rationale:
 
-This is useful in integration test in order to determine whether required files in a bucket exist.
+Allows checking what &mdash; if anything &mdash; is currently inside a bucket.
 
 Covers:
 
@@ -68,7 +68,7 @@ Needs: dsn
 #### Uploading a File to BucketFS
 `req~uploading-a-file-to-bucketfs~1`
 
-BucketFS Java uploads a file from a locally accessible filesystem to a bucket.
+BFJS uploads a file from a locally accessible filesystem to a bucket.
 
 Rationale:
 
@@ -83,11 +83,11 @@ Needs: dsn
 #### Uploading Text to a File in BucketFS
 `req~uploading-text-to-a-file-in-bucketfs~1`
 
-BucketFS Java uploads text (aka. a "string") to a file inside a bucket.
+BFSJ uploads text (aka. a "string") to a file inside a bucket.
 
 Rationale:
 
-Some tests require dynamically generated configuration data in files inside buckets. This requirement allows creating the configuration in the bucket without having to create a local file first.
+Often small files in Buckets need to be created on the fly. Configuration files for example or keys. Uploading from text allows d
 
 Covers:
 
@@ -98,11 +98,11 @@ Needs: dsn
 #### Uploading InputStream to a File in BucketFS
 `req~uploading-input-stream-to-a-file-in-bucketfs~1`
 
-BucketFS Java uploads the contents of an InputStream to a file inside a bucket.
+BFSJ uploads the contents of an InputStream to a file inside a bucket.
 
 Rationale:
 
-Some tests load the content from resources using `getResourceAsStream()`. 
+Especially integration tests often access resource content via `getResourceAsStream()`. Adding a method for this makes the test code more compact.
 
 Covers:
 
@@ -113,7 +113,7 @@ Needs: dsn
 #### Downloading a File from BucketFS
 `req~downloading-a-file-from-bucketfs~1`
 
-BucketFS Java downloads a file from a bucket to a locally accessible filesystem.
+BFSJ downloads a file from a bucket to a locally accessible filesystem.
 
 Rationale:
 
@@ -125,30 +125,14 @@ Covers:
 
 Needs: dsn
 
-#### Bucket Authentication
-`req~bucket-authentication~1`
-
-BucketFS Java handles the authentication against the buckets automatically.
-
-Rationale:
-
-Unless a test is about a 3rd-party software that accesses BucketFS from the outside, providing bucket credentials is unnecessary overhead in integration tests.
-
-Covers:
-
-* [feat~bucketfs-access~1](#bucketfs-access)
-
-
-Needs: dsn
-
 #### Waiting for Bucket Content Synchronization
 `req~waiting-for-bucket-content-synchronization~1`
 
-BucketFS Java allows integrators to wait for bucket contents to be synchronized on a single node after uploading a file.
+BFSJ allows users to wait for bucket contents to be synchronized on a single node after uploading a file.
 
 Rationale:
 
-Files uploaded to BucketFS are not immediately usable due to internal synchronization mechanisms. For integration tests it is necessary that integrators can rely on the file to be available in a bucket before running tests that depend on it.
+Files uploaded to BucketFS are not immediately usable due to internal synchronization mechanisms. In case of automated scripts, immediately continuing without waiting until the files are properly synced can lead to race conditions.
 
 Covers:
 

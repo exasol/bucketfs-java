@@ -54,6 +54,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
+    // [impl->dsn~bucket-lists-its-contents~1]
     public List<String> listContents() throws BucketAccessException, InterruptedException {
         return listContents(BUCKET_ROOT);
     }
@@ -113,6 +114,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                 : pathInBucket;
     }
 
+    // [impl->dsn~downloading-a-file-from-a-bucket~1]
     @Override
     public void downloadFile(final String pathInBucket, final Path localPath)
             throws InterruptedException, BucketAccessException {
