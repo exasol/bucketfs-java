@@ -59,4 +59,13 @@ public interface ReadOnlyBucket {
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
     void downloadFile(String pathInBucket, Path localPath) throws InterruptedException, BucketAccessException;
+
+    /**
+     * Download a file from a bucket into a string.
+     *
+     * @param pathInBucket path of the file in BucketFS
+     * @throws InterruptedException  if the file download was interrupted
+     * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
+     */
+    String downloadFileAsString(String pathInBucket) throws InterruptedException, BucketAccessException;
 }

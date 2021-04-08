@@ -125,7 +125,24 @@ Covers:
 
 Needs: dsn
 
+#### Downloading a File from BucketFS as String
+
+`req~downloading-a-file-from-bucketfs-as-string~1`
+
+BFSJ downloads a file from a bucket as a string.
+
+Rationale:
+
+This allows downloading files and directly use from code.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
 #### Waiting for Bucket Content Synchronization
+
 `req~waiting-for-bucket-content-synchronization~1`
 
 BFSJ allows users to wait for bucket contents to be synchronized on a single node after uploading a file.

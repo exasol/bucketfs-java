@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.exasol</groupId>
     <artifactId>bucketfs-java</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>BucketFS Java</name>
     <description>Java library for automating tasks on Exasol's BucketFS.
     </description>
@@ -70,15 +70,15 @@
     <profiles>
         <profile>
             <id>fast</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <test.excludeTags>slow,expensive</test.excludeTags>
             </properties>
         </profile>
         <profile>
             <id>slow</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <test.excludeTags>expensive</test.excludeTags>
             </properties>
@@ -91,6 +91,12 @@
         </profile>
     </profiles>
     <dependencies>
+        <dependency>
+            <groupId>com.exasol</groupId>
+            <artifactId>error-reporting-java</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -207,7 +213,7 @@
             <plugin>
                 <groupId>com.exasol</groupId>
                 <artifactId>project-keeper-maven-plugin</artifactId>
-                <version>0.6.0</version>
+                <version>0.6.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -217,8 +223,7 @@
                 </executions>
                 <configuration>
                     <modules>
-                        <!-- add modules here: -->
-                        <!-- <module>For available modules see below.</module> -->
+                        <module>maven_central</module>
                     </modules>
                 </configuration>
             </plugin>
