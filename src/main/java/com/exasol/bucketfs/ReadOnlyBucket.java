@@ -64,6 +64,7 @@ public interface ReadOnlyBucket {
      * Download a file from a bucket into a string.
      *
      * @param pathInBucket path of the file in BucketFS
+     * @return file contents as string
      * @throws InterruptedException  if the file download was interrupted
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
