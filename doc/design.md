@@ -114,6 +114,7 @@ Covers:
 Needs: impl, itest
 
 ### Downloading a file from a `Bucket`
+
 `dsn~downloading-a-file-from-a-bucket~1`
 
 The `Bucket` offers downloading a file from a bucket in BucketFS to a locally accessible filesystem.
@@ -121,6 +122,18 @@ The `Bucket` offers downloading a file from a bucket in BucketFS to a locally ac
 Covers:
 
 * `req~downloading-a-file-from-bucketfs~1`
+
+Needs: impl, itest
+
+### Downloading a file from a `Bucket` as string
+
+`dsn~downloading-a-file-from-a-bucket-as-string~1`
+
+The `Bucket` offers downloading a file from a bucket in BucketFS to as a Java string.
+
+Covers:
+
+* `req~downloading-a-file-from-bucketfs-as-string~1`
 
 Needs: impl, itest
 

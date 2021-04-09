@@ -1,11 +1,13 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.exasol.config.BucketConfiguration;
+import com.exasol.containers.exec.ExitCode;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.testcontainers.containers.Container.ExecResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,15 +16,12 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.testcontainers.containers.Container.ExecResult;
-
-import com.exasol.config.BucketConfiguration;
-import com.exasol.containers.exec.ExitCode;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Tag("slow")
 class SyncAwareBucketIT extends AbstractBucketIT {
@@ -119,6 +118,18 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final Path pathToFile = tempDir.resolve(fileName);
         bucket.downloadFile(fileName, pathToFile);
         assertThat(Files.readString(pathToFile), equalTo(content));
+    }
+
+    // [itest->dsn~downloading-a-file-from-a-bucket-as-string~1]
+    @Test
+    void testDownloadAsString()
+            throws InterruptedException, BucketAccessException, TimeoutException {
+        final String fileName = "read_me.txt";
+        final Bucket bucket = getDefaultBucket();
+        final String content = "read me";
+        bucket.uploadStringContent(content, fileName);
+        final String result = bucket.downloadFileAsString(fileName);
+        assertThat(result, equalTo(content));
     }
 
     @Test

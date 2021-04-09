@@ -1,5 +1,7 @@
 package com.exasol.bucketfs;
 
+import com.exasol.errorreporting.ExaError;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -122,25 +124,43 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         LOGGER.fine(() -> "Downloading  file from bucket \"" + this.bucketFsName + "/" + this.bucketName + "\": \""
                 + uri + "\" to \"" + localPath + "\"");
         try {
-            final int statusCode = httpGet(uri, localPath);
-            if (statusCode != HttpURLConnection.HTTP_OK) {
-                LOGGER.severe(() -> statusCode + ": Failed to download \"" + uri + "\" to file \"" + localPath + "\"");
-                throw new BucketAccessException("Unable to downolad file \"" + localPath + "\" from ", statusCode, uri);
-            }
+            final String content = httpGet(uri);
+            Files.write(localPath, content.getBytes());
         } catch (final IOException exception) {
-            throw new BucketAccessException("Unable to upload file \"" + localPath + "\" from ", uri, exception);
+            throw new BucketAccessException("Unable to download file \"" + localPath + "\" from ", uri, exception);
         }
         LOGGER.fine(() -> "Successfully downloaded file to \"" + localPath + "\"");
     }
 
-    private int httpGet(final URI uri, final Path localPath) throws IOException, InterruptedException {
+    // [impl->dsn~downloading-a-file-from-a-bucket-as-string~1]
+    @Override
+    public String downloadFileAsString(final String pathInBucket)
+            throws InterruptedException, BucketAccessException {
+        final URI uri = createPublicReadURI(pathInBucket);
+        LOGGER.fine(() -> "Downloading  file from bucket \"" + this.bucketFsName + "/" + this.bucketName + "\": \""
+                + uri + "\"");
+        try {
+            return httpGet(uri);
+        } catch (final IOException exception) {
+            throw new BucketAccessException(
+                    "Unable to download file from BucketFS as string.", uri, exception);
+        }
+    }
+
+    private String httpGet(final URI uri) throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder(uri) //
                 .GET() //
                 .header("Authorization", encodeBasicAuthForReading()) //
                 .build();
         final HttpResponse<String> response = this.client.send(request, BodyHandlers.ofString());
-        Files.write(localPath, response.body().getBytes());
-        return response.statusCode();
+        checkHttpStatusCode(response.statusCode());
+        return response.body();
+    }
+
+    private void checkHttpStatusCode(int statusCode) throws IOException {
+        if (statusCode != HttpURLConnection.HTTP_OK) {
+            throw new IOException(ExaError.messageBuilder("E-BFSJ-1").message("Http status code {{status code}} != 200 (HTTP-OK)", statusCode).toString());
+        }
     }
 
     private String encodeBasicAuthForReading() {
