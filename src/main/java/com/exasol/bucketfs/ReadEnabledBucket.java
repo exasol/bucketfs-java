@@ -1,7 +1,5 @@
 package com.exasol.bucketfs;
 
-import com.exasol.errorreporting.ExaError;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -12,6 +10,8 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
+
+import com.exasol.errorreporting.ExaError;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -121,8 +121,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     public void downloadFile(final String pathInBucket, final Path localPath)
             throws InterruptedException, BucketAccessException {
         final URI uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this.bucketFsName + "/" + this.bucketName + "\": \""
-                + uri + "\" to \"" + localPath + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\" to \"" + localPath + "\"");
         try {
             final String content = httpGet(uri);
             Files.write(localPath, content.getBytes());
@@ -134,16 +133,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     // [impl->dsn~downloading-a-file-from-a-bucket-as-string~1]
     @Override
-    public String downloadFileAsString(final String pathInBucket)
-            throws InterruptedException, BucketAccessException {
+    public String downloadFileAsString(final String pathInBucket) throws InterruptedException, BucketAccessException {
         final URI uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this.bucketFsName + "/" + this.bucketName + "\": \""
-                + uri + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\"");
         try {
             return httpGet(uri);
         } catch (final IOException exception) {
-            throw new BucketAccessException(
-                    "Unable to download file from BucketFS as string.", uri, exception);
+            throw new BucketAccessException("Unable to download file from BucketFS as string.", uri, exception);
         }
     }
 
@@ -157,14 +153,20 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         return response.body();
     }
 
-    private void checkHttpStatusCode(int statusCode) throws IOException {
+    private void checkHttpStatusCode(final int statusCode) throws IOException {
         if (statusCode != HttpURLConnection.HTTP_OK) {
-            throw new IOException(ExaError.messageBuilder("E-BFSJ-1").message("Http status code {{status code}} != 200 (HTTP-OK)", statusCode).toString());
+            throw new IOException(ExaError.messageBuilder("E-BFSJ-1")
+                    .message("Http status code {{status code}} != 200 (HTTP-OK)", statusCode).toString());
         }
     }
 
     private String encodeBasicAuthForReading() {
         return "Basic " + Base64.getEncoder().encodeToString(("r:" + this.readPassword).getBytes());
+    }
+
+    @Override
+    public String toString() {
+        return (this.bucketFsName == null ? (this.port + ":") : (this.bucketFsName + "/")) + this.bucketName;
     }
 
     @SuppressWarnings("squid:S1452")
