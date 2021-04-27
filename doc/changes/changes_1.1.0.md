@@ -6,6 +6,10 @@ Code name:
 
 * #14: Added downloadFileAsString method
 
+## Bugfixes
+
+* #18: Improved log output in case the optional service name is not present in a bucket object.
+
 ## Dependency Updates
 
 ### Compile Dependency Updates
