@@ -9,6 +9,7 @@ Code name:
 ## Bugfixes
 
 * #18: Improved log output in case the optional service name is not present in a bucket object.
+* #19: Better distinction between different error causes when uploading or downloading files.
 
 ## Dependency Updates
 
