@@ -47,8 +47,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     protected void uploadContentNonBlocking(final BodyPublisher bodyPublisher, final String pathInBucket,
             final String contentDescription) throws InterruptedException, BucketAccessException {
         final URI uri = createWriteUri(pathInBucket);
-        LOGGER.info(() -> "Uploading \"" + contentDescription + "\" to bucket \"" + this.bucketFsName + "/"
-                + this.bucketName + "\": \"" + uri + "\"");
+        LOGGER.info(() -> "Uploading \"" + contentDescription + "\" to bucket \"" + this + "\" at \"" + uri + "\"");
         try {
             final int statusCode = httpPut(uri, bodyPublisher);
             if (statusCode != HttpURLConnection.HTTP_OK) {
