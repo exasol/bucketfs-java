@@ -50,6 +50,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
     }
 
+    @Test
     void testListBucketContentsOfIllegalPathThrowsException() {
         assertThrows(BucketAccessException.class, () -> getDefaultBucket().listContents("illegal\\path"));
     }
