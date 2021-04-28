@@ -10,7 +10,7 @@ Breaking changes:
 
 ## Features
 
-* #14: Added downloadFileAsString method
+* #14: Added `downloadFileAsString` method.
 
 ## Bugfixes
 
