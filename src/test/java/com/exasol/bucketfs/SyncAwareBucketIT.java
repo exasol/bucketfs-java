@@ -154,7 +154,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var contentB = "abcdeABCDE\n";
         final var fileB = Files.writeString(tempDir.resolve("b.txt"), contentB.repeat(scaleContentSizeBy));
         final var bucket = getDefaultBucket();
-        for (var i = 1; i <= 10; ++i) {
+        for (int i = 1; i <= 10; ++i) {
             final var useA = (i % 2) == 1;
             final var currentFile = useA ? fileA : fileB;
             final var currentFirstLine = useA ? contentA : contentB;

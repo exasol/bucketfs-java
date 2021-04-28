@@ -1,6 +1,8 @@
 # bucketfs-java 2.0.0, released 2021-04-XX
 
-Code name:
+Code name: Improved error handling
+
+## Summary
 
 Breaking changes:
 

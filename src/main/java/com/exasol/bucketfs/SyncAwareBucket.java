@@ -47,17 +47,18 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     // [impl->dsn~bucketfs-object-overwrite-throttle~1]
     private void delayRepeatedUploadToSamePath(final String extendedPathInBucket) throws BucketAccessException {
         if (this.uploadHistory.containsKey(extendedPathInBucket)) {
-            final var lastUploadAt = this.uploadHistory.get(extendedPathInBucket).with(ChronoField.NANO_OF_SECOND, 0);
-            final var now = Instant.now();
+            final Instant lastUploadAt = this.uploadHistory.get(extendedPathInBucket) //
+                    .with(ChronoField.NANO_OF_SECOND, 0);
+            final Instant now = Instant.now();
             if (!now.isAfter(lastUploadAt.plusSeconds(1))) {
-                final var delayInMillis = 1000L - (now.getNano() / 1000000L);
+                final long delayInMillis = 1000L - (now.getNano() / 1000000L);
                 LOGGER.fine(() -> "Delaying upload to \"" + extendedPathInBucket + "\" for " + delayInMillis + " ms");
                 try {
                     Thread.sleep(delayInMillis);
-                } catch (final InterruptedException e) {
+                } catch (final InterruptedException exception) {
                     Thread.currentThread().interrupt();
                     throw new BucketAccessException(messageBuilder("E-BFSJ-8")
-                            .message("Interrupted while delaying repeated upload to \"{{path}}\"", extendedPathInBucket)
+                            .message("Interrupted while delaying repeated upload to {{path}}", extendedPathInBucket)
                             .toString());
                 }
             }
@@ -102,8 +103,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
             } catch (final InterruptedException exception) {
                 Thread.currentThread().interrupt();
                 throw new BucketAccessException(messageBuilder("E-BFSJ-10")
-                        .message("Interrupted while waiting for \"{{path}}\" to be synchronized on BucketFS.",
-                                pathInBucket)
+                        .message("Interrupted while waiting for {{path}} to be synchronized on BucketFS.", pathInBucket)
                         .toString());
             }
         }

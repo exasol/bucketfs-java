@@ -59,8 +59,8 @@ class BucketContentSyncIT extends AbstractBucketIT {
     @Test
     void testWaitForArchiveToBeExtracted(@TempDir final Path tempDir)
             throws IOException, BucketAccessException, InterruptedException, TimeoutException {
-        final var filename = "archive.zip";
-        final var tempFile = tempDir.resolve(filename);
+        final String filename = "archive.zip";
+        final Path tempFile = tempDir.resolve(filename);
         createArchive(tempFile);
         assertObjectSynchronized(tempFile, getDefaultBucket(), filename);
     }

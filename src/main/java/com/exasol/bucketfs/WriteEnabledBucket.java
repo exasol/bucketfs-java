@@ -80,13 +80,12 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     protected BucketAccessException createUploadIoException(final URI uri, final IOException exception) {
         return new BucketAccessException(
-                messageBuilder("E-BFSJ-7").message("I/O error trying to upload to \"{{URI}}\"", uri).toString(),
-                exception);
+                messageBuilder("E-BFSJ-7").message("I/O error trying to upload to {{URI}}", uri).toString(), exception);
     }
 
     protected BucketAccessException createUploadInterruptedException(final URI uri) {
         return new BucketAccessException(
-                messageBuilder("E-BFSJ-6").message("Interrupted trying to upload \"{{URI}}\".", uri).toString());
+                messageBuilder("E-BFSJ-6").message("Interrupted trying to upload {{URI}}.", uri).toString());
     }
 
     private void recordUploadInHistory(final String pathInBucket) {
