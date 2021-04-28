@@ -31,4 +31,6 @@ Breaking changes:
 
 ### Plugin Dependency Updates
 
+* Updated `com.exasol:error-code-crawler-maven-plugin:0.1.1` to `0.2.0`
 * Updated `com.exasol:project-keeper-maven-plugin:0.6.0` to `0.6.1`
+* Updated `org.codehaus.mojo:versions-maven-plugin:2.7` to `2.8.1`
