@@ -195,7 +195,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             throw new BucketAccessException(messageBuilder("E-BFSJ-3")
                     .message("Access denied trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
         default:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-REB-1")
+            throw new BucketAccessException(messageBuilder("E-BFSJ-1")
                     .message("Unable do {{operation}} \"{{URI}}\". HTTP status {{status}}.", operation, uri, statusCode)
                     .toString());
         }
