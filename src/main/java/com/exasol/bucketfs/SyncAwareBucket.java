@@ -1,19 +1,21 @@
 package com.exasol.bucketfs;
 
-import java.io.IOException;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.http.HttpRequest.BodyPublisher;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
  */
 public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
+    private static final Logger LOGGER = Logger.getLogger(SyncAwareBucket.class.getName());
     private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 60000;
     private static final long FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS = 200;
     private final BucketFsMonitor monitor;
@@ -26,43 +28,38 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     // [impl->dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1]
     @Override
     public boolean isObjectSynchronized(final String pathInBucket, final Instant afterUTC)
-            throws InterruptedException, BucketAccessException {
+            throws BucketAccessException {
         return this.monitor.isObjectSynchronized(this, pathInBucket, afterUTC);
     }
 
     // [impl->dsn~uploading-to-bucket~1]
     @Override
     public void uploadFile(final Path localPath, final String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadFile(localPath, pathInBucket, true);
-    }
-
-    // [impl->dsn~uploading-to-bucket~1]
-    @Override
-    public void uploadFile(final Path localPath, final String pathInBucket, final boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        final String extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
-        try {
-            uploadContent(BodyPublishers.ofFile(localPath), extendedPathInBucket, "file " + extendedPathInBucket,
-                    blocking);
-        } catch (final IOException exception) {
-            throw new BucketAccessException("I/O failed to open file \"" + localPath + "\" for upload to BucketFS.",
-                    exception);
-        }
+            throws TimeoutException, BucketAccessException, FileNotFoundException {
+        delayRepeatedUploadToSamePath(pathInBucket);
+        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        uploadFileNonBlocking(localPath, pathInBucket);
+        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
     }
 
     // Wait some time between uploads of the same file so we can distinguish the upload success logs for detecting
     // upload success.
     // [impl->dsn~bucketfs-object-overwrite-throttle~1]
-    private void delayRepeatedUploadToSamePath(final String extendedPathInBucket) throws InterruptedException {
+    private void delayRepeatedUploadToSamePath(final String extendedPathInBucket) throws BucketAccessException {
         if (this.uploadHistory.containsKey(extendedPathInBucket)) {
-            final Instant lastUploadAt = this.uploadHistory.get(extendedPathInBucket).with(ChronoField.NANO_OF_SECOND,
-                    0);
-            final Instant now = Instant.now();
+            final var lastUploadAt = this.uploadHistory.get(extendedPathInBucket).with(ChronoField.NANO_OF_SECOND, 0);
+            final var now = Instant.now();
             if (!now.isAfter(lastUploadAt.plusSeconds(1))) {
-                final long delayInMillis = 1000L - (now.getNano() / 1000000L);
+                final var delayInMillis = 1000L - (now.getNano() / 1000000L);
                 LOGGER.fine(() -> "Delaying upload to \"" + extendedPathInBucket + "\" for " + delayInMillis + " ms");
-                Thread.sleep(delayInMillis);
+                try {
+                    Thread.sleep(delayInMillis);
+                } catch (final InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new BucketAccessException(messageBuilder("E-BFSJ-8")
+                            .message("Interrupted while delaying repeated upload to \"{{path}}\"", extendedPathInBucket)
+                            .toString());
+                }
             }
         } else {
             LOGGER.fine(() -> "No previous uploads to \"" + extendedPathInBucket
@@ -70,59 +67,45 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         }
     }
 
-    private void uploadContent(final BodyPublisher bodyPublisher, final String pathInBucket,
-            final String contentDescription, final boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        if (blocking) {
-            delayRepeatedUploadToSamePath(pathInBucket);
-        }
-        final long millisSinceEpochBeforeUpload = System.currentTimeMillis();
-        uploadContentNonBlocking(bodyPublisher, pathInBucket, contentDescription);
-        if (blocking) {
-            waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
-        }
-    }
-
     // [impl->dsn~uploading-strings-to-bucket~1]
     @Override
     public void uploadStringContent(final String content, final String pathInBucket)
             throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadStringContent(content, pathInBucket, true);
-    }
-
-    @Override
-    public void uploadStringContent(final String content, final String pathInBucket, final boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        final String excerpt = (content.length() > 20) ? content.substring(0, 20) + "..." : content;
-        final String description = "text " + excerpt;
-        uploadContent(BodyPublishers.ofString(content), pathInBucket, description, blocking);
+        delayRepeatedUploadToSamePath(pathInBucket);
+        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        uploadStringContentNonBlocking(content, pathInBucket);
+        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
     }
 
     // [impl->dsn~uploading-input-stream-to-bucket~1]
     @Override
     public void uploadInputStream(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadInputStream(inputStreamSupplier, pathInBucket, true);
-    }
-
-    // [impl->dsn~dsn~uploading-input-stream-to-bucket~1]
-    @Override
-    public void uploadInputStream(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket,
-            final boolean blocking) throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadContentNonBlocking(BodyPublishers.ofInputStream(inputStreamSupplier), pathInBucket, "input stream");
+            throws BucketAccessException, TimeoutException {
+        delayRepeatedUploadToSamePath(pathInBucket);
+        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        uploadInputStreamNonBlocking(inputStreamSupplier, pathInBucket);
+        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
     }
 
     // [impl->dsn~waiting-until-archive-extracted~1]
     // [impl->dsn~waiting-until-file-appears-in-target-directory~1]
     private void waitForFileToBeSynchronized(final String pathInBucket, final long millisSinceEpochBeforeUpload)
-            throws InterruptedException, TimeoutException, BucketAccessException {
-        final long expiry = millisSinceEpochBeforeUpload + BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS;
-        final Instant afterUtc = Instant.ofEpochMilli(millisSinceEpochBeforeUpload);
+            throws TimeoutException, BucketAccessException {
+        final var expiry = millisSinceEpochBeforeUpload + BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS;
+        final var afterUtc = Instant.ofEpochMilli(millisSinceEpochBeforeUpload);
         while (System.currentTimeMillis() < expiry) {
             if (this.monitor.isObjectSynchronized(this, pathInBucket, afterUtc)) {
                 return;
             }
-            Thread.sleep(FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS);
+            try {
+                Thread.sleep(FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS);
+            } catch (final InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new BucketAccessException(messageBuilder("E-BFSJ-10")
+                        .message("Interrupted while waiting for \"{{path}}\" to be synchronized on BucketFS.",
+                                pathInBucket)
+                        .toString());
+            }
         }
         final String message = "Timeout waiting for object \"" + pathInBucket + "\" to be synchronized in bucket \""
                 + getFullyQualifiedBucketName() + "\" after " + afterUtc + ".";

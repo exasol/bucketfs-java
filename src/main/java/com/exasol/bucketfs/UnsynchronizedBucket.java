@@ -1,5 +1,6 @@
 package com.exasol.bucketfs;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Set;
@@ -42,11 +43,11 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @param pathInBucket path inside the bucket
      * @param localPath    path of the file to be uploaded
      * @throws TimeoutException      if the synchronization check takes too long
-     * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
+     * @throws FileNotFoundException in case the source file is not found
      */
     void uploadFileNonBlocking(Path localPath, String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException;
+            throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**
      * Upload the contents of a string to the bucket.
@@ -61,45 +62,21 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      *
      * @param content      string to write
      * @param pathInBucket path inside the bucket
-     * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
      */
     void uploadStringContentNonBlocking(String content, String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException;
+            throws BucketAccessException, TimeoutException;
 
     /**
-     * Upload the contents of an input stream to the bucket.
-     * <p>
-     * This call blocks until the uploaded file is synchronized in BucketFS or a timeout occurs.
-     * </p>
+     * Upload the contents of an input stream to the bucket non-blocking.
      *
      * @param inputStreamSupplier supplier that provides the input stream
      * @param pathInBucket        path inside the bucket
-     * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
      */
     // [impl->dsn~uploading-input-stream-to-bucket~1]
-    void uploadInputStream(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException;
-
-    /**
-     * Upload the contents of an input stream to the bucket.
-     * <p>
-     * When blocking is enabled, this call waits until either the uploaded file is synchronized or a timeout occurred.
-     * </p>
-     *
-     * @param inputStreamSupplier supplier that provides the input stream
-     * @param pathInBucket        path inside the bucket
-     * @param blocking            when set to {@code true}, the call waits for the uploaded object to be synchronized,
-     *                            otherwise immediately returns
-     * @throws InterruptedException  if the upload is interrupted
-     * @throws BucketAccessException if the file cannot be uploaded to the given URI
-     * @throws TimeoutException      if synchronization takes too long
-     */
-    // [impl->dsn~dsn~uploading-input-stream-to-bucket~1]
-    void uploadInputStream(Supplier<InputStream> inputStreamSupplier, String pathInBucket, boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException;
-
+    void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
+            throws BucketAccessException, TimeoutException;
 }

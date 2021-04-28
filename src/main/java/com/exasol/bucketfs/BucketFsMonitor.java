@@ -13,9 +13,8 @@ public interface BucketFsMonitor {
      * @param pathInBucket path to the object located in the bucket
      * @param afterUTC     point in UTC time after which the object synchronization counts
      * @return {@code true} if the object exists in the bucket and is synchronized
-     * @throws InterruptedException  if an interrupt occurs while the object synchronization is being evaluated
      * @throws BucketAccessException if the object in the bucket is inaccessible
      */
     public boolean isObjectSynchronized(final ReadOnlyBucket bucket, final String pathInBucket, final Instant afterUTC)
-            throws InterruptedException, BucketAccessException;
+            throws BucketAccessException;
 }

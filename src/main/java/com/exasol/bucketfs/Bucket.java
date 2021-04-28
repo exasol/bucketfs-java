@@ -1,8 +1,11 @@
 package com.exasol.bucketfs;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 public interface Bucket extends UnsynchronizedBucket {
     /**
@@ -14,11 +17,9 @@ public interface Bucket extends UnsynchronizedBucket {
      * @param pathInBucket path to the object inside the bucket
      * @param afterUTC     point in time after which the synchronization needs to happen.
      * @return {@code true} if the object is synchronized
-     * @throws InterruptedException  if the check of the object synchronization is interrupted
      * @throws BucketAccessException if the object at the reference does not exist or is inaccessible
      */
-    boolean isObjectSynchronized(String pathInBucket, Instant afterUTC)
-            throws InterruptedException, BucketAccessException;
+    boolean isObjectSynchronized(String pathInBucket, Instant afterUTC) throws BucketAccessException;
 
     /**
      * Upload a file to the bucket.
@@ -33,38 +34,12 @@ public interface Bucket extends UnsynchronizedBucket {
      * @param pathInBucket path inside the bucket
      * @param localPath    path of the file to be uploaded
      * @throws TimeoutException      if the synchronization check takes too long
-     * @throws InterruptedException  if the upload is interrupted
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
+     * @throws FileNotFoundException if the source file is not found
      */
     // [impl->dsn~uploading-to-bucket~1]
     void uploadFile(Path localPath, String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException;
-
-    /**
-     * Upload a file to the bucket and block the call until it is synchronized.
-     * <p>
-     * Uploads a file from a given local path to a URI pointing to a BucketFS bucket. If the bucket URI ends in a slash,
-     * that URI is interpreted as a directory inside the bucket and the original filename is appended.
-     * </p>
-     * <p>
-     * When blocking is enabled, this call waits until either the uploaded file is synchronized or a timeout occurred.
-     * </p>
-     *
-     * @param pathInBucket path inside the bucket
-     * @param localPath    path of the file to be uploaded
-     * @param blocking     when set to {@code true}, the call waits for the uploaded object to be synchronized,
-     *                     otherwise immediately returns
-     * @throws InterruptedException  if the upload is interrupted
-     * @throws BucketAccessException if the file cannot be uploaded to the given URI
-     * @throws TimeoutException      if synchronization takes too long
-     *
-     * @deprecated Use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
-     *             instead.
-     */
-    // [impl->dsn~uploading-to-bucket~1]
-    @Deprecated(since = "1.0.0")
-    void uploadFile(Path localPath, String pathInBucket, boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException;
+            throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**
      * Upload the contents of a string to the bucket.
@@ -87,27 +62,13 @@ public interface Bucket extends UnsynchronizedBucket {
             throws InterruptedException, BucketAccessException, TimeoutException;
 
     /**
-     * Upload the contents of a string to the bucket.
-     * <p>
-     * This method is intended for writing small objects in BucketFS dynamically like for example configuration files.
-     * For large payload use {@link Bucket#uploadFile(Path, String)} instead.
-     * </p>
-     * <p>
-     * When blocking is enabled, this call waits until either the uploaded file is synchronized or a timeout occurred.
-     * </p>
+     * Upload the contents of an input stream to the bucket.
      *
-     * @param content      string to write
-     * @param pathInBucket path inside the bucket
-     * @param blocking     when set to {@code true}, the call waits for the uploaded object to be synchronized,
-     *                     otherwise immediately returns
-     * @throws InterruptedException  if the upload is interrupted
+     * @param inputStreamSupplier supplier that provides the input stream
+     * @param pathInBucket        path inside the bucket
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
-     *
-     * @deprecated use {@link Bucket#uploadFile(Path, String)} or {@link Bucket#uploadFileNonBlocking(Path, String)}
-     *             instead
      */
-    @Deprecated(since = "1.0.0")
-    void uploadStringContent(String content, String pathInBucket, boolean blocking)
-            throws InterruptedException, BucketAccessException, TimeoutException;
+    void uploadInputStream(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
+            throws BucketAccessException, TimeoutException;
 }

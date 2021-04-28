@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * Bucket that support read access like listing contents and downloading files.
  */
 public class ReadEnabledBucket implements ReadOnlyBucket {
-    protected static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
     protected final String bucketFsName;
     protected final String bucketName;
@@ -72,7 +72,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private List<String> requestListing(final String path, final URI uri) throws BucketAccessException {
         try {
             final var request = HttpRequest.newBuilder(uri).build();
-            final var<String> response = this.client.send(request, BodyHandlers.ofString());
+            final var response = this.client.send(request, BodyHandlers.ofString());
             evaluateRequestStatus(uri, LIST, response.statusCode());
             return parseContentListResponseBody(response, removeLeadingSlash(path));
         } catch (final IOException exception) {
@@ -148,12 +148,12 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
             final IOException exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-REB-5")
+        return new BucketAccessException(messageBuilder("E-BFSJ-5")
                 .message("I/O error trying to {{operation}} \"{{URI}}\"", operation, uri).toString(), exception);
     }
 
     private BucketAccessException createDownloadInterruptedException(final URI uri, final BucketOperation operation) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-REB-4")
+        return new BucketAccessException(messageBuilder("E-BFSJ-4")
                 .message("Interrupted trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
     }
 
@@ -182,21 +182,21 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
     }
 
-    private void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
+    protected void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
             throws BucketAccessException {
         switch (statusCode) {
         case HTTP_OK:
             return;
-        case HTTP_FORBIDDEN:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-REB-1")
-                    .message("Access denied trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
         case HTTP_NOT_FOUND:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-REB-2")
-                    .message("File or directory not found trying to {{operation}} \"{{URI}}\".)", operation, uri)
+            throw new BucketAccessException(messageBuilder("E-BFSJ-2")
+                    .message("File or directory not found trying to {{operation}} \"{{URI}}\".", operation, uri)
                     .toString());
+        case HTTP_FORBIDDEN:
+            throw new BucketAccessException(messageBuilder("E-BFSJ-3")
+                    .message("Access denied trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
         default:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-REB-3")
-                    .message("Unable do {{operation}} \"{{URI}}\". HTTP status {{status}}", operation, uri, statusCode)
+            throw new BucketAccessException(messageBuilder("E-BFSJ-REB-1")
+                    .message("Unable do {{operation}} \"{{URI}}\". HTTP status {{status}}.", operation, uri, statusCode)
                     .toString());
         }
     }

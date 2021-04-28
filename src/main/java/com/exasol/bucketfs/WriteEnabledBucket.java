@@ -1,23 +1,27 @@
 package com.exasol.bucketfs;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.*;
+import static com.exasol.bucketfs.BucketOperation.UPLOAD;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
  */
 public class WriteEnabledBucket extends ReadEnabledBucket implements UnsynchronizedBucket {
+    private static final Logger LOGGER = Logger.getLogger(WriteEnabledBucket.class.getName());
     private final String writePassword;
 
     protected WriteEnabledBucket(final Builder<? extends Builder<?>> builder) {
@@ -33,41 +37,19 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     // [impl->dsn~uploading-to-bucket~1]
     @Override
     public void uploadFileNonBlocking(final Path localPath, final String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        final String extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
-        try {
-            uploadContentNonBlocking(BodyPublishers.ofFile(localPath), extendedPathInBucket,
-                    "file " + extendedPathInBucket);
-        } catch (final IOException exception) {
-            throw new BucketAccessException("I/O failed to open file \"" + localPath + "\" for upload to BucketFS.",
-                    exception);
-        }
+            throws BucketAccessException, TimeoutException, FileNotFoundException {
+        final var extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
+        final var uri = createWriteUri(extendedPathInBucket);
+        uploadWithBodyPublisher(extendedPathInBucket, uri, BodyPublishers.ofFile(localPath),
+                "file \"" + localPath + "\"");
     }
 
-    protected void uploadContentNonBlocking(final BodyPublisher bodyPublisher, final String pathInBucket,
-            final String contentDescription) throws InterruptedException, BucketAccessException {
-        final URI uri = createWriteUri(pathInBucket);
-        LOGGER.info(() -> "Uploading \"" + contentDescription + "\" to bucket \"" + this + "\" at \"" + uri + "\"");
-        try {
-            final int statusCode = httpPut(uri, bodyPublisher);
-            if (statusCode != HttpURLConnection.HTTP_OK) {
-                LOGGER.severe(
-                        () -> statusCode + ": Failed to upload \"" + contentDescription + "\" to \"" + uri + "\"");
-                throw new BucketAccessException("Unable to upload file \"" + contentDescription + "\" to ", statusCode,
-                        uri);
-            }
-        } catch (final IOException exception) {
-            throw new BucketAccessException("I/O error trying to upload \"" + contentDescription + "\" to ", uri,
-                    exception);
-        }
-        LOGGER.fine(() -> "Successfully uploaded to \"" + uri + "\"");
+    protected void uploadWithBodyPublisher(final String pathInBucket, final URI uri, final BodyPublisher publisher,
+            final String what) throws BucketAccessException {
+        LOGGER.fine(() -> "Uploading " + what + " to bucket \"" + this + "\" at \"" + uri + "\"");
+        requestUpload(uri, publisher);
         recordUploadInHistory(pathInBucket);
-    }
-
-    private void recordUploadInHistory(final String pathInBucket) {
-        final Instant now = Instant.now();
-        LOGGER.fine(() -> "Recorded upload to \"" + pathInBucket + "\" at " + now + " in upload history");
-        this.uploadHistory.put(pathInBucket, now);
+        LOGGER.fine(() -> "Successfully uploaded " + what + " to \"" + uri + "\"");
     }
 
     private URI createWriteUri(final String pathInBucket) throws BucketAccessException {
@@ -79,13 +61,38 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         }
     }
 
-    private int httpPut(final URI uri, final BodyPublisher bodyPublisher) throws IOException, InterruptedException {
-        final HttpRequest request = HttpRequest.newBuilder(uri) //
-                .PUT(bodyPublisher) //
-                .header("Authorization", encodeBasicAuth(true)) //
-                .build();
-        final HttpResponse<String> response = this.client.send(request, BodyHandlers.ofString());
-        return response.statusCode();
+    private void requestUpload(final URI uri, final BodyPublisher bodyPublisher) throws BucketAccessException {
+        try {
+            final var request = HttpRequest.newBuilder(uri) //
+                    .PUT(bodyPublisher) //
+                    .header("Authorization", encodeBasicAuth(true)) //
+                    .build();
+            final var response = this.client.send(request, BodyHandlers.ofString());
+            final var statusCode = response.statusCode();
+            evaluateRequestStatus(uri, UPLOAD, statusCode);
+        } catch (final IOException exception) {
+            throw createUploadIoException(uri, exception);
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw createUploadInterruptedException(uri);
+        }
+    }
+
+    protected BucketAccessException createUploadIoException(final URI uri, final IOException exception) {
+        return new BucketAccessException(
+                messageBuilder("E-BFSJ-7").message("I/O error trying to upload to \"{{URI}}\"", uri).toString(),
+                exception);
+    }
+
+    protected BucketAccessException createUploadInterruptedException(final URI uri) {
+        return new BucketAccessException(
+                messageBuilder("E-BFSJ-6").message("Interrupted trying to upload \"{{URI}}\".", uri).toString());
+    }
+
+    private void recordUploadInHistory(final String pathInBucket) {
+        final var now = Instant.now();
+        LOGGER.fine(() -> "Recorded upload to \"" + pathInBucket + "\" at " + now + " in upload history");
+        this.uploadHistory.put(pathInBucket, now);
     }
 
     private String encodeBasicAuth(final boolean write) {
@@ -95,24 +102,20 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     @Override
     public void uploadStringContentNonBlocking(final String content, final String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        final String excerpt = (content.length() > 20) ? content.substring(0, 20) + "..." : content;
-        final String description = "text " + excerpt;
-        uploadContentNonBlocking(BodyPublishers.ofString(content), pathInBucket, description);
+            throws BucketAccessException, TimeoutException {
+        final var uri = createWriteUri(pathInBucket);
+        final var excerpt = (content.length() > 20) ? content.substring(0, 20) + "..." : content;
+        uploadWithBodyPublisher(pathInBucket, uri, BodyPublishers.ofString(content),
+                "string content \"" + excerpt + "\"");
     }
 
     // [impl->dsn~uploading-input-stream-to-bucket~1]
     @Override
-    public void uploadInputStream(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadInputStream(inputStreamSupplier, pathInBucket, true);
-    }
-
-    // [impl->dsn~dsn~uploading-input-stream-to-bucket~1]
-    @Override
-    public void uploadInputStream(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket,
-            final boolean blocking) throws InterruptedException, BucketAccessException, TimeoutException {
-        uploadContentNonBlocking(BodyPublishers.ofInputStream(inputStreamSupplier), pathInBucket, "input stream");
+    public void uploadInputStreamNonBlocking(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket)
+            throws BucketAccessException, TimeoutException {
+        final var uri = createWriteUri(pathInBucket);
+        uploadWithBodyPublisher(pathInBucket, uri, BodyPublishers.ofInputStream(inputStreamSupplier),
+                "content of input stream");
     }
 
     /**
