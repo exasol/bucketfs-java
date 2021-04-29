@@ -1,4 +1,4 @@
-# bucketfs-java 2.0.0, released 2021-04-XX
+# bucketfs-java 2.0.0, released 2021-04-29
 
 Code name: Improved error handling
 
@@ -16,6 +16,7 @@ Breaking changes:
 
 ## Bugfixes
 
+* #15: Fixed accidentally disabled test for illegal path when listing bucket contents.
 * #18: Improved log output in case the optional service name is not present in a bucket object.
 * #19: Better distinction between different error causes when uploading or downloading files.
 
