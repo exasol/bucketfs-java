@@ -56,7 +56,7 @@ public class BucketFsServiceConfiguration {
         if (this.bucketConfigurations.containsKey(bucketName)) {
             return this.bucketConfigurations.get(bucketName);
         } else {
-            throw new IllegalArgumentException("Bucket \"" + bucketName + "\" does not exist in configuration");
+            throw new IllegalArgumentException("Bucket '" + bucketName + "' does not exist in configuration");
         }
     }
 

@@ -36,9 +36,8 @@ public interface ReadOnlyBucket {
      *
      * @return bucket contents
      * @throws BucketAccessException if the contents are not accessible or the path is invalid
-     * @throws InterruptedException  if the list request was interrupted
      */
-    List<String> listContents() throws BucketAccessException, InterruptedException;
+    List<String> listContents() throws BucketAccessException;
 
     /**
      * List the contents of a path inside a bucket.
@@ -46,27 +45,24 @@ public interface ReadOnlyBucket {
      * @param path relative path from the bucket root
      * @return list of file system entries
      * @throws BucketAccessException if the contents are not accessible or the path is invalid
-     * @throws InterruptedException  if the list request was interrupted
      */
-    List<String> listContents(String path) throws BucketAccessException, InterruptedException;
+    List<String> listContents(String path) throws BucketAccessException;
 
     /**
      * Download a file from a bucket to a local filesystem.
      *
      * @param pathInBucket path of the file in BucketFS
      * @param localPath    local path the file is downloaded to
-     * @throws InterruptedException  if the file download was interrupted
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
-    void downloadFile(String pathInBucket, Path localPath) throws InterruptedException, BucketAccessException;
+    void downloadFile(String pathInBucket, Path localPath) throws BucketAccessException;
 
     /**
      * Download a file from a bucket into a string.
      *
      * @param pathInBucket path of the file in BucketFS
      * @return file contents as string
-     * @throws InterruptedException  if the file download was interrupted
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
-    String downloadFileAsString(String pathInBucket) throws InterruptedException, BucketAccessException;
+    String downloadFileAsString(String pathInBucket) throws BucketAccessException;
 }

@@ -18,26 +18,27 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
 
     @Override
     public boolean isObjectSynchronized(final ReadOnlyBucket bucket, final String pathInBucket, final Instant afterUTC)
-            throws InterruptedException, BucketAccessException {
+            throws BucketAccessException {
         try {
             return createBucketLogPatternDetector(pathInBucket).isPatternPresentAfter(afterUTC);
-        } catch (
-        final IOException exception) {
-            throw new BucketAccessException(
-                    "Unable to check if object \"" + pathInBucket + "\" is synchronized in bucket \""
-                            + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "\".",
+        } catch (final IOException exception) {
+            throw new BucketAccessException("Unable to check if object '" + pathInBucket
+                    + "' is synchronized in bucket '" + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "'.",
                     exception);
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(exception);
         }
     }
 
     private LogPatternDetector createBucketLogPatternDetector(final String pathInBucket) {
-        final String pattern = pathInBucket + ".*" + (isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
+        final var pattern = pathInBucket + ".*" + (isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
         return this.detectorFactory.createLogPatternDetector(EXASOL_CORE_DAEMON_LOGS_PATH,
                 BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern);
     }
 
     private static boolean isSupportedArchiveFormat(final String pathInBucket) {
-        for (final String extension : UnsynchronizedBucket.SUPPORTED_ARCHIVE_EXTENSIONS) {
+        for (final var extension : UnsynchronizedBucket.SUPPORTED_ARCHIVE_EXTENSIONS) {
             if (pathInBucket.endsWith(extension)) {
                 return true;
             }
