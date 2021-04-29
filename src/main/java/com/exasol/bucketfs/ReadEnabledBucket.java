@@ -65,7 +65,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public List<String> listContents(final String path) throws BucketAccessException {
         final var uri = createPublicReadURI(BUCKET_ROOT);
-        LOGGER.fine(() -> "Listing contents of bucket under URI \"" + uri + "\"");
+        LOGGER.fine(() -> "Listing contents of bucket under URI '" + uri + "'");
         return requestListing(path, uri);
     }
 
@@ -125,17 +125,14 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public void downloadFile(final String pathInBucket, final Path localPath) throws BucketAccessException {
         final var uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\" to \"" + localPath + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "' to '" + localPath + "'");
         requestFileOnBucket(uri, localPath);
-        LOGGER.fine(() -> "Successfully downloaded file to \"" + localPath + "\"");
+        LOGGER.fine(() -> "Successfully downloaded file to '" + localPath + "'");
     }
 
     private void requestFileOnBucket(final URI uri, final Path localPath) throws BucketAccessException {
         try {
-            final var request = HttpRequest.newBuilder(uri) //
-                    .GET() //
-                    .header("Authorization", encodeBasicAuthForReading()) //
-                    .build();
+            final var request = createGetRequest(uri);
             final var response = this.client.send(request, BodyHandlers.ofFile(localPath));
             evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
         } catch (final IOException exception) {
@@ -146,22 +143,29 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
     }
 
+    private HttpRequest createGetRequest(final URI uri) {
+        return HttpRequest.newBuilder(uri) //
+                .GET() //
+                .header("Authorization", encodeBasicAuthForReading()) //
+                .build();
+    }
+
     private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
             final IOException exception) {
         return new BucketAccessException(messageBuilder("E-BFSJ-5")
-                .message("I/O error trying to {{operation}} \"{{URI}}\"", operation, uri).toString(), exception);
+                .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
     }
 
     private BucketAccessException createDownloadInterruptedException(final URI uri, final BucketOperation operation) {
         return new BucketAccessException(messageBuilder("E-BFSJ-4")
-                .message("Interrupted trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
+                .message("Interrupted trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
     }
 
     // [impl->dsn~downloading-a-file-from-a-bucket-as-string~1]
     @Override
     public String downloadFileAsString(final String pathInBucket) throws BucketAccessException {
         final var uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "'");
         final var response = requestFileOnBucketAsString(uri);
         evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
         return response.body();
@@ -169,10 +173,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     private HttpResponse<String> requestFileOnBucketAsString(final URI uri) throws BucketAccessException {
         try {
-            final var request = HttpRequest.newBuilder(uri) //
-                    .GET() //
-                    .header("Authorization", encodeBasicAuthForReading()) //
-                    .build();
+            final var request = createGetRequest(uri);
             return this.client.send(request, BodyHandlers.ofString());
         } catch (final IOException exception) {
             throw createDownloadIoException(uri, DOWNLOAD, exception);
@@ -189,14 +190,14 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             return;
         case HTTP_NOT_FOUND:
             throw new BucketAccessException(messageBuilder("E-BFSJ-2")
-                    .message("File or directory not found trying to {{operation}} \"{{URI}}\".", operation, uri)
+                    .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
                     .toString());
         case HTTP_FORBIDDEN:
             throw new BucketAccessException(messageBuilder("E-BFSJ-3")
-                    .message("Access denied trying to {{operation}} \"{{URI}}\".", operation, uri).toString());
+                    .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
         default:
             throw new BucketAccessException(messageBuilder("E-BFSJ-1")
-                    .message("Unable do {{operation}} \"{{URI}}\". HTTP status {{status}}.", operation, uri, statusCode)
+                    .message("Unable do {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
                     .toString());
         }
     }
