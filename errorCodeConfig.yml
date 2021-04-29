@@ -2,4 +2,4 @@ error-tags:
   BFSJ:
     packages:
       - com.exasol.bucketfs
-    highest-index: 10
+    highest-index: 11

@@ -74,13 +74,25 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             final var request = HttpRequest.newBuilder(uri).build();
             final var response = this.client.send(request, BodyHandlers.ofString());
             evaluateRequestStatus(uri, LIST, response.statusCode());
-            return parseContentListResponseBody(response, removeLeadingSlash(path));
+            final var list = parseContentListResponseBody(response, removeLeadingSlash(path));
+            if (list.isEmpty()) {
+                throw createPathToBeListedNotFoundException(path);
+            } else {
+                return list;
+            }
         } catch (final IOException exception) {
             throw createDownloadIoException(uri, LIST, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw createDownloadInterruptedException(uri, LIST);
         }
+    }
+
+    private BucketAccessException createPathToBeListedNotFoundException(final String path) {
+        return new BucketAccessException(messageBuilder("E-BFSJ-11")
+                .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", path,
+                        this)
+                .toString());
     }
 
     private String removeLeadingSlash(final String path) {
