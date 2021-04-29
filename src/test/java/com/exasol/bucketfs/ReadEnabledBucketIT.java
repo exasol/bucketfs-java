@@ -50,8 +50,13 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
     }
 
+    @Test
     void testListBucketContentsOfIllegalPathThrowsException() {
-        assertThrows(BucketAccessException.class, () -> getDefaultBucket().listContents("illegal\\path"));
+        final var nonExistentPath = "illegal%path";
+        final BucketAccessException exception = assertThrows(BucketAccessException.class,
+                () -> getDefaultBucket().listContents(nonExistentPath));
+        assertThat(exception.getMessage(), equalTo("E-BFSJ-11: Unable to list contents of '" + nonExistentPath
+                + "' in bucket bfsdefault/default: No such file or directory."));
     }
 
     @Test
