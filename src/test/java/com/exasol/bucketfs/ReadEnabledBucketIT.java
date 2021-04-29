@@ -55,7 +55,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final var nonExistentPath = "illegal%path";
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> getDefaultBucket().listContents(nonExistentPath));
-        assertThat(exception.getMessage(), matchesPattern("E-BFSJ-11: Unable to list contents of '" + nonExistentPath
+        assertThat(exception.getMessage(), equalTo("E-BFSJ-11: Unable to list contents of '" + nonExistentPath
                 + "' in bucket bfsdefault/default: No such file or directory."));
     }
 
@@ -66,7 +66,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final var bucket = getDefaultBucket();
         final var exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
-        assertThat(exception.getMessage(),
-                equalTo("E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
+        assertThat(exception.getMessage(), matchesPattern(
+                "E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
     }
 }
