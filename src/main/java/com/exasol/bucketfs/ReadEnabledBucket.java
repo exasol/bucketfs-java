@@ -65,7 +65,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public List<String> listContents(final String path) throws BucketAccessException {
         final var uri = createPublicReadURI(BUCKET_ROOT);
-        LOGGER.fine(() -> "Listing contents of bucket under URI \"" + uri + "\"");
+        LOGGER.fine(() -> "Listing contents of bucket under URI '" + uri + "'");
         return requestListing(path, uri);
     }
 
@@ -125,14 +125,14 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public void downloadFile(final String pathInBucket, final Path localPath) throws BucketAccessException {
         final var uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\" to \"" + localPath + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "' to '" + localPath + "'");
         requestFileOnBucket(uri, localPath);
-        LOGGER.fine(() -> "Successfully downloaded file to \"" + localPath + "\"");
+        LOGGER.fine(() -> "Successfully downloaded file to '" + localPath + "'");
     }
 
     private void requestFileOnBucket(final URI uri, final Path localPath) throws BucketAccessException {
         try {
-            final var request = createRequest(uri);
+            final var request = createGetRequest(uri);
             final var response = this.client.send(request, BodyHandlers.ofFile(localPath));
             evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
         } catch (final IOException exception) {
@@ -143,7 +143,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
     }
 
-    private HttpRequest createRequest(final URI uri) {
+    private HttpRequest createGetRequest(final URI uri) {
         return HttpRequest.newBuilder(uri) //
                 .GET() //
                 .header("Authorization", encodeBasicAuthForReading()) //
@@ -165,7 +165,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public String downloadFileAsString(final String pathInBucket) throws BucketAccessException {
         final var uri = createPublicReadURI(pathInBucket);
-        LOGGER.fine(() -> "Downloading  file from bucket \"" + this + "\" at \"" + uri + "\"");
+        LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "'");
         final var response = requestFileOnBucketAsString(uri);
         evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
         return response.body();
@@ -173,7 +173,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     private HttpResponse<String> requestFileOnBucketAsString(final URI uri) throws BucketAccessException {
         try {
-            final var request = createRequest(uri);
+            final var request = createGetRequest(uri);
             return this.client.send(request, BodyHandlers.ofString());
         } catch (final IOException exception) {
             throw createDownloadIoException(uri, DOWNLOAD, exception);

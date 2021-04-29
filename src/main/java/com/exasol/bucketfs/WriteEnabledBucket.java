@@ -41,15 +41,15 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         final var extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
         final var uri = createWriteUri(extendedPathInBucket);
         uploadWithBodyPublisher(extendedPathInBucket, uri, BodyPublishers.ofFile(localPath),
-                "file \"" + localPath + "\"");
+                "file '" + localPath + "'");
     }
 
     protected void uploadWithBodyPublisher(final String pathInBucket, final URI uri, final BodyPublisher publisher,
             final String what) throws BucketAccessException {
-        LOGGER.fine(() -> "Uploading " + what + " to bucket \"" + this + "\" at \"" + uri + "\"");
+        LOGGER.fine(() -> "Uploading " + what + " to bucket '" + this + "' at '" + uri + "'");
         requestUpload(uri, publisher);
         recordUploadInHistory(pathInBucket);
-        LOGGER.fine(() -> "Successfully uploaded " + what + " to \"" + uri + "\"");
+        LOGGER.fine(() -> "Successfully uploaded " + what + " to '" + uri + "'");
     }
 
     private URI createWriteUri(final String pathInBucket) throws BucketAccessException {
@@ -90,7 +90,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     private void recordUploadInHistory(final String pathInBucket) {
         final var now = Instant.now();
-        LOGGER.fine(() -> "Recorded upload to \"" + pathInBucket + "\" at " + now + " in upload history");
+        LOGGER.fine(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
         this.uploadHistory.put(pathInBucket, now);
     }
 
@@ -105,7 +105,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         final var uri = createWriteUri(pathInBucket);
         final var excerpt = (content.length() > 20) ? content.substring(0, 20) + "..." : content;
         uploadWithBodyPublisher(pathInBucket, uri, BodyPublishers.ofString(content),
-                "string content \"" + excerpt + "\"");
+                "string content '" + excerpt + "'");
     }
 
     // [impl->dsn~uploading-input-stream-to-bucket~1]

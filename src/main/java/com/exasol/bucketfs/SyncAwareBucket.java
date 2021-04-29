@@ -52,7 +52,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
             final Instant now = Instant.now();
             if (!now.isAfter(lastUploadAt.plusSeconds(1))) {
                 final long delayInMillis = 1000L - (now.getNano() / 1000000L);
-                LOGGER.fine(() -> "Delaying upload to \"" + extendedPathInBucket + "\" for " + delayInMillis + " ms");
+                LOGGER.fine(() -> "Delaying upload to '" + extendedPathInBucket + "' for " + delayInMillis + " ms");
                 try {
                     Thread.sleep(delayInMillis);
                 } catch (final InterruptedException exception) {
@@ -63,8 +63,8 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                 }
             }
         } else {
-            LOGGER.fine(() -> "No previous uploads to \"" + extendedPathInBucket
-                    + "\" recorded in upload history. No upload delay required.");
+            LOGGER.fine(() -> "No previous uploads to '" + extendedPathInBucket
+                    + "' recorded in upload history. No upload delay required.");
         }
     }
 
@@ -107,8 +107,8 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                         .toString());
             }
         }
-        final String message = "Timeout waiting for object \"" + pathInBucket + "\" to be synchronized in bucket \""
-                + getFullyQualifiedBucketName() + "\" after " + afterUtc + ".";
+        final String message = "Timeout waiting for object '" + pathInBucket + "' to be synchronized in bucket '"
+                + getFullyQualifiedBucketName() + "' after " + afterUtc + ".";
         LOGGER.severe(() -> message);
         throw new TimeoutException(message);
     }
