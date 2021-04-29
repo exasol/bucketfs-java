@@ -4,6 +4,9 @@ Code name: Improved error handling
 
 ## Summary
 
+In version 2.0.0 we added support for downloading the contents of a file on BucketFS directly into a Java String.
+We also fixed a couple of bugs, removed obsolete API methods and made the log message more uniform.
+
 Breaking changes:
 
 * Removed obsolete method `upload<...>(<...>, boolean blocking)` from interface `Bucket`.
