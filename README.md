@@ -42,41 +42,4 @@ Requirement, design documents and coverage tags are written in [OpenFastTrace](h
 
 * [System Requirement Specification](doc/system_requirements.md)
 * [Design](doc/design.md)
-
-## Dependencies
-
-### Run Time Dependencies
-
-Running the BucketFS Java requires a Java Runtime version 11 or later.
-
-### Test Dependencies
-
-| Dependency                                                                          | Purpose                                                | License                       |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------|-------------------------------|
-| [Java Hamcrest](http://hamcrest.org/JavaHamcrest/)                                  | Checking for conditions in code via matchers           | BSD License                   |
-| [JUnit](https://junit.org/junit5)                                                   | Unit testing framework                                 | Eclipse Public License 1.0    |
-| [Mockito](http://site.mockito.org/)                                                 | Mocking framework                                      | MIT License                   |
-| [Testcontainers](https://www.testcontainers.org/)                                   | Docker Container control abstraction                   | MIT License                   |
-
-### Build Dependencies
-
-| Plug-in                                                                             | Purpose                                                | License                       |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------|-------------------------------|
-| [Apache Maven](https://maven.apache.org/)                                           | Build tool                                             | Apache License 2.0            |
-| [Maven Compiler Plugin](https://maven.apache.org/plugins/maven-compiler-plugin/)    | Setting required Java version                          | Apache License 2.0            |
-| [Maven GPG Plugin](https://maven.apache.org/plugins/maven-gpg-plugin/)              | Code signing                                           | Apache License 2.0            |
-| [Maven Enforcer Plugin][maven-enforcer-plugin]                                      | Controlling environment constants                      | Apache License 2.0            |
-| [Maven Javadoc Plugin](https://maven.apache.org/plugins/maven-javadoc-plugin/)      | Creating a Javadoc JAR                                 | Apache License 2.0            |
-| [Maven Jacoco Plugin](https://www.eclemma.org/jacoco/trunk/doc/maven.html)          | Code coverage metering                                 | Eclipse Public License 2.0    |
-| [Maven Source Plugin](https://maven.apache.org/plugins/maven-source-plugin/)        | Creating a source code JAR                             | Apache License 2.0            |
-| [Maven Surefire Plugin](https://maven.apache.org/surefire/maven-surefire-plugin/)   | Unit testing                                           | Apache License 2.0            |
-| [OpenFastTrace Maven Plugin][oft-maven-plugin]                                      | Requirement Tracing                                    | GPL v3                        |
-| [Project Keeper Maven Plugin][project-keeper-maven-plugin]                          | Checking project structure                             | MIT License                   |
-| [Sonatype OSS Index Maven Plugin][sonatype-oss-index-maven-plugin]                  | Checking Dependencies Vulnerability                    | ASL2                          |
-| [Versions Maven Plugin][versions-maven-plugin]                                      | Checking if dependencies updates are available         | Apache License 2.0            |
-
-[maven-enforcer-plugin]: http://maven.apache.org/enforcer/maven-enforcer-plugin/
-[oft-maven-plugin]: https://github.com/itsallcode/openfasttrace-maven-plugin
-[project-keeper-maven-plugin]: https://github.com/exasol/project-keeper-maven-plugin
-[sonatype-oss-index-maven-plugin]: https://sonatype.github.io/ossindex-maven/maven-plugin/
-[versions-maven-plugin]: https://www.mojohaus.org/versions-maven-plugin/
+* [Dependencies](dependencies.md)

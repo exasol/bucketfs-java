@@ -40,6 +40,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
         uploadFileNonBlocking(localPath, pathInBucket);
         waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+        recordUploadInHistory(pathInBucket);
     }
 
     // Wait some time between uploads of the same file so we can distinguish the upload success logs for detecting
@@ -50,7 +51,10 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
             final Instant lastUploadAt = this.uploadHistory.get(extendedPathInBucket) //
                     .with(ChronoField.NANO_OF_SECOND, 0);
             final Instant now = Instant.now();
-            if (!now.isAfter(lastUploadAt.plusSeconds(1))) {
+            if (now.isAfter(lastUploadAt.plusSeconds(1))) {
+                LOGGER.fine(() -> "Last upload to '" + extendedPathInBucket + "' was at " + lastUploadAt
+                        + ". No need to add extra delay.");
+            } else {
                 final long delayInMillis = 1000L - (now.getNano() / 1000000L);
                 LOGGER.fine(() -> "Delaying upload to '" + extendedPathInBucket + "' for " + delayInMillis + " ms");
                 try {
@@ -62,7 +66,9 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                             .toString());
                 }
             }
-        } else {
+        } else
+
+        {
             LOGGER.fine(() -> "No previous uploads to '" + extendedPathInBucket
                     + "' recorded in upload history. No upload delay required.");
         }
@@ -76,6 +82,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
         uploadStringContentNonBlocking(content, pathInBucket);
         waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+        recordUploadInHistory(pathInBucket);
     }
 
     // [impl->dsn~uploading-input-stream-to-bucket~1]
@@ -86,6 +93,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
         uploadInputStreamNonBlocking(inputStreamSupplier, pathInBucket);
         waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+        recordUploadInHistory(pathInBucket);
     }
 
     // [impl->dsn~waiting-until-archive-extracted~1]
