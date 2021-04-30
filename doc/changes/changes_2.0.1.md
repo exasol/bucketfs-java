@@ -7,7 +7,7 @@ Code name: Improved repeated upload reliability
 In certain situations especially on 6.2.x there was a race condition that made detection of successful reupload to the same path in a bucket unreliable.
 This has now been fixed. This scenario is realistically only happening in integration tests, but there it is likely.
 
-Replaced handwritten dependency list with auto-generated list and linked it in the [README](../../README.md).
+Replaced handwritten dependency list with auto-generated list and linked it in the README.
 
 ## Bugfixes
 

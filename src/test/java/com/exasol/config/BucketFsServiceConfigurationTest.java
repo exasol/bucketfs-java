@@ -44,7 +44,8 @@ class BucketFsServiceConfigurationTest {
 
     @Test
     void testGetBucketConfigurationThrowsExceptionIfBucketDoesNotExist() {
+        final BucketFsServiceConfiguration serviceConfigurationBuilder = BucketFsServiceConfiguration.builder().build();
         assertThrows(IllegalArgumentException.class,
-                () -> BucketFsServiceConfiguration.builder().build().getBucketConfiguration("non-existent"));
+                () -> serviceConfigurationBuilder.getBucketConfiguration("non-existent"));
     }
 }

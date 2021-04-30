@@ -66,9 +66,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                             .toString());
                 }
             }
-        } else
-
-        {
+        } else {
             LOGGER.fine(() -> "No previous uploads to '" + extendedPathInBucket
                     + "' recorded in upload history. No upload delay required.");
         }

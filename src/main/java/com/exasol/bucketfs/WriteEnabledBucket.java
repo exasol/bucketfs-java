@@ -40,13 +40,12 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
             throws BucketAccessException, TimeoutException, FileNotFoundException {
         final var extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
         final var uri = createWriteUri(extendedPathInBucket);
-        uploadWithBodyPublisher(extendedPathInBucket, uri, BodyPublishers.ofFile(localPath),
-                "file '" + localPath + "'");
+        uploadWithBodyPublisher(uri, BodyPublishers.ofFile(localPath), "file '" + localPath + "'");
         recordUploadInHistory(pathInBucket);
     }
 
-    protected void uploadWithBodyPublisher(final String pathInBucket, final URI uri, final BodyPublisher publisher,
-            final String what) throws BucketAccessException {
+    protected void uploadWithBodyPublisher(final URI uri, final BodyPublisher publisher, final String what)
+            throws BucketAccessException {
         LOGGER.fine(() -> "Uploading " + what + " to bucket '" + this + "' at '" + uri + "'");
         requestUpload(uri, publisher);
         LOGGER.fine(() -> "Successfully uploaded " + what + " to '" + uri + "'");
@@ -88,6 +87,15 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                 messageBuilder("E-BFSJ-6").message("Interrupted trying to upload {{URI}}.", uri).toString());
     }
 
+    /**
+     * Record the upload in the internal upload history of this bucket object.
+     * <p>
+     * This is mainly necessary to work around issues with detecting repeated uploads. Under certain circumstances they
+     * need to be delayed and the upload history helps with that.
+     * </p>
+     *
+     * @param pathInBucket path in the bucket to which an upload happened.
+     */
     protected void recordUploadInHistory(final String pathInBucket) {
         final var now = Instant.now();
         LOGGER.fine(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
@@ -104,8 +112,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
             throws BucketAccessException, TimeoutException {
         final var uri = createWriteUri(pathInBucket);
         final var excerpt = (content.length() > 20) ? content.substring(0, 20) + "..." : content;
-        uploadWithBodyPublisher(pathInBucket, uri, BodyPublishers.ofString(content),
-                "string content '" + excerpt + "'");
+        uploadWithBodyPublisher(uri, BodyPublishers.ofString(content), "string content '" + excerpt + "'");
         recordUploadInHistory(pathInBucket);
     }
 
@@ -114,8 +121,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     public void uploadInputStreamNonBlocking(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket)
             throws BucketAccessException, TimeoutException {
         final var uri = createWriteUri(pathInBucket);
-        uploadWithBodyPublisher(pathInBucket, uri, BodyPublishers.ofInputStream(inputStreamSupplier),
-                "content of input stream");
+        uploadWithBodyPublisher(uri, BodyPublishers.ofInputStream(inputStreamSupplier), "content of input stream");
         recordUploadInHistory(pathInBucket);
     }
 
