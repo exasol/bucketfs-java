@@ -1,4 +1,4 @@
-# bucketfs-java 2.0.0, released 2021-04-29
+# bucketfs-java 2.0.1, released 2021-04-??
 
 Code name: Improved repeated upload reliability
 
