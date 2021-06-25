@@ -1,6 +1,6 @@
 # bucketfs-java
 
-[![Build Status](https://api.travis-ci.com/exasol/bucketfs-java.svg?branch=master)](https://travis-ci.org/exasol/bucketfs-java)
+[![Build Status](https://travis-ci.com/exasol/bucketfs-java.svg?branch=main)](https://travis-ci.com/exasol/bucketfs-java)
 [![Maven Central](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
 
 SonarCloud results:
