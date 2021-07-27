@@ -113,6 +113,18 @@ Covers:
 
 Needs: impl, itest
 
+### Delete a file from a `Bucket`
+
+`dsn~delete-a-file-from-a-bucket~1`
+
+The `Bucket` offers deleting a file from a bucket.
+
+Covers:
+
+* `req~deleting-a-file-from-bucketfs~1`
+
+Needs: impl, itest
+
 ### Downloading a file from a `Bucket`
 
 `dsn~downloading-a-file-from-a-bucket~1`

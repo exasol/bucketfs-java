@@ -1,11 +1,11 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.exasol.containers.exec.ExitCode;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,13 +13,12 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-import com.exasol.containers.exec.ExitCode;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Tag("slow")
 class SyncAwareBucketIT extends AbstractBucketIT {
@@ -167,5 +166,14 @@ class SyncAwareBucketIT extends AbstractBucketIT {
                 fail("Unable to read hash from file in container");
             }
         }
+    }
+
+    @Test
+        //[itest->dsn~delete-a-file-from-a-bucket~1]
+    void testDeleteFile() throws BucketAccessException, InterruptedException, TimeoutException {
+        final var bucket = getDefaultBucket();
+        bucket.uploadStringContent("test", "myFile.txt");
+        bucket.deleteFileNonBlocking("myFile.txt");
+        assertThat(bucket.listContents(), not(hasItem("myFile.txt")));
     }
 }

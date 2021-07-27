@@ -218,12 +218,22 @@ The same style of overloaded function exists for text content upload too in the 
 
 Unless you really need it and know exactly what you are doing, we recommend to stick to blocking operation for your tests.
 
+### Delete a File from BucketFS
+
+Deleting a file is straight forward:
+
+```java
+bucket.deleteFileNonBlocking(fileName);
+```
+
+Warning: If you try to upload a file shortly (< ~30s) after you deleted it, the upload will fail with access denied. (implementation details of BucketFS).
+
 ### Downloading a File from BucketFS
 
 Downloading a file is straight forward:
 
 ```java
-bucket.downloadFile(source, destination);
+bucket.downloadFile(source,destination);
 ```
 
 Here the source is a path inside the bucket and destination is a path on a local file system.
