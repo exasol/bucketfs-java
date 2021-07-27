@@ -1,7 +1,5 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.errorreporting.ExaError.messageBuilder;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -10,6 +8,8 @@ import java.time.temporal.ChronoField;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
@@ -98,7 +98,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     // [impl->dsn~waiting-until-file-appears-in-target-directory~1]
     private void waitForFileToBeSynchronized(final String pathInBucket, final long millisSinceEpochBeforeUpload)
             throws TimeoutException, BucketAccessException {
-        final var expiry = millisSinceEpochBeforeUpload + BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS;
+        final var expiry = System.currentTimeMillis() + BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS;
         final var afterUtc = Instant.ofEpochMilli(millisSinceEpochBeforeUpload);
         while (System.currentTimeMillis() < expiry) {
             if (this.monitor.isObjectSynchronized(this, pathInBucket, afterUtc)) {
