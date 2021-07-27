@@ -10,4 +10,5 @@ Code name:
 
 ### Plugin Dependency Updates
 
+* Updated `com.exasol:error-code-crawler-maven-plugin:0.2.0` to `0.5.0`
 * Updated `com.exasol:project-keeper-maven-plugin:0.7.0` to `0.10.0`
