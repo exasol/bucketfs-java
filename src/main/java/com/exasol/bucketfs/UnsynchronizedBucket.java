@@ -87,6 +87,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * </p>
      *
      * @param pathInBucket file path
+     * @throws BucketAccessException if delete failed
      */
     //[impl->dsn~delete-a-file-from-a-bucket~1]
     void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
