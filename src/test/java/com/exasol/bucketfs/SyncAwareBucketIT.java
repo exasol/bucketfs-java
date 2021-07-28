@@ -201,6 +201,14 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-12: Failed to delete"));
     }
 
+    private SyncAwareBucket getBucketWithExceptionThrowingHttpClient(Exception exceptionThrownByHttpClient, SyncAwareBucket bucket) throws IOException, InterruptedException {
+        final SyncAwareBucket bucketSpy = spy(bucket);
+        final HttpClient client = mock(HttpClient.class);
+        when(client.send(any(), any())).thenThrow(exceptionThrownByHttpClient);
+        when(bucketSpy.getClient()).thenReturn(client);
+        return bucketSpy;
+    }
+
     @Test
     void testInterruptedDuringUploadFile() throws BucketAccessException, InterruptedException, TimeoutException, IOException {
         final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new InterruptedException());
@@ -222,14 +230,6 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         bucket.uploadStringContent("test", testFile);
         final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
-    }
-
-    private SyncAwareBucket getBucketWithExceptionThrowingHttpClient(Exception exceptionThrownByHttpClient, SyncAwareBucket bucket) throws IOException, InterruptedException {
-        final SyncAwareBucket bucketSpy = spy(bucket);
-        final HttpClient client = mock(HttpClient.class);
-        when(client.send(any(), any())).thenThrow(exceptionThrownByHttpClient);
-        when(bucketSpy.getClient()).thenReturn(client);
-        return bucketSpy;
     }
 
     private String getUniqueFileName() {
