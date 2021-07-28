@@ -110,7 +110,20 @@ Covers:
 
 Needs: dsn
 
+#### Deleting a File from BucketFs
+
+`req~deleting-a-file-from-bucketfs~1`
+
+BFSJ can delete a file from BucketFs.
+
+Needs: dsn
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
 #### Downloading a File from BucketFS
+
 `req~downloading-a-file-from-bucketfs~1`
 
 BFSJ downloads a file from a bucket to a locally accessible filesystem.

@@ -1,10 +1,5 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
-import static com.exasol.bucketfs.BucketOperation.LIST;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
-import static java.net.HttpURLConnection.*;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
@@ -13,6 +8,11 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
+
+import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
+import static com.exasol.bucketfs.BucketOperation.LIST;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+import static java.net.HttpURLConnection.*;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -25,7 +25,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String ipAddress;
     protected final int port;
     protected final String readPassword;
-    protected final HttpClient client = HttpClient.newBuilder().build();
+    private final HttpClient client = HttpClient.newBuilder().build();
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
 
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
@@ -163,7 +163,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
-            final IOException exception) {
+                                                            final IOException exception) {
         return new BucketAccessException(messageBuilder("E-BFSJ-5")
                 .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
     }
@@ -198,24 +198,33 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
             throws BucketAccessException {
         switch (statusCode) {
-        case HTTP_OK:
-            return;
-        case HTTP_NOT_FOUND:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-2")
-                    .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
-                    .toString());
-        case HTTP_FORBIDDEN:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-3")
-                    .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
-        default:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-1")
-                    .message("Unable do {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
-                    .toString());
+            case HTTP_OK:
+                return;
+            case HTTP_NOT_FOUND:
+                throw new BucketAccessException(messageBuilder("E-BFSJ-2")
+                        .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
+                        .toString());
+            case HTTP_FORBIDDEN:
+                throw new BucketAccessException(messageBuilder("E-BFSJ-3")
+                        .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
+            default:
+                throw new BucketAccessException(messageBuilder("E-BFSJ-1")
+                        .message("Unable do {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
+                        .toString());
         }
     }
 
     private String encodeBasicAuthForReading() {
         return "Basic " + Base64.getEncoder().encodeToString(("r:" + this.readPassword).getBytes());
+    }
+
+    /**
+     * Get the http client.
+     *
+     * @return http client
+     */
+    protected HttpClient getClient() {
+        return client;
     }
 
     @Override

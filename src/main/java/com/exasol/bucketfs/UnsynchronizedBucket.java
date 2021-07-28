@@ -79,4 +79,16 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
     // [impl->dsn~uploading-input-stream-to-bucket~1]
     void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
             throws BucketAccessException, TimeoutException;
+
+    /**
+     * Delete a file from BucketFS.
+     * <p>
+     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail with access denied.
+     * </p>
+     *
+     * @param pathInBucket file path
+     * @throws BucketAccessException if delete failed
+     */
+    //[impl->dsn~delete-a-file-from-a-bucket~1]
+    void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
 }

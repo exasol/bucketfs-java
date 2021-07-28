@@ -1,8 +1,5 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.bucketfs.BucketOperation.UPLOAD;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
-
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +13,10 @@ import java.util.Base64;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import static com.exasol.bucketfs.BucketOperation.DELETE;
+import static com.exasol.bucketfs.BucketOperation.UPLOAD;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
@@ -66,7 +67,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                     .PUT(bodyPublisher) //
                     .header("Authorization", encodeBasicAuth(true)) //
                     .build();
-            final var response = this.client.send(request, BodyHandlers.ofString());
+            final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
             evaluateRequestStatus(uri, UPLOAD, statusCode);
         } catch (final IOException exception) {
@@ -133,6 +134,31 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     @SuppressWarnings("squid:S1452")
     public static Builder<? extends Builder<?>> builder() {
         return new Builder<>();
+    }
+
+    @Override
+    //[impl->dsn~delete-a-file-from-a-bucket~1]
+    public void deleteFileNonBlocking(final String filenameInBucket)
+            throws BucketAccessException {
+        try {
+            final var uri = createWriteUri(filenameInBucket);
+            final var request = HttpRequest.newBuilder(uri) //
+                    .DELETE() //
+                    .header("Authorization", encodeBasicAuth(true)) //
+                    .build();
+            final var response = getClient().send(request, BodyHandlers.ofString());
+            final var statusCode = response.statusCode();
+            evaluateRequestStatus(uri, DELETE, statusCode);
+        } catch (IOException exception) {
+            throw getDeleteFailedException(filenameInBucket, exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw getDeleteFailedException(filenameInBucket, exception);
+        }
+    }
+
+    private BucketAccessException getDeleteFailedException(String filenameInBucket, Exception exception) {
+        return new BucketAccessException(messageBuilder("E-BFSJ-12").message("Failed to delete {{file}} from BucketFS.", filenameInBucket).toString(), exception);
     }
 
     /**
