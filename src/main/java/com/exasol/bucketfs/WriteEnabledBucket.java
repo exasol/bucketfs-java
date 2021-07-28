@@ -158,7 +158,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     }
 
     private BucketAccessException getDeleteFailedException(String filenameInBucket, Exception exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-12").message("Failed to delete {{file}} from BucketFS..", filenameInBucket).toString(), exception);
+        return new BucketAccessException(messageBuilder("E-BFSJ-12").message("Failed to delete {{file}} from BucketFS.", filenameInBucket).toString(), exception);
     }
 
     /**

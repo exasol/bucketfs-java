@@ -226,7 +226,7 @@ Deleting a file is straight forward:
 bucket.deleteFileNonBlocking(fileName);
 ```
 
-Warning: If you try to upload a file shortly, for example, less than about 30s after you deleted it, the upload will fail with access denied. This due to the implementation details of BucketFS.
+Warning: If you try to upload a file shortly after you deleted it (e.g. less than 30 seconds later), the upload will fail with access denied. This due to the implementation details of BucketFS.
 
 ### Downloading a File from BucketFS
 
