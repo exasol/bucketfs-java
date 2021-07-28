@@ -67,7 +67,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                     .PUT(bodyPublisher) //
                     .header("Authorization", encodeBasicAuth(true)) //
                     .build();
-            final var response = this.client.send(request, BodyHandlers.ofString());
+            final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
             evaluateRequestStatus(uri, UPLOAD, statusCode);
         } catch (final IOException exception) {
@@ -146,7 +146,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                     .DELETE() //
                     .header("Authorization", encodeBasicAuth(true)) //
                     .build();
-            final var response = this.client.send(request, BodyHandlers.ofString());
+            final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
             evaluateRequestStatus(uri, DELETE, statusCode);
         } catch (IOException exception) {

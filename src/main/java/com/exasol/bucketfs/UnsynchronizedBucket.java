@@ -83,7 +83,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Delete a file from BucketFS.
      * <p>
-     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail with access denied. (implementation details of BucketFS).
+     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail with access denied.
      * </p>
      *
      * @param pathInBucket file path

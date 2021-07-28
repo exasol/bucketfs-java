@@ -147,8 +147,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire-and-failsafe.version}</version>
                 <configuration>
-                    <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches in the 
-                        logging lambdas too. -->
+                    <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches in the
+                                                                          logging lambdas too. -->
                     <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties ${argLine}</argLine>
                     <excludedGroups>${test.excludeTags}</excludedGroups>
                 </configuration>
@@ -158,8 +158,8 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.surefire-and-failsafe.version}</version>
                 <configuration>
-                    <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches in the 
-                        logging lambdas too. -->
+                    <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches in the
+                                                                          logging lambdas too. -->
                     <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties ${argLine}</argLine>
                     <excludedGroups>${test.excludeTags}</excludedGroups>
                 </configuration>
