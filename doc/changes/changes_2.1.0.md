@@ -1,6 +1,6 @@
 # BucketFS Java 2.1.0, released 2021-??-??
 
-Code name: Added Delete method
+Code name: Added delete method
 
 ## Summary:
 
