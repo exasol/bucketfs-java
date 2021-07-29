@@ -57,7 +57,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
     }
 
     private String getDirectory(final String[] parts) {
-        final String directory = Arrays.stream(parts).limit(parts.length - 1)
+        final String directory = Arrays.stream(parts).limit((long) parts.length - 1)
                 .collect(Collectors.joining(BucketConstants.PATH_SEPARATOR));
         if (directory.startsWith(BucketConstants.PATH_SEPARATOR)) {
             return directory.substring(1);
