@@ -9,6 +9,7 @@
 # Constraints
 
 ## Log-based Synchronization Check has a Minimum Resolution of one Second
+
 `const~log-based-synchronization-check-has-a-minimum-resolution-of-one-second~1`
 
 At least the monitoring solution based on cluster logs is limited to a resolution of one second.
@@ -48,6 +49,7 @@ This section describes the runtime behavior of the software.
 ## BucketFS Access
 
 ### List of `Bucket`Contents
+
 `dsn~bucket-lists-its-contents~1`
 
 The `Bucket` lists its contents as a set of object names.
@@ -59,6 +61,7 @@ Covers:
 Needs: impl, itest
 
 ### Uploading to `Bucket`
+
 `dsn~uploading-to-bucket~1`
 
 The `Bucket` offers uploading a file from a locally accessible filesystem to a bucket in BucketFS.
@@ -70,6 +73,7 @@ Covers:
 Needs: impl, itest
 
 ### Uploading Strings to `Bucket`
+
 `dsn~uploading-strings-to-bucket~1`
 
 The `Bucket` offers uploading strings into a file in bucket in BucketFS.
@@ -81,6 +85,7 @@ Covers:
 Needs: impl, itest
 
 ### Uploading InputStream to `Bucket`
+
 `dsn~uploading-input-stream-to-bucket~1`
 
 The `Bucket` offers uploading of the contents of an `InputStream` into a file in that bucket on BucketFS.
@@ -92,6 +97,7 @@ Covers:
 Needs: impl, itest
 
 ### Waiting Until File Appears in Target Directory
+
 `dsn~waiting-until-file-appears-in-target-directory~1`
 
 When uploading a file into a bucket, users can choose to block the call until the file appears in the bucket's target directory.
@@ -103,6 +109,7 @@ Covers:
 Needs: impl, itest
 
 ### Waiting Until Archive Extracted
+
 `dsn~waiting-until-archive-extracted~1`
 
 When uploading an archive of type `.tar.gz` or `.zip` into a bucket, users can choose to block the call until the archive is fully extracted in the bucket's target directory.
@@ -110,6 +117,22 @@ When uploading an archive of type `.tar.gz` or `.zip` into a bucket, users can c
 Covers:
 
 * `req~waiting-for-bucket-content-synchronization~1`
+
+Needs: impl, itest
+
+### Conditional Upload
+
+`dsn~conditional-upload~1`
+
+We decided to check if the file needs to get uploaded by comparing the checksum of the local file and the file in BucketFs. BucketFs does not support the creation of checksums we install a Python UDF that calculates the checksum. Since installing and running of the UDF takes some time (~2 secs), we only compare the checksums for files > 1 MB. For other files we simply upload the file since it's probably faster than building the checksum.
+
+A downside of this approach is that we need an SQL connection to the database. However, currently we could not find a better one.
+
+We decided to implement the checksum check as a strategy for the `WriteEnabledBucket`. That allows users to also write other strategies. Another important argument is that by that only the strategy needs to have the SQL connection.
+
+Covers:
+
+* `req-conditional-upload~1`
 
 Needs: impl, itest
 
@@ -174,6 +197,7 @@ We decided to define a monitoring interface that a software that uses the librar
 Users have the option to instantiate Bucket objects with synchronization checking if they provide a monitoring implementation. Otherwise they need to fall back to non-blocking operation.
 
 #### Validating BucketFS Object Synchronization via the Monitoring API
+
 `dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1`
 
 The `SyncAwareBucket` uses a `BucketFsMonitor` to check object synchronization.
@@ -185,6 +209,7 @@ Covers:
 Needs: impl, itest
 
 #### BucketFS Object Overwrite Throttle
+
 `dsn~bucketfs-object-overwrite-throttle~1`
 
 The `SyncAwareBucket` delays subsequent uploads to the same path in a bucket so that the upload speed does not exceed the monitoring resolution of one second.

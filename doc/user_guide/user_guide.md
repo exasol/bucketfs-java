@@ -194,6 +194,24 @@ bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar","jars/"
 
 In this case the `Bucket` treats the destination path in the bucket as if you wrote `jars/virtual-schemas-3.0.1.jar`.
 
+### Uploading Large File Only if Necessary
+
+Uploading large files can be slow. To avoid that slowing down your tests, BFSJ can check if the file already exists and compare checksums. It will then only upload the file if the checksums differ.
+
+To enable this feature use:
+
+```java
+bucket.setUploadNecessityCheckStrategy(new UploadNecessityCheckStrategy(sqlConnection));
+```
+
+To disable it again use:
+
+```java
+bucket.setUploadNecessityCheckStrategy(new AlwaysUploadStrategy());
+```
+
+By default, this feature is disabled.
+
 ### Uploading Text as a File
 
 It's a common use-case test scenarios to create small files of well-defined content and upload them to BucketFS. Most of the time those are configuration files.

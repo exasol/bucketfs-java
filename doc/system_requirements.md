@@ -38,6 +38,7 @@ The following list gives you an overview of terms and abbreviations commonly use
 Features are the highest level requirements in this document that describe the main functionality of BucketFS Java.
 
 ### BucketFS Access
+
 `feat~bucketfs-access~1`
 
 BucketFS Java provides access to the BucketFS service(s) of the Exasol database.
@@ -51,6 +52,7 @@ This section lists functional requirements from the user's perspective. The requ
 ### BucketFS Access
 
 #### Bucket Content Listing
+
 `req~bucket-content-listing~1`
 
 BFSJ lists the contents of a bucket in BucketFS.
@@ -66,6 +68,7 @@ Covers:
 Needs: dsn
 
 #### Uploading a File to BucketFS
+
 `req~uploading-a-file-to-bucketfs~1`
 
 BFJS uploads a file from a locally accessible filesystem to a bucket.
@@ -81,6 +84,7 @@ Covers:
 Needs: dsn
 
 #### Uploading Text to a File in BucketFS
+
 `req~uploading-text-to-a-file-in-bucketfs~1`
 
 BFSJ uploads text (aka. a "string") to a file inside a bucket.
@@ -96,6 +100,7 @@ Covers:
 Needs: dsn
 
 #### Uploading InputStream to a File in BucketFS
+
 `req~uploading-input-stream-to-a-file-in-bucketfs~1`
 
 BFSJ uploads the contents of an InputStream to a file inside a bucket.
@@ -103,6 +108,22 @@ BFSJ uploads the contents of an InputStream to a file inside a bucket.
 Rationale:
 
 Especially integration tests often access resource content via `getResourceAsStream()`. Adding a method for this makes the test code more compact.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
+#### Conditional Upload
+
+`req-conditional-upload~1`
+
+For large files BFSJ can determine if its necessary to upload a file or if it's already there.
+
+Rationale:
+
+Uploading large files can take long. That slows down test.
 
 Covers:
 

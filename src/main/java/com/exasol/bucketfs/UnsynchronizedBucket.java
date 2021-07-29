@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import com.exasol.bucketfs.uploadnecassity.UploadNecessityCheckStrategy;
+
 /**
  * Interface for write access to a bucket in Bucket FS.
  *
@@ -40,13 +42,14 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * BucketFS.
      * </p>
      *
-     * @param pathInBucket path inside the bucket
      * @param localPath    path of the file to be uploaded
+     * @param pathInBucket path inside the bucket
      * @throws TimeoutException      if the synchronization check takes too long
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws FileNotFoundException in case the source file is not found
+     * @return {@code true} if the file was uploaded. Otherwise upload was unnecessary
      */
-    void uploadFileNonBlocking(Path localPath, String pathInBucket)
+    boolean uploadFileNonBlocking(Path localPath, String pathInBucket)
             throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**
@@ -83,12 +86,23 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
     /**
      * Delete a file from BucketFS.
      * <p>
-     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail with access denied.
+     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail
+     * with access denied.
      * </p>
      *
      * @param pathInBucket file path
      * @throws BucketAccessException if delete failed
      */
-    //[impl->dsn~delete-a-file-from-a-bucket~1]
+    // [impl->dsn~delete-a-file-from-a-bucket~1]
     void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
+
+    /**
+     * Set an {@link UploadNecessityCheckStrategy}.
+     * <p>
+     * This class uses the strategy during file upload to decide if the file should really be uploaded.
+     * </p>
+     * 
+     * @param uploadNecessityCheckStrategy strategy to use from now on
+     */
+    void setUploadNecessityCheckStrategy(final UploadNecessityCheckStrategy uploadNecessityCheckStrategy);
 }

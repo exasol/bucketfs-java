@@ -12,7 +12,7 @@ import com.exasol.config.BucketFsServiceConfiguration;
 import com.exasol.containers.ExasolContainer;
 
 @Testcontainers
-abstract class AbstractBucketIT {
+public abstract class AbstractBucketIT {
     @Container
     protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>() //
             .withReuse(true);
