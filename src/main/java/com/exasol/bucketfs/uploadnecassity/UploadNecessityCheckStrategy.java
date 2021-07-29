@@ -18,6 +18,7 @@ public interface UploadNecessityCheckStrategy {
      * @param fullFileNameInBucketFs path to the file in BucketFs
      * @param bucket                 bucket the file is uploaded to
      * @return {@code true} if the file should get uploaded
+     * @throws BucketAccessException if checking fails
      */
     public boolean isUploadNecessary(Path file, String fullFileNameInBucketFs, ReadOnlyBucket bucket)
             throws BucketAccessException;

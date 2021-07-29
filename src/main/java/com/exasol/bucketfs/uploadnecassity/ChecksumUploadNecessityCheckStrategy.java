@@ -82,7 +82,9 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
      * Get the MD5-checksum of a file in BucketFS.
      *
      * @param fileInBucketFs path to a file in bucketFs
+     * @param bucket         bucket the file is stored in
      * @return md5 checksum
+     * @throws BucketAccessException if checksum calculation failed
      */
     public String getMd5Checksum(final String fileInBucketFs, final ReadOnlyBucket bucket)
             throws BucketAccessException {
