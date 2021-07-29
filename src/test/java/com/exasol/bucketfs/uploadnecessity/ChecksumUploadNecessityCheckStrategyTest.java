@@ -1,4 +1,4 @@
-package com.exasol.bucketfs.uploadnecassity;
+package com.exasol.bucketfs.uploadnecessity;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;

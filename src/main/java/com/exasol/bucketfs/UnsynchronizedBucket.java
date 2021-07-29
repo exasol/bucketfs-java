@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import com.exasol.bucketfs.uploadnecassity.UploadNecessityCheckStrategy;
+import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 
 /**
  * Interface for write access to a bucket in Bucket FS.

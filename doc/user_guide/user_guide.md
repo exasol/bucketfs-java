@@ -18,7 +18,7 @@ Please check out ["Introduction to the Dependency Mechanism"](http://maven.apach
 
 We assume here that you are familiar with the basics.
 
-### BucketFs Java as Maven Dependency
+### BucketFS Java as Maven Dependency
 
 Just add the following dependency to add the Exasol test containers to your project.
 
@@ -196,7 +196,7 @@ In this case the `Bucket` treats the destination path in the bucket as if you wr
 
 ### Uploading Large File Only if Necessary
 
-Uploading large files can be slow. To avoid that slowing down your tests, BFSJ can check if the file already exists in the same location on BucketFS and compare checksums. It will then only upload the file if the checksums differ.
+Uploading large files can be slow. To avoid that slowing down your tests, BFSJ can check if the file already exists in the same location on BucketFS and compare checksums. It will then only upload the file if the checksums differ. Since comparing the checksums also takes some time BFSJ only compares checksums for files larger than 1 MB. Smaller files it always uploads.
 
 To enable this feature use:
 
@@ -207,7 +207,7 @@ bucket.setUploadNecessityCheckStrategy(new UploadNecessityCheckStrategy(sqlConne
 To disable it again use:
 
 ```java
-bucket.setUploadNecessityCheckStrategy(new AlwaysUploadStrategy());
+bucket.setUploadNecessityCheckStrategy(new UploadAlwaysStrategy());
 ```
 
 By default, this feature is disabled.

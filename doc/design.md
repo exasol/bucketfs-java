@@ -16,7 +16,7 @@ At least the monitoring solution based on cluster logs is limited to a resolutio
 
 That means this monitor cannot distinguish between subsequent uploads to the same object in a bucket if they are not at least one second apart.
 
-For more details on what this means and how we deal with this constraint see the design decision in section ["How do we validate that objects on BucketFs are ready to use"](#how-do-we-validate-that-objects-on-bucketfs-are-ready-to-use).
+For more details on what this means and how we deal with this constraint see the design decision in section ["How do we validate that objects on BucketFS are ready to use"](#how-do-we-validate-that-objects-on-bucketfs-are-ready-to-use).
 
 Needs: dsn
 
@@ -124,7 +124,7 @@ Needs: impl, itest
 
 `dsn~conditional-upload~1`
 
-We decided to check if the file needs to get uploaded by comparing the checksum of the local file and the file in BucketFs. BucketFs does not support the creation of checksums we install a Python UDF that calculates the checksum. Since installing and running of the UDF takes some time (~2 secs), we only compare the checksums for files > 1 MB. For other files we simply upload the file since it's probably faster than building the checksum.
+We decided to check if the file needs to get uploaded by comparing the checksum of the local file and the file in BucketFS. BucketFS does not support the creation of checksums we install a Python UDF that calculates the checksum. Since installing and running of the UDF takes some time (~2 secs), we only compare the checksums for files > 1 MB. For other files we simply upload the file since it's probably faster than building the checksum.
 
 A downside of this approach is that we need an SQL connection to the database. However, currently we could not find a better one.
 

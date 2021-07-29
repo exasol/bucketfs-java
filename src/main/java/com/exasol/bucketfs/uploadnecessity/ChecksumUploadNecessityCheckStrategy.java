@@ -1,6 +1,6 @@
-package com.exasol.bucketfs.uploadnecassity;
+package com.exasol.bucketfs.uploadnecessity;
 
-import static com.exasol.bucketfs.uploadnecassity.ByteArrayToHexConverter.toHex;
+import static com.exasol.bucketfs.uploadnecessity.ByteArrayToHexConverter.toHex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,21 +17,25 @@ import com.exasol.errorreporting.ExaError;
 
 /**
  * This {@link UploadNecessityCheckStrategy} compares the checksum of the local file and the file on BucketFS and only
- * uploads the file if the checksums differ or if the file does not exist in BucketFS.
+ * uploads the file if the checksums differ or if the file does not exist in BucketFS. For performance reasons this
+ * strategy always uploads files with a size less or equal 1 MB.
  */
 //[impl->dsn~conditional-upload~1]
 public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityCheckStrategy {
     private static final String UDF_SCHEMA = "BUCKET_FS_JAVA_HELPER";
-    private static final String UDF_NAME = "bucketfs_checksum";
+    private static final String UDF_NAME = "BUCKET_FS_CHECKSUM";
     private static final String UDF_FULL_NAME = UDF_SCHEMA + "." + UDF_NAME;
     private static final int ONE_MEGABYTE = 1000000;
     private final Connection sqlConnection;
 
     /**
      * Create a new instance of {@link ChecksumUploadNecessityCheckStrategy}.
+     * <p>
+     * This strategy uses a User Defined Function (UDF) to create the checksum of the file in BucketFS. Therefore it
+     * requires a database connection.
+     * </p>
      * 
-     * @param sqlConnection SQL connection to the Exasol database. (used for calculating the checksum of the file in
-     *                      BucketFs in a UDF)
+     * @param sqlConnection SQL connection to the Exasol database
      */
     public ChecksumUploadNecessityCheckStrategy(final Connection sqlConnection) {
         this.sqlConnection = sqlConnection;
@@ -91,17 +95,17 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
         installChecksumUdf();
         try (final PreparedStatement statement = this.sqlConnection
                 .prepareStatement("SELECT " + UDF_FULL_NAME + "(?)")) {
-            statement.setString(1,
-                    "/buckets/" + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "/" + fileInBucketFs);
+            final String pathInUdf = "/buckets/" + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "/"
+                    + fileInBucketFs;
+            statement.setString(1, pathInUdf);
             try (final ResultSet result = statement.executeQuery()) {
                 result.next();
                 return result.getString(1);
             }
         } catch (final SQLException exception) {
-            throw new BucketAccessException(ExaError.messageBuilder("F-BFSJ-15")
-                    .message("Failed to determine checksum of file {{file}} in BucketFs using a python UDF.",
-                            fileInBucketFs)
-                    .toString(), exception);
+            throw new BucketAccessException(ExaError.messageBuilder("F-BFSJ-15").message(
+                    "Failed to determine checksum of file {{file}} in BucketFS using UDF " + UDF_FULL_NAME + ".",
+                    fileInBucketFs).toString(), exception);
         } finally {
             uninstallChecksumUdf();
         }
@@ -113,7 +117,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
             statement.executeUpdate(getChecksumUdfStatement());
         } catch (final SQLException exception) {
             throw new BucketAccessException(ExaError.messageBuilder("E-BFSJ-14").message(
-                    "Failed to install sha-512 checksum UDF. This UDF is required by bucketfs-java for building the checksum of files in BucketFs.")
+                    "Failed to install sha-512 checksum UDF. This UDF is required by bucketfs-java for building the checksum of files in BucketFS.")
                     .toString(), exception);
         }
     }
@@ -130,16 +134,14 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
 
     private String getChecksumUdfStatement() {
         try {
+            final byte[] pythonScriptAsBytes = Objects
+                    .requireNonNull(getClass().getClassLoader().getResourceAsStream("checksumUdf.py")).readAllBytes();
+            final String pythonScript = new String(pythonScriptAsBytes, StandardCharsets.UTF_8);
             return "CREATE OR REPLACE PYTHON3 SCALAR SCRIPT " + UDF_FULL_NAME
-                    + "(my_path VARCHAR(2000)) RETURNS VARCHAR(256) AS\n"
-                    + new String(
-                            Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("checksumUdf.py"))
-                                    .readAllBytes(),
-                            StandardCharsets.UTF_8)
-                    + "\n/";
+                    + "(my_path VARCHAR(2000)) RETURNS VARCHAR(256) AS\n" + pythonScript + "\n/";
         } catch (final IOException | NullPointerException exception) {
             throw new IllegalStateException(ExaError.messageBuilder("F-BFSJ-13")
-                    .message("Failed to get python UDF from resources.").ticketMitigation().toString(), exception);
+                    .message("Failed to get Python UDF from resources.").ticketMitigation().toString(), exception);
         }
     }
 }

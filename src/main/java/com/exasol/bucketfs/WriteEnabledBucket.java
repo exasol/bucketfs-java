@@ -18,8 +18,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import com.exasol.bucketfs.uploadnecassity.AlwaysUploadStrategy;
-import com.exasol.bucketfs.uploadnecassity.UploadNecessityCheckStrategy;
+import com.exasol.bucketfs.uploadnecessity.UploadAlwaysStrategy;
+import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
@@ -27,7 +27,7 @@ import com.exasol.bucketfs.uploadnecassity.UploadNecessityCheckStrategy;
 public class WriteEnabledBucket extends ReadEnabledBucket implements UnsynchronizedBucket {
     private static final Logger LOGGER = Logger.getLogger(WriteEnabledBucket.class.getName());
     private final String writePassword;
-    private UploadNecessityCheckStrategy uploadNecessityCheckStrategy = new AlwaysUploadStrategy();
+    private UploadNecessityCheckStrategy uploadNecessityCheckStrategy = new UploadAlwaysStrategy();
 
     protected WriteEnabledBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
@@ -50,7 +50,8 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
             recordUploadInHistory(pathInBucket);
             return true;
         } else {
-            LOGGER.fine("Skipping upload since the UploadNecessityCheckStrategy decided it's not necessary.");
+            LOGGER.fine("Skipping upload since the " + this.uploadNecessityCheckStrategy.getClass().getSimpleName()
+                    + " decided it's not necessary.");
             return false;
         }
     }

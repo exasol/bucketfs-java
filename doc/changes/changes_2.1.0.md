@@ -4,7 +4,7 @@ Code name: Delete bucket object and conditional upload
 
 ## Summary:
 
-In this release we added a method for deleting files from BucketFs.
+In this release we added a method for deleting files from BucketFS.
 
 Additionally users can no provide a strategy that decides whether an upload is really necessary or if it can be skipped. We also added a ready-to-use strategy that checks via hash sums if the file to be uploaded is already present. This can speed up tests significantly if they would otherwise repeatedly upload the same large files.
 

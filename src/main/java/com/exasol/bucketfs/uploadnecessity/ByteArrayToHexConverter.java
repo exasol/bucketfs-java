@@ -1,4 +1,4 @@
-package com.exasol.bucketfs.uploadnecassity;
+package com.exasol.bucketfs.uploadnecessity;
 
 /**
  * This class converts a byte array into a hexadecimal representation.
@@ -15,10 +15,10 @@ final class ByteArrayToHexConverter {
      * @return hex representation as string
      */
     static String toHex(final byte[] bytes) {
-        final StringBuilder sb = new StringBuilder();
-        for (final byte checksumByte : bytes) {
-            sb.append(String.format("%02x", checksumByte));
+        final StringBuilder result = new StringBuilder();
+        for (final byte eachByte : bytes) {
+            result.append(String.format("%02x", eachByte));
         }
-        return sb.toString();
+        return result.toString();
     }
 }

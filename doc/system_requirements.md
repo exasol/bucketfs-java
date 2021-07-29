@@ -131,11 +131,11 @@ Covers:
 
 Needs: dsn
 
-#### Deleting a File from BucketFs
+#### Deleting a File from BucketFS
 
 `req~deleting-a-file-from-bucketfs~1`
 
-BFSJ can delete a file from BucketFs.
+BFSJ can delete a file from BucketFS.
 
 Needs: dsn
 
