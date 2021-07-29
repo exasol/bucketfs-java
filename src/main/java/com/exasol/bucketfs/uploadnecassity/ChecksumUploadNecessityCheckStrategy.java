@@ -22,7 +22,7 @@ import com.exasol.errorreporting.ExaError;
 //[impl->dsn~conditional-upload~1]
 public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityCheckStrategy {
     private static final String UDF_SCHEMA = "BUCKET_FS_JAVA_HELPER";
-    private static final String UDF_NAME = "bucketfs_md5_sum";
+    private static final String UDF_NAME = "bucketfs_checksum";
     private static final String UDF_FULL_NAME = UDF_SCHEMA + "." + UDF_NAME;
     private static final int ONE_MEGABYTE = 1000000;
     private final Connection sqlConnection;
@@ -45,7 +45,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
             final String fileName = parts[parts.length - 1];
             final List<String> filesInBucketDirectory = bucket.listContents(getDirectory(parts));
             if (Files.size(file) > ONE_MEGABYTE && filesInBucketDirectory.contains(fileName)) {
-                return !localMd5Checksum(file).equals(getMd5Checksum(fullFileNameInBucketFs, bucket));
+                return !localSha512Checksum(file).equals(getSha512Checksum(fullFileNameInBucketFs, bucket));
             } else {
                 return true;
             }
@@ -66,8 +66,8 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
         }
     }
 
-    private String localMd5Checksum(final Path localPath) throws NoSuchAlgorithmException, IOException {
-        final MessageDigest checksumBuilder = MessageDigest.getInstance("MD5");
+    private String localSha512Checksum(final Path localPath) throws NoSuchAlgorithmException, IOException {
+        final MessageDigest checksumBuilder = MessageDigest.getInstance("SHA-512");
         try (final InputStream inputStream = Files.newInputStream(localPath);
                 final DigestInputStream checksumBuildingStream = new DigestInputStream(inputStream, checksumBuilder)) {
             final byte[] buffer = new byte[1000];
@@ -79,14 +79,14 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
     }
 
     /**
-     * Get the MD5-checksum of a file in BucketFS.
+     * Get the SHA-512-checksum of a file in BucketFS.
      *
      * @param fileInBucketFs path to a file in bucketFs
      * @param bucket         bucket the file is stored in
-     * @return md5 checksum
+     * @return sha 512 checksum
      * @throws BucketAccessException if checksum calculation failed
      */
-    public String getMd5Checksum(final String fileInBucketFs, final ReadOnlyBucket bucket)
+    public String getSha512Checksum(final String fileInBucketFs, final ReadOnlyBucket bucket)
             throws BucketAccessException {
         installChecksumUdf();
         try (final PreparedStatement statement = this.sqlConnection
@@ -113,7 +113,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
             statement.executeUpdate(getChecksumUdfStatement());
         } catch (final SQLException exception) {
             throw new BucketAccessException(ExaError.messageBuilder("E-BFSJ-14").message(
-                    "Failed to install md5 checksum UDF. This UDF is required by bucketfs-java for building the checksum of files in BucketFs.")
+                    "Failed to install sha-512 checksum UDF. This UDF is required by bucketfs-java for building the checksum of files in BucketFs.")
                     .toString(), exception);
         }
     }
@@ -123,9 +123,8 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
             statement.executeUpdate("DROP SCRIPT  " + UDF_FULL_NAME + ";");
             statement.executeUpdate("DROP SCHEMA  " + UDF_SCHEMA + ";");
         } catch (final SQLException exception) {
-            throw new BucketAccessException(
-                    ExaError.messageBuilder("E-BFSJ-16").message("Failed to uninstall md5 checksum UDF.").toString(),
-                    exception);
+            throw new BucketAccessException(ExaError.messageBuilder("E-BFSJ-16")
+                    .message("Failed to uninstall sha-512 checksum UDF.").toString(), exception);
         }
     }
 
@@ -133,8 +132,10 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
         try {
             return "CREATE OR REPLACE PYTHON3 SCALAR SCRIPT " + UDF_FULL_NAME
                     + "(my_path VARCHAR(2000)) RETURNS VARCHAR(256) AS\n"
-                    + new String(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("md5SumUdf.py"))
-                            .readAllBytes(), StandardCharsets.UTF_8)
+                    + new String(
+                            Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("checksumUdf.py"))
+                                    .readAllBytes(),
+                            StandardCharsets.UTF_8)
                     + "\n/";
         } catch (final IOException | NullPointerException exception) {
             throw new IllegalStateException(ExaError.messageBuilder("F-BFSJ-13")

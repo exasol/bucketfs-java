@@ -57,21 +57,21 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     }
 
     @Test
-    void testGetMd5Checksum()
+    void testGetSha512Checksum()
             throws NoSuchAlgorithmException, BucketAccessException, InterruptedException, TimeoutException {
         final String testContent = "test";
-        final String testFile = "aFileForMd5SumTest.txt";
+        final String testFile = "aFileForChecksumTest.txt";
         this.bucket.uploadStringContent(testContent, testFile);
-        final String md5Checksum = this.uploadCheck.getMd5Checksum(testFile, this.bucket);
-        final MessageDigest md = MessageDigest.getInstance("MD5");
+        final String checksum = this.uploadCheck.getSha512Checksum(testFile, this.bucket);
+        final MessageDigest md = MessageDigest.getInstance("SHA-512");
         md.update(testContent.getBytes());
-        assertThat(md5Checksum, equalTo(toHex(md.digest())));
+        assertThat(checksum, equalTo(toHex(md.digest())));
     }
 
     @Test
     void testGetChecksumOfNonExistingFile() {
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
-                () -> this.uploadCheck.getMd5Checksum(getUniqueFileName(), getBucket()));
+                () -> this.uploadCheck.getSha512Checksum(getUniqueFileName(), getBucket()));
         assertThat(exception.getMessage(), startsWith("F-BFSJ-15: Failed to determine checksum of file"));
     }
 
