@@ -16,8 +16,8 @@ import com.exasol.bucketfs.*;
 import com.exasol.errorreporting.ExaError;
 
 /**
- * This {@link UploadNecessityCheckStrategy} compares the checksum of the local file and the file on BucketFs and only
- * uploads the file if they differ or if the file does not exist in BucketFs.
+ * This {@link UploadNecessityCheckStrategy} compares the checksum of the local file and the file on BucketFS and only
+ * uploads the file if the checksums differ or if the file does not exist in BucketFS.
  */
 //[impl->dsn~conditional-upload~1]
 public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityCheckStrategy {

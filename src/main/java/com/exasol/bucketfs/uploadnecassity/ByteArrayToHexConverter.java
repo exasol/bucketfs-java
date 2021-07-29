@@ -1,9 +1,9 @@
 package com.exasol.bucketfs.uploadnecassity;
 
 /**
- * This class converts a byte array into a hex representation.
+ * This class converts a byte array into a hexadecimal representation.
  */
-class ByteArrayToHexConverter {
+final class ByteArrayToHexConverter {
     private ByteArrayToHexConverter() {
         // this class has only static methods
     }

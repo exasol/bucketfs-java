@@ -119,7 +119,7 @@ Needs: dsn
 
 `req-conditional-upload~1`
 
-For large files BFSJ can determine if its necessary to upload a file or if it's already there.
+For large files BFSJ can determine if its necessary to upload a file or if that file is already present in the Bucket at the given target path.
 
 Rationale:
 
