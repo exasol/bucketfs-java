@@ -18,7 +18,7 @@ Please check out ["Introduction to the Dependency Mechanism"](http://maven.apach
 
 We assume here that you are familiar with the basics.
 
-### BucketFs Java as Maven Dependency
+### BucketFS Java as Maven Dependency
 
 Just add the following dependency to add the Exasol test containers to your project.
 
@@ -193,6 +193,24 @@ bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar","jars/"
 ```
 
 In this case the `Bucket` treats the destination path in the bucket as if you wrote `jars/virtual-schemas-3.0.1.jar`.
+
+### Uploading Large File Only if Necessary
+
+Uploading large files can be slow. To avoid that slowing down your tests, BFSJ can check if the file already exists in the same location on BucketFS and compare checksums. It will then only upload the file if the checksums differ. Since comparing the checksums also takes some time BFSJ only compares checksums for files larger than 1 MB. If a file is smaller, BFSJ uploads it regardless of whether it already existed.
+
+To enable this feature use:
+
+```java
+bucket.setUploadNecessityCheckStrategy(new UploadNecessityCheckStrategy(sqlConnection));
+```
+
+To disable it again use:
+
+```java
+bucket.setUploadNecessityCheckStrategy(new UploadAlwaysStrategy());
+```
+
+By default, this feature is disabled.
 
 ### Uploading Text as a File
 

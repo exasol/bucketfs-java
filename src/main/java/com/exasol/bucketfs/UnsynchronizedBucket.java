@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
+
 /**
  * Interface for write access to a bucket in Bucket FS.
  *
@@ -27,7 +29,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      *
      * @return write password.
      */
-    String getWritePassword();
+    public String getWritePassword();
 
     /**
      * Upload a file to the bucket.
@@ -40,13 +42,14 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * BucketFS.
      * </p>
      *
-     * @param pathInBucket path inside the bucket
      * @param localPath    path of the file to be uploaded
+     * @param pathInBucket path inside the bucket
      * @throws TimeoutException      if the synchronization check takes too long
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws FileNotFoundException in case the source file is not found
+     * @return {@link UploadResult} describing the status of the upload
      */
-    void uploadFileNonBlocking(Path localPath, String pathInBucket)
+    public UploadResult uploadFileNonBlocking(Path localPath, String pathInBucket)
             throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**
@@ -65,7 +68,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
      */
-    void uploadStringContentNonBlocking(String content, String pathInBucket)
+    public void uploadStringContentNonBlocking(String content, String pathInBucket)
             throws BucketAccessException, TimeoutException;
 
     /**
@@ -77,18 +80,29 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws TimeoutException      if synchronization takes too long
      */
     // [impl->dsn~uploading-input-stream-to-bucket~1]
-    void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
+    public void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
             throws BucketAccessException, TimeoutException;
 
     /**
      * Delete a file from BucketFS.
      * <p>
-     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail with access denied.
+     * Warning: If you try to upload a file shortly (less than about 30s) after you deleted it, the upload will fail
+     * with access denied.
      * </p>
      *
      * @param pathInBucket file path
      * @throws BucketAccessException if delete failed
      */
-    //[impl->dsn~delete-a-file-from-a-bucket~1]
-    void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
+    // [impl->dsn~delete-a-file-from-a-bucket~1]
+    public void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
+
+    /**
+     * Set an {@link UploadNecessityCheckStrategy}.
+     * <p>
+     * This class uses the strategy during file upload to decide if the file should really be uploaded.
+     * </p>
+     * 
+     * @param uploadNecessityCheckStrategy strategy to use from now on
+     */
+    public void setUploadNecessityCheckStrategy(final UploadNecessityCheckStrategy uploadNecessityCheckStrategy);
 }

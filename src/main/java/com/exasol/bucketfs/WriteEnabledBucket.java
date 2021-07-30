@@ -1,5 +1,9 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.bucketfs.BucketOperation.DELETE;
+import static com.exasol.bucketfs.BucketOperation.UPLOAD;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,9 +18,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import static com.exasol.bucketfs.BucketOperation.DELETE;
-import static com.exasol.bucketfs.BucketOperation.UPLOAD;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
+import com.exasol.bucketfs.uploadnecessity.UploadAlwaysStrategy;
+import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
@@ -24,6 +27,7 @@ import static com.exasol.errorreporting.ExaError.messageBuilder;
 public class WriteEnabledBucket extends ReadEnabledBucket implements UnsynchronizedBucket {
     private static final Logger LOGGER = Logger.getLogger(WriteEnabledBucket.class.getName());
     private final String writePassword;
+    private UploadNecessityCheckStrategy uploadNecessityCheckStrategy = new UploadAlwaysStrategy();
 
     protected WriteEnabledBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
@@ -37,12 +41,19 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     // [impl->dsn~uploading-to-bucket~1]
     @Override
-    public void uploadFileNonBlocking(final Path localPath, final String pathInBucket)
-            throws BucketAccessException, TimeoutException, FileNotFoundException {
+    public UploadResult uploadFileNonBlocking(final Path localPath, final String pathInBucket)
+            throws BucketAccessException, FileNotFoundException {
         final var extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
-        final var uri = createWriteUri(extendedPathInBucket);
-        uploadWithBodyPublisher(uri, BodyPublishers.ofFile(localPath), "file '" + localPath + "'");
-        recordUploadInHistory(pathInBucket);
+        if (this.uploadNecessityCheckStrategy.isUploadNecessary(localPath, pathInBucket, this)) {
+            final var uri = createWriteUri(extendedPathInBucket);
+            uploadWithBodyPublisher(uri, BodyPublishers.ofFile(localPath), "file '" + localPath + "'");
+            recordUploadInHistory(pathInBucket);
+            return new UploadResult(true);
+        } else {
+            LOGGER.fine("Skipping upload since the " + this.uploadNecessityCheckStrategy.getClass().getSimpleName()
+                    + " decided it's not necessary.");
+            return new UploadResult(false);
+        }
     }
 
     protected void uploadWithBodyPublisher(final URI uri, final BodyPublisher publisher, final String what)
@@ -137,9 +148,8 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     }
 
     @Override
-    //[impl->dsn~delete-a-file-from-a-bucket~1]
-    public void deleteFileNonBlocking(final String filenameInBucket)
-            throws BucketAccessException {
+    // [impl->dsn~delete-a-file-from-a-bucket~1]
+    public void deleteFileNonBlocking(final String filenameInBucket) throws BucketAccessException {
         try {
             final var uri = createWriteUri(filenameInBucket);
             final var request = HttpRequest.newBuilder(uri) //
@@ -149,16 +159,22 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
             final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
             evaluateRequestStatus(uri, DELETE, statusCode);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             throw getDeleteFailedException(filenameInBucket, exception);
-        } catch (InterruptedException exception) {
+        } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw getDeleteFailedException(filenameInBucket, exception);
         }
     }
 
-    private BucketAccessException getDeleteFailedException(String filenameInBucket, Exception exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-12").message("Failed to delete {{file}} from BucketFS.", filenameInBucket).toString(), exception);
+    private BucketAccessException getDeleteFailedException(final String filenameInBucket, final Exception exception) {
+        return new BucketAccessException(messageBuilder("E-BFSJ-12")
+                .message("Failed to delete {{file}} from BucketFS.", filenameInBucket).toString(), exception);
+    }
+
+    @Override
+    public void setUploadNecessityCheckStrategy(final UploadNecessityCheckStrategy uploadNecessityCheckStrategy) {
+        this.uploadNecessityCheckStrategy = uploadNecessityCheckStrategy;
     }
 
     /**

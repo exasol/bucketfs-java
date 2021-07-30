@@ -1,5 +1,7 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -8,8 +10,6 @@ import java.time.temporal.ChronoField;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-
-import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
@@ -38,9 +38,11 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
             throws TimeoutException, BucketAccessException, FileNotFoundException {
         delayRepeatedUploadToSamePath(pathInBucket);
         final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
-        uploadFileNonBlocking(localPath, pathInBucket);
-        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
-        recordUploadInHistory(pathInBucket);
+        final UploadResult uploadResult = uploadFileNonBlocking(localPath, pathInBucket);
+        if (uploadResult.wasUploadNecessary()) {
+            waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+            recordUploadInHistory(pathInBucket);
+        }
     }
 
     // Wait some time between uploads of the same file so we can distinguish the upload success logs for detecting

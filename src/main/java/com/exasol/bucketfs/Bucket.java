@@ -28,7 +28,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * that URI is interpreted as a directory inside the bucket and the original filename is appended.
      * </p>
      * <p>
-     * This call blocks until the uploaded file is synchronized in BucketFs or a timeout occurs.
+     * This call blocks until the uploaded file is synchronized in BucketFS or a timeout occurs.
      * </p>
      *
      * @param pathInBucket path inside the bucket
@@ -48,7 +48,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * For large payload use {@link Bucket#uploadFile(Path, String)} instead.
      * </p>
      * <p>
-     * This call blocks until the uploaded file is synchronized in BucketFs or a timeout occurs.
+     * This call blocks until the uploaded file is synchronized in BucketFS or a timeout occurs.
      * </p>
      *
      * @param content      string to write

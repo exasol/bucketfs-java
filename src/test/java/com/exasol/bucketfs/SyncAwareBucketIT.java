@@ -1,12 +1,12 @@
 package com.exasol.bucketfs;
 
-import com.exasol.containers.exec.ExitCode;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
+import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
 
 import java.io.*;
 import java.net.http.HttpClient;
@@ -15,17 +15,19 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
-import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
+import com.exasol.containers.exec.ExitCode;
 
 @Tag("slow")
 class SyncAwareBucketIT extends AbstractBucketIT {
-    private SyncAwareBucket getDefaultBucket() {
+    private SyncAwareBucket createDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         return SyncAwareBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
@@ -44,7 +46,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
             throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final var fileName = "test-uploaded.txt";
         final var testFile = createTestFile(tempDir, fileName, 10000);
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         bucket.uploadFile(testFile, fileName);
         assertThat(bucket.listContents(), hasItem(fileName));
     }
@@ -57,15 +59,15 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     // [itest->dsn~uploading-to-bucket~1]
-    @ValueSource(strings = {"dir1/", "dir2/sub2/", "dir3/sub3/subsub3/", "/dir4/", "/dir5/sub5/"})
+    @ValueSource(strings = { "dir1/", "dir2/sub2/", "dir3/sub3/subsub3/", "/dir4/", "/dir5/sub5/" })
     @ParameterizedTest
     void testUploadToDirectoryInBucket(final String pathInBucket, @TempDir final Path tempDir)
             throws BucketAccessException, InterruptedException, IOException, TimeoutException {
         final var fileName = "file.txt";
         final var file = createTestFile(tempDir, fileName, 1);
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         bucket.uploadFile(file, pathInBucket);
-        assertThat(getDefaultBucket().listContents(pathInBucket), Matchers.contains(fileName));
+        assertThat(createDefaultBucket().listContents(pathInBucket), Matchers.contains(fileName));
     }
 
     // [itest->dsn~uploading-strings-to-bucket~1]
@@ -73,7 +75,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     void testUploadStringContent() throws IOException, BucketAccessException, InterruptedException, TimeoutException {
         final var content = "Hello BucketFS!";
         final var pathInBucket = "string-uploaded.txt";
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         bucket.uploadStringContent(content, pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket.toString()));
     }
@@ -83,7 +85,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     void testUploadInputStreamContent() throws BucketAccessException, InterruptedException, TimeoutException {
         final var content = "Hello BucketFS!";
         final var pathInBucket = "string-uploaded.txt";
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         bucket.uploadInputStream(() -> new ByteArrayInputStream(content.getBytes()), pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket));
     }
@@ -91,20 +93,20 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     @Test
     void testUploadNonExistentFileThrowsException() {
         final var file = Path.of("/this/path/does/not/exist");
-        assertThrows(FileNotFoundException.class, () -> getDefaultBucket().uploadFile(file, "nowhere.txt"));
+        assertThrows(FileNotFoundException.class, () -> createDefaultBucket().uploadFile(file, "nowhere.txt"));
     }
 
     @Test
     void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException {
         final var file = createTestFile(tempDir, "irrelevant.txt", 1);
         assertThrows(BucketAccessException.class,
-                () -> getDefaultBucket().uploadFile(file, "this\\is\\an\\illegal\\URL"));
+                () -> createDefaultBucket().uploadFile(file, "this\\is\\an\\illegal\\URL"));
     }
 
     @Test
     void testUploadContentToIllegalUrlThrowsException() {
         assertThrows(BucketAccessException.class,
-                () -> getDefaultBucket().uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
+                () -> createDefaultBucket().uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
     }
 
     // [itest->dsn~downloading-a-file-from-a-bucket~1]
@@ -112,7 +114,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     void testDownloadFile(@TempDir final Path tempDir)
             throws InterruptedException, BucketAccessException, TimeoutException, IOException {
         final var fileName = "read_me.txt";
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         final var content = "read me";
         bucket.uploadStringContent(content, fileName);
         final var pathToFile = tempDir.resolve(fileName);
@@ -124,7 +126,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     @Test
     void testDownloadAsString() throws InterruptedException, BucketAccessException, TimeoutException {
         final var fileName = "read_me.txt";
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         final var content = "read me";
         bucket.uploadStringContent(content, fileName);
         final var result = bucket.downloadFileAsString(fileName);
@@ -136,7 +138,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
             throws InterruptedException, BucketAccessException, TimeoutException {
         final var pathToFile = tempDir.resolve("/this/path/does/not/exist");
         final var pathInBucket = "foo.txt";
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         bucket.uploadStringContent("some content", pathInBucket);
         final var exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
@@ -155,7 +157,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var fileA = Files.writeString(tempDir.resolve("a.txt"), contentA.repeat(scaleContentSizeBy));
         final var contentB = "abcdeABCDE\n";
         final var fileB = Files.writeString(tempDir.resolve("b.txt"), contentB.repeat(scaleContentSizeBy));
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         for (int i = 1; i <= 10; ++i) {
             final var useA = (i % 2) == 1;
             final var currentFile = useA ? fileA : fileB;
@@ -172,9 +174,9 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-        //[itest->dsn~delete-a-file-from-a-bucket~1]
+    // [itest->dsn~delete-a-file-from-a-bucket~1]
     void testDeleteFile() throws BucketAccessException, InterruptedException, TimeoutException {
-        final var bucket = getDefaultBucket();
+        final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
         bucket.deleteFileNonBlocking(testFile);
@@ -182,26 +184,31 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testInterruptedDuringDeleteFile() throws BucketAccessException, InterruptedException, TimeoutException, IOException {
+    void testInterruptedDuringDeleteFile()
+            throws BucketAccessException, InterruptedException, TimeoutException, IOException {
         assertDeleteThrowsExceptionWhenClientThrows(new InterruptedException());
         assertTrue(Thread.currentThread().isInterrupted());
     }
 
     @Test
-    void testIoExceptionDuringDeleteFile() throws BucketAccessException, InterruptedException, TimeoutException, IOException {
+    void testIoExceptionDuringDeleteFile()
+            throws BucketAccessException, InterruptedException, TimeoutException, IOException {
         assertDeleteThrowsExceptionWhenClientThrows(new IOException());
     }
 
-    private void assertDeleteThrowsExceptionWhenClientThrows(Exception exceptionThrownByHttpClient) throws InterruptedException, BucketAccessException, TimeoutException, IOException {
-        final var bucket = getDefaultBucket();
+    private void assertDeleteThrowsExceptionWhenClientThrows(final Exception exceptionThrownByHttpClient)
+            throws InterruptedException, BucketAccessException, TimeoutException, IOException {
+        final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
         final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
-        final BucketAccessException exception = assertThrows(BucketAccessException.class, () -> bucketSpy.deleteFileNonBlocking(testFile));
+        final BucketAccessException exception = assertThrows(BucketAccessException.class,
+                () -> bucketSpy.deleteFileNonBlocking(testFile));
         assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-12: Failed to delete"));
     }
 
-    private SyncAwareBucket getBucketWithExceptionThrowingHttpClient(Exception exceptionThrownByHttpClient, SyncAwareBucket bucket) throws IOException, InterruptedException {
+    private SyncAwareBucket getBucketWithExceptionThrowingHttpClient(final Exception exceptionThrownByHttpClient,
+            final SyncAwareBucket bucket) throws IOException, InterruptedException {
         final SyncAwareBucket bucketSpy = spy(bucket);
         final HttpClient client = mock(HttpClient.class);
         when(client.send(any(), any())).thenThrow(exceptionThrownByHttpClient);
@@ -210,7 +217,8 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testInterruptedDuringUploadFile() throws BucketAccessException, InterruptedException, TimeoutException, IOException {
+    void testInterruptedDuringUploadFile()
+            throws BucketAccessException, InterruptedException, TimeoutException, IOException {
         final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new InterruptedException());
         assertAll(//
                 () -> assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-6: Interrupted trying to upload")),
@@ -219,17 +227,43 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testIoExceptionDuringUploadFile() throws BucketAccessException, InterruptedException, TimeoutException, IOException {
+    void testIoExceptionDuringUploadFile()
+            throws BucketAccessException, InterruptedException, TimeoutException, IOException {
         final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new IOException());
         assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-7: I/O error trying to upload"));
     }
 
-    private BucketAccessException assertUploadThrowsExceptionWhenClientThrows(Exception exceptionThrownByHttpClient) throws InterruptedException, BucketAccessException, TimeoutException, IOException {
-        final var bucket = getDefaultBucket();
+    private BucketAccessException assertUploadThrowsExceptionWhenClientThrows(
+            final Exception exceptionThrownByHttpClient)
+            throws InterruptedException, BucketAccessException, TimeoutException, IOException {
+        final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
         final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void testUploadNecessityCheckStrategy(final boolean uploadNecessary, @TempDir final Path tempDir)
+            throws IOException, BucketAccessException, TimeoutException {
+        final SyncAwareBucket bucket = createDefaultBucket();
+        final String fileName = getUniqueFileName();
+        final Path testFile = tempDir.resolve(fileName);
+        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = createUploadNeverStrategyMock(bucket,
+                fileName, testFile, uploadNecessary);
+        Files.writeString(testFile, "some content");
+        bucket.setUploadNecessityCheckStrategy(uploadNecessityCheckStrategy);
+        bucket.uploadFile(testFile, fileName);
+        assertThat(bucket.listContents().contains(fileName), equalTo(uploadNecessary));
+        verify(uploadNecessityCheckStrategy).isUploadNecessary(testFile, fileName, bucket);
+    }
+
+    private UploadNecessityCheckStrategy createUploadNeverStrategyMock(final SyncAwareBucket bucket,
+            final String fileName, final Path testFile, final boolean uploadNecessary) throws BucketAccessException {
+        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = mock(UploadNecessityCheckStrategy.class);
+        when(uploadNecessityCheckStrategy.isUploadNecessary(testFile, fileName, bucket)).thenReturn(uploadNecessary);
+        return uploadNecessityCheckStrategy;
     }
 
     private String getUniqueFileName() {

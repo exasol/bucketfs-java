@@ -1,14 +1,17 @@
-# BucketFS Java 2.1.0, released 2021-??-??
+# BucketFS Java 2.1.0, released 2021-07-30
 
-Code name: Added delete method
+Code name: Delete bucket object and conditional upload
 
 ## Summary:
 
-In this release we added a method for deleting files from BucketFs.
+In this release we added a method for deleting files from BucketFS.
+
+Additionally users can no provide a strategy that decides whether an upload is really necessary or if it can be skipped. We also added a ready-to-use strategy that checks via hash sums if the file to be uploaded is already present. This can speed up tests significantly if they would otherwise repeatedly upload the same large files.
 
 ## Features:
 
 * #30: Added method for deleting files
+* #33: Added conditional upload
 
 ## Bug Fixes:
 
