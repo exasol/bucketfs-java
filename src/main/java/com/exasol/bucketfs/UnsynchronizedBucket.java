@@ -47,9 +47,9 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws TimeoutException      if the synchronization check takes too long
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws FileNotFoundException in case the source file is not found
-     * @return {@code true} if the file was uploaded. Otherwise upload was unnecessary
+     * @return {@link UploadResult} describing the status of the upload
      */
-    boolean uploadFileNonBlocking(Path localPath, String pathInBucket)
+    UploadResult uploadFileNonBlocking(Path localPath, String pathInBucket)
             throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**

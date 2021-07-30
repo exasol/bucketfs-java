@@ -38,7 +38,8 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
             throws TimeoutException, BucketAccessException, FileNotFoundException {
         delayRepeatedUploadToSamePath(pathInBucket);
         final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
-        if (uploadFileNonBlocking(localPath, pathInBucket)) {
+        final UploadResult uploadResult = uploadFileNonBlocking(localPath, pathInBucket);
+        if (uploadResult.wasUploadNecessary()) {
             waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
             recordUploadInHistory(pathInBucket);
         }

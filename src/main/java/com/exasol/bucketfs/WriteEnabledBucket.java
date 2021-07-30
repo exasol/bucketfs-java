@@ -41,18 +41,18 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     // [impl->dsn~uploading-to-bucket~1]
     @Override
-    public boolean uploadFileNonBlocking(final Path localPath, final String pathInBucket)
+    public UploadResult uploadFileNonBlocking(final Path localPath, final String pathInBucket)
             throws BucketAccessException, FileNotFoundException {
         final var extendedPathInBucket = extendPathInBucketDownToFilename(localPath, pathInBucket);
         if (this.uploadNecessityCheckStrategy.isUploadNecessary(localPath, pathInBucket, this)) {
             final var uri = createWriteUri(extendedPathInBucket);
             uploadWithBodyPublisher(uri, BodyPublishers.ofFile(localPath), "file '" + localPath + "'");
             recordUploadInHistory(pathInBucket);
-            return true;
+            return new UploadResult(true);
         } else {
             LOGGER.fine("Skipping upload since the " + this.uploadNecessityCheckStrategy.getClass().getSimpleName()
                     + " decided it's not necessary.");
-            return false;
+            return new UploadResult(false);
         }
     }
 
