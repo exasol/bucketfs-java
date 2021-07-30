@@ -1,4 +1,4 @@
-# BucketFS Java 2.1.0, released 2021-07-29
+# BucketFS Java 2.1.0, released 2021-07-30
 
 Code name: Delete bucket object and conditional upload
 
