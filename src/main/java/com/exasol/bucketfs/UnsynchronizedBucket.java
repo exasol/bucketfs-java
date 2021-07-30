@@ -29,7 +29,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      *
      * @return write password.
      */
-    String getWritePassword();
+    public String getWritePassword();
 
     /**
      * Upload a file to the bucket.
@@ -49,7 +49,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws FileNotFoundException in case the source file is not found
      * @return {@link UploadResult} describing the status of the upload
      */
-    UploadResult uploadFileNonBlocking(Path localPath, String pathInBucket)
+    public UploadResult uploadFileNonBlocking(Path localPath, String pathInBucket)
             throws BucketAccessException, TimeoutException, FileNotFoundException;
 
     /**
@@ -68,7 +68,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws BucketAccessException if the file cannot be uploaded to the given URI
      * @throws TimeoutException      if synchronization takes too long
      */
-    void uploadStringContentNonBlocking(String content, String pathInBucket)
+    public void uploadStringContentNonBlocking(String content, String pathInBucket)
             throws BucketAccessException, TimeoutException;
 
     /**
@@ -80,7 +80,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws TimeoutException      if synchronization takes too long
      */
     // [impl->dsn~uploading-input-stream-to-bucket~1]
-    void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
+    public void uploadInputStreamNonBlocking(Supplier<InputStream> inputStreamSupplier, String pathInBucket)
             throws BucketAccessException, TimeoutException;
 
     /**
@@ -94,7 +94,7 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * @throws BucketAccessException if delete failed
      */
     // [impl->dsn~delete-a-file-from-a-bucket~1]
-    void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
+    public void deleteFileNonBlocking(final String pathInBucket) throws BucketAccessException;
 
     /**
      * Set an {@link UploadNecessityCheckStrategy}.
@@ -104,5 +104,5 @@ public interface UnsynchronizedBucket extends ReadOnlyBucket {
      * 
      * @param uploadNecessityCheckStrategy strategy to use from now on
      */
-    void setUploadNecessityCheckStrategy(final UploadNecessityCheckStrategy uploadNecessityCheckStrategy);
+    public void setUploadNecessityCheckStrategy(final UploadNecessityCheckStrategy uploadNecessityCheckStrategy);
 }
