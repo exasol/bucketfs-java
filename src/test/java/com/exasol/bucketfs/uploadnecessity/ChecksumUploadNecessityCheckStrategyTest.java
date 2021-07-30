@@ -21,7 +21,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.exasol.bucketfs.*;
 
-//[itest->dsn~conditional-upload~1]
 class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     private static Connection connection;
     private static ChecksumUploadNecessityCheckStrategy uploadCheck;
@@ -96,6 +95,7 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     }
 
     @Test
+    // [itest->dsn~conditional-upload-by-checksum~1]
     void testUploadRequiredByDifferentContent(@TempDir final Path tempDir)
             throws IOException, BucketAccessException, TimeoutException, InterruptedException {
         final String twoMbString = "a".repeat(2000000);
@@ -107,6 +107,7 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     }
 
     @Test
+    // [itest->dsn~conditional-upload-by-existence~1]
     void testUploadRequiredByNewFile(@TempDir final Path tempDir) throws IOException, BucketAccessException {
         final String twoMbString = "a".repeat(2000000);
         final String fileName = getUniqueFileName();
@@ -116,6 +117,7 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     }
 
     @Test
+    //// [itest->dsn~conditional-upload-by-size~1]
     void testUploadRequiredBySmallFile(@TempDir final Path tempDir)
             throws IOException, BucketAccessException, TimeoutException {
         final String smallString = "test";

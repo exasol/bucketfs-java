@@ -22,7 +22,6 @@ import com.exasol.errorreporting.ExaError;
  * uploads the file if the checksums differ or if the file does not exist in BucketFS. For performance reasons this
  * strategy always uploads files with a size less or equal 1 MB.
  */
-//[impl->dsn~conditional-upload~1]
 public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityCheckStrategy {
     private static final String UDF_SCHEMA = "BUCKET_FS_JAVA_HELPER";
     private static final String UDF_NAME = "BUCKET_FS_CHECKSUM";
@@ -44,6 +43,9 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
     }
 
     @Override
+    // [impl->dsn~conditional-upload-by-existence~1]
+    // [impl->dsn~conditional-upload-by-size~1]
+    // [impl->dsn~conditional-upload-by-checksum~1]
     public boolean isUploadNecessary(final Path file, final String fullFileNameInBucketFs, final ReadOnlyBucket bucket)
             throws BucketAccessException {
         try {

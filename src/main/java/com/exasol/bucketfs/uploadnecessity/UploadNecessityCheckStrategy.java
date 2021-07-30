@@ -8,7 +8,6 @@ import com.exasol.bucketfs.ReadOnlyBucket;
 /**
  * This is an interface for strategies that decide if it necessary to upload a file to BucketFS.
  */
-//[impl->dsn~conditional-upload~1]
 public interface UploadNecessityCheckStrategy {
 
     /**

@@ -120,15 +120,39 @@ Covers:
 
 Needs: impl, itest
 
-### Conditional Upload
+### Conditional Upload by Existence
 
-`dsn~conditional-upload~1`
+`dsn~conditional-upload-by-existence~1`
 
-We decided to check if the file needs to get uploaded by comparing the checksum of the local file and the file in BucketFS. BucketFS does not support the creation of checksums we install a Python UDF that calculates the checksum. Since installing and running of the UDF takes some time (~2 secs), we only compare the checksums for files > 1 MB. For other files we simply upload the file since it's probably faster than building the checksum.
+BFSJ can check if a file needs to get uploaded by checking if the file exists in the Bucket.
 
-A downside of this approach is that we need an SQL connection to the database. However, currently we could not find a better one.
+Covers:
 
-We decided to implement the checksum check as a strategy for the `WriteEnabledBucket`. That allows users to also write other strategies. Another important argument is that by that only the strategy needs to have the SQL connection.
+* `req-conditional-upload~1`
+
+Needs: impl, itest
+
+### Conditional Upload by Size
+
+`dsn~conditional-upload-by-size~1`
+
+BFSJ always uploads files less or equal than 1 MB.
+
+Rationale:
+
+For other files the checksum comparison would be too expensive.
+
+Covers:
+
+* `req-conditional-upload~1`
+
+Needs: impl, itest
+
+### Conditional Upload by Checksum
+
+`dsn~conditional-upload-by-checksum~1`
+
+BFSJ checks if a file needs to get uploaded by comparing the checksum.
 
 Covers:
 
