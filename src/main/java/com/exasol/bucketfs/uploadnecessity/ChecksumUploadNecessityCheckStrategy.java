@@ -1,5 +1,6 @@
 package com.exasol.bucketfs.uploadnecessity;
 
+import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
 import static com.exasol.bucketfs.uploadnecessity.ByteArrayToHexConverter.toHex;
 
 import java.io.IOException;
@@ -12,7 +13,8 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.exasol.bucketfs.*;
+import com.exasol.bucketfs.BucketAccessException;
+import com.exasol.bucketfs.ReadOnlyBucket;
 import com.exasol.errorreporting.ExaError;
 
 /**
@@ -45,7 +47,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
     public boolean isUploadNecessary(final Path file, final String fullFileNameInBucketFs, final ReadOnlyBucket bucket)
             throws BucketAccessException {
         try {
-            final String[] parts = fullFileNameInBucketFs.split(BucketConstants.PATH_SEPARATOR);
+            final String[] parts = fullFileNameInBucketFs.split(PATH_SEPARATOR);
             final String fileName = parts[parts.length - 1];
             final List<String> filesInBucketDirectory = bucket.listContents(getDirectory(parts));
             if (Files.size(file) > ONE_MEGABYTE && filesInBucketDirectory.contains(fileName)) {
@@ -62,8 +64,8 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
 
     private String getDirectory(final String[] parts) {
         final String directory = Arrays.stream(parts).limit((long) parts.length - 1)
-                .collect(Collectors.joining(BucketConstants.PATH_SEPARATOR));
-        if (directory.startsWith(BucketConstants.PATH_SEPARATOR)) {
+                .collect(Collectors.joining(PATH_SEPARATOR));
+        if (directory.startsWith(PATH_SEPARATOR)) {
             return directory.substring(1);
         } else {
             return directory;
@@ -95,8 +97,8 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
         installChecksumUdf();
         try (final PreparedStatement statement = this.sqlConnection
                 .prepareStatement("SELECT " + UDF_FULL_NAME + "(?)")) {
-            final String pathInUdf = "/buckets/" + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "/"
-                    + fileInBucketFs;
+            final String pathInUdf = "/buckets/" + bucket.getBucketFsName() + PATH_SEPARATOR + bucket.getBucketName()
+                    + PATH_SEPARATOR + fileInBucketFs;
             statement.setString(1, pathInUdf);
             try (final ResultSet result = statement.executeQuery()) {
                 result.next();

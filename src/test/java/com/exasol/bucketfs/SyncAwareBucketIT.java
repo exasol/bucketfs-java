@@ -243,19 +243,27 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
     }
 
-    @Test
-    void testUploadNecessityCheckStrategy(@TempDir final Path tempDir)
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void testUploadNecessityCheckStrategy(final boolean uploadNecessary, @TempDir final Path tempDir)
             throws IOException, BucketAccessException, TimeoutException {
-        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = mock(UploadNecessityCheckStrategy.class);
         final SyncAwareBucket bucket = createDefaultBucket();
         final String fileName = getUniqueFileName();
         final Path testFile = tempDir.resolve(fileName);
-        when(uploadNecessityCheckStrategy.isUploadNecessary(testFile, fileName, bucket)).thenReturn(false);
+        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = createUploadNeverStrategyMock(bucket,
+                fileName, testFile, uploadNecessary);
         Files.writeString(testFile, "some content");
         bucket.setUploadNecessityCheckStrategy(uploadNecessityCheckStrategy);
         bucket.uploadFile(testFile, fileName);
-        assertThat(bucket.listContents(), not(hasItem(fileName)));
+        assertThat(bucket.listContents().contains(fileName), equalTo(uploadNecessary));
         verify(uploadNecessityCheckStrategy).isUploadNecessary(testFile, fileName, bucket);
+    }
+
+    private UploadNecessityCheckStrategy createUploadNeverStrategyMock(final SyncAwareBucket bucket,
+            final String fileName, final Path testFile, final boolean uploadNecessary) throws BucketAccessException {
+        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = mock(UploadNecessityCheckStrategy.class);
+        when(uploadNecessityCheckStrategy.isUploadNecessary(testFile, fileName, bucket)).thenReturn(uploadNecessary);
+        return uploadNecessityCheckStrategy;
     }
 
     private String getUniqueFileName() {
