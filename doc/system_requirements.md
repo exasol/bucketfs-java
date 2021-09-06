@@ -51,6 +51,22 @@ This section lists functional requirements from the user's perspective. The requ
 
 ### BucketFS Access
 
+#### Creating new Buckets
+
+`req~creating-new-buckets~1`
+
+BFSJ creates a new bucket in BucketFS with a given name.
+
+Rationale:
+
+Allows adding new buckets in case the existing buckets are not sufficient.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
 #### Bucket Content Listing
 
 `req~bucket-content-listing~1`
