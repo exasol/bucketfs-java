@@ -1,14 +1,12 @@
-package com.exasol.bucketfs.jsonrpc.command;
+package com.exasol.bucketfs.jsonrpc;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import com.exasol.bucketfs.jsonrpc.JsonMapper;
-
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
 
-public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand.Result> {
+public class CreateBucketCommand extends JsonResponseCommand<Void> {
 
     private final Request request;
 
@@ -23,12 +21,12 @@ public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand
     }
 
     @Override
-    Result processResult(final JsonStructure responsePayload) {
-        return new Result(responsePayload);
+    Void processResult(final JsonStructure responsePayload) {
+        return null;
     }
 
-    static CreateBucketCommandBuilder builder(final JsonMapper jsonMapper) {
-        return new CreateBucketCommandBuilder(jsonMapper);
+    static CreateBucketCommandBuilder builder(final JsonRpcCommandExecutor executor, final JsonMapper jsonMapper) {
+        return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
     public static class Request {
@@ -90,64 +88,53 @@ public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand
     }
 
     public static final class CreateBucketCommandBuilder {
+        private final JsonMapper jsonMapper;
+        private final JsonRpcCommandExecutor executor;
+
         private String bucketFsName = null;
         private String bucketName = null;
         private boolean isPublic = false;
         private String readPassword = null;
         private String writePassword = null;
         private List<String> additionalFiles = null;
-        private final JsonMapper jsonMapper;
 
-        private CreateBucketCommandBuilder(final JsonMapper jsonMapper) {
+        private CreateBucketCommandBuilder(final JsonRpcCommandExecutor executor, final JsonMapper jsonMapper) {
+            this.executor = executor;
             this.jsonMapper = jsonMapper;
         }
 
-        public CreateBucketCommandBuilder withBucketFsName(final String bucketFsName) {
+        public CreateBucketCommandBuilder bucketFsName(final String bucketFsName) {
             this.bucketFsName = bucketFsName;
             return this;
         }
 
-        public CreateBucketCommandBuilder withBucketName(final String bucketName) {
+        public CreateBucketCommandBuilder bucketName(final String bucketName) {
             this.bucketName = bucketName;
             return this;
         }
 
-        public CreateBucketCommandBuilder withIsPublic(final boolean isPublic) {
+        public CreateBucketCommandBuilder isPublic(final boolean isPublic) {
             this.isPublic = isPublic;
             return this;
         }
 
-        public CreateBucketCommandBuilder withReadPassword(final String readPassword) {
+        public CreateBucketCommandBuilder readPassword(final String readPassword) {
             this.readPassword = readPassword;
             return this;
         }
 
-        public CreateBucketCommandBuilder withWritePassword(final String writePassword) {
+        public CreateBucketCommandBuilder writePassword(final String writePassword) {
             this.writePassword = writePassword;
             return this;
         }
 
-        public CreateBucketCommandBuilder withAdditionalFiles(final List<String> additionalFiles) {
+        public CreateBucketCommandBuilder additionalFiles(final List<String> additionalFiles) {
             this.additionalFiles = additionalFiles;
             return this;
         }
 
-        public CreateBucketCommand build() {
-            return new CreateBucketCommand(this.jsonMapper, new Request(this));
-        }
-    }
-
-    public static class Result {
-
-        private final JsonStructure response;
-
-        private Result(final JsonStructure response) {
-            this.response = response;
-        }
-
-        @Override
-        public String toString() {
-            return "Result [response=" + this.response + "]";
+        public void execute() {
+            this.executor.execute(new CreateBucketCommand(this.jsonMapper, new Request(this)));
         }
     }
 }

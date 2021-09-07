@@ -21,11 +21,14 @@ Additionally users can no provide a strategy that decides whether an upload is r
 
 ### Compile Dependency Updates
 
+* Added `jakarta.json.bind:jakarta.json.bind-api:2.0.0`
 * Added `org.apache.commons:commons-compress:1.21`
+* Added `org.eclipse:yasson:2.0.2`
+* Added `org.glassfish:jakarta.json:2.0.1`
 
 ### Test Dependency Updates
 
-* Updated `com.exasol:exasol-testcontainers:3.5.2` to `3.5.3`
+* Updated `com.exasol:exasol-testcontainers:3.5.2` to `4.0.1`
 * Updated `org.junit.jupiter:junit-jupiter-engine:5.7.1` to `5.7.2`
 * Updated `org.junit.jupiter:junit-jupiter-params:5.7.1` to `5.7.2`
 * Updated `org.mockito:mockito-junit-jupiter:3.9.0` to `3.11.2`

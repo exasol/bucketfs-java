@@ -32,14 +32,14 @@ public class JsonRpcPayload {
 
     public class Parameters {
         @JsonbProperty("params")
-        private final JsonObject parameters;
+        private final JsonObject params;
 
-        private Parameters(final JsonObject parameters) {
-            this.parameters = parameters;
+        private Parameters(final JsonObject params) {
+            this.params = params;
         }
 
-        public JsonObject getParameters() {
-            return this.parameters;
+        public JsonObject getParams() {
+            return this.params;
         }
     }
 }

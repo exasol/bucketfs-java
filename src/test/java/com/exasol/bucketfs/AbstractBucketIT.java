@@ -13,9 +13,17 @@ import com.exasol.containers.ExasolContainer;
 
 @Testcontainers
 public abstract class AbstractBucketIT {
+    private static final int DEFAULT_JSON_RPC_PORT = 443;
+
     @Container
-    protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>() //
-            .withReuse(true);
+    protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = createContainer();
+
+    private static ExasolContainer<?> createContainer() {
+        final ExasolContainer<?> container = new ExasolContainer<>("7.1.0-d1") //
+                .withReuse(true);
+        container.addExposedPort(DEFAULT_JSON_RPC_PORT);
+        return container;
+    }
 
     protected String getContainerIpAddress() {
         return EXASOL.getContainerIpAddress();
@@ -23,6 +31,10 @@ public abstract class AbstractBucketIT {
 
     protected Integer getMappedDefaultBucketFsPort() {
         return EXASOL.getMappedPort(EXASOL.getDefaultInternalBucketfsPort());
+    }
+
+    protected Integer getMappedJsonRpcPort() {
+        return EXASOL.getMappedPort(DEFAULT_JSON_RPC_PORT);
     }
 
     protected BucketConfiguration getDefaultBucketConfiguration() {

@@ -5,8 +5,8 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.any;
 
 import java.io.*;
 import java.net.http.HttpClient;

@@ -8,27 +8,26 @@ import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.logging.Logger;
 
-import com.exasol.bucketfs.jsonrpc.auth.Authenticator;
-
-public class JsonRpcClient {
+class JsonRpcClient {
     private static final Logger LOGGER = Logger.getLogger(JsonRpcClient.class.getName());
 
     private final HttpClient httpClient;
     private final JsonMapper serializer;
-    private final Authenticator interceptor;
-    private final URI serverUri;
+    private final Authenticator authenticator;
+    private final URI serviceUri;
 
-    public JsonRpcClient(final HttpClient httpClient, final JsonMapper serializer,
-            final Authenticator interceptor, final URI serverUri) {
-        this.httpClient = httpClient;
-        this.serializer = serializer;
-        this.interceptor = interceptor;
-        this.serverUri = serverUri;
+    JsonRpcClient(final HttpClient httpClient, final JsonMapper serializer,
+            final Authenticator authenticator, final URI serviceUri) {
+        this.httpClient = Objects.requireNonNull(httpClient);
+        this.serializer = Objects.requireNonNull(serializer);
+        this.authenticator = Objects.requireNonNull(authenticator);
+        this.serviceUri = Objects.requireNonNull(serviceUri);
     }
 
-    public String sendRequest(final JsonRpcPayload payload) {
+    String sendRequest(final JsonRpcPayload payload) {
         final var request = buildRequest(payload);
         final Instant start = Instant.now();
         final HttpResponse<String> response = sendRequest(request);
@@ -41,9 +40,9 @@ public class JsonRpcClient {
 
     private HttpRequest buildRequest(final JsonRpcPayload payload) {
         final String requestBody = this.serializer.serialize(payload);
-        final Builder requestBuilder = HttpRequest.newBuilder(this.serverUri)
+        final Builder requestBuilder = HttpRequest.newBuilder(this.serviceUri)
                 .POST(BodyPublishers.ofString(requestBody));
-        this.interceptor.authenticate(requestBuilder);
+        this.authenticator.authenticate(requestBuilder);
         final var request = requestBuilder.build();
         LOGGER.fine(() -> "Sending request " + request + " with body '" + requestBody + "'");
         return request;
@@ -51,8 +50,10 @@ public class JsonRpcClient {
 
     private void verifySuccessResponse(final HttpRequest request, final HttpResponse<String> response) {
         if ((response.statusCode() / 100) != 2) {
-            throw new JsonRpcException("Received non-ok response status " + response.statusCode() + " for request "
-                    + request + ". Response body: '" + response.body() + "'");
+            final String message = "Received non-ok response status " + response.statusCode() + " for request "
+                    + request + ". Response body: '" + response.body() + "'";
+            LOGGER.warning(message);
+            throw new JsonRpcException(message);
         }
     }
 
@@ -66,5 +67,4 @@ public class JsonRpcClient {
             throw new JsonRpcException("Error executing request '" + request + "'", e);
         }
     }
-
 }

@@ -71,11 +71,4 @@ public class JsonRpcResponse {
                 + this.description
                 + ", revision=" + this.revision + ", output=" + this.output + "]";
     }
-
-    // {"result_jobid": "11.14", "result_code": 0, "result_name": "OK", "result_desc": "Success", "result_revision":
-    // 19, "result_output": ["/exa/etc/bucketfs.cfg", "/exa/etc/bucketfs_db.cfg"]}
-
-    // {"result_jobid": "11.15", "result_code": 1, "result_name": "Exception", "result_desc": "JobError:
-    // ERROR::ConfD: Given bucket mynewbucket3 already exists in bucketfs bfsdefault.", "result_revision": 19}
-
 }

@@ -1,6 +1,4 @@
-package com.exasol.bucketfs.jsonrpc.command;
-
-import com.exasol.bucketfs.jsonrpc.*;
+package com.exasol.bucketfs.jsonrpc;
 
 import jakarta.json.JsonStructure;
 
@@ -13,7 +11,7 @@ abstract class JsonResponseCommand<R> extends RpcCommand<R> {
     }
 
     @Override
-    public final R processResult(final String responsePayload) {
+    final R processResult(final String responsePayload) {
         final JsonRpcResponse payload = this.jsonMapper.deserialize(responsePayload, JsonRpcResponse.class);
         verifySuccess(payload);
         return this.processResult(payload.getOutput());

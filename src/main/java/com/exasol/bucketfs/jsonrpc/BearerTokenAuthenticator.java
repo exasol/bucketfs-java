@@ -1,12 +1,12 @@
-package com.exasol.bucketfs.jsonrpc.auth;
+package com.exasol.bucketfs.jsonrpc;
 
 import java.net.http.HttpRequest;
 
-public class BearerTokenAuthenticator implements Authenticator {
+class BearerTokenAuthenticator implements Authenticator {
 
     private final String token;
 
-    public BearerTokenAuthenticator(final String token) {
+    BearerTokenAuthenticator(final String token) {
         this.token = token;
     }
 

@@ -1,7 +1,7 @@
-package com.exasol.bucketfs.jsonrpc.auth;
+package com.exasol.bucketfs.jsonrpc;
 
 import java.net.http.HttpRequest;
 
-public interface Authenticator {
+interface Authenticator {
     void authenticate(HttpRequest.Builder requestBuilder);
 }
