@@ -1,5 +1,8 @@
 package com.exasol.bucketfs.jsonrpc.command;
 
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 import com.exasol.bucketfs.jsonrpc.JsonMapper;
 
 import jakarta.json.JsonStructure;
@@ -24,7 +27,12 @@ public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand
         return new Result(responsePayload);
     }
 
+    static CreateBucketCommandBuilder builder(final JsonMapper jsonMapper) {
+        return new CreateBucketCommandBuilder(jsonMapper);
+    }
+
     public static class Request {
+        // Mandatory values
         @JsonbProperty("bucketfs_name")
         private final String bucketFsName;
         @JsonbProperty("bucket_name")
@@ -32,19 +40,28 @@ public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand
         @JsonbProperty("public")
         private final boolean isPublic;
 
+        // Optional values
         @JsonbProperty("read_password")
         private final String readPassword;
         @JsonbProperty("write_password")
         private final String writePassword;
+        @JsonbProperty("additional_files")
+        private final List<String> additionalFiles;
 
-        public Request(final String bucketFsName, final String bucketName, final boolean isPublic,
-                final String readPassword,
-                final String writePassword) {
-            this.bucketFsName = bucketFsName;
-            this.bucketName = bucketName;
-            this.isPublic = isPublic;
-            this.readPassword = readPassword;
-            this.writePassword = writePassword;
+        private Request(final CreateBucketCommandBuilder builder) {
+            this.bucketFsName = Objects.requireNonNull(builder.bucketFsName, "bucketFsName");
+            this.bucketName = Objects.requireNonNull(builder.bucketName, "bucketName");
+            this.isPublic = builder.isPublic;
+            this.readPassword = base64Encode(builder.readPassword);
+            this.writePassword = base64Encode(builder.writePassword);
+            this.additionalFiles = builder.additionalFiles;
+        }
+
+        private static String base64Encode(final String value) {
+            if (value == null) {
+                return null;
+            }
+            return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
         }
 
         public String getBucketFsName() {
@@ -65,6 +82,58 @@ public class CreateBucketCommand extends JsonResponseCommand<CreateBucketCommand
 
         public String getWritePassword() {
             return this.writePassword;
+        }
+
+        public List<String> getAdditionalFiles() {
+            return this.additionalFiles;
+        }
+    }
+
+    public static final class CreateBucketCommandBuilder {
+        private String bucketFsName = null;
+        private String bucketName = null;
+        private boolean isPublic = false;
+        private String readPassword = null;
+        private String writePassword = null;
+        private List<String> additionalFiles = null;
+        private final JsonMapper jsonMapper;
+
+        private CreateBucketCommandBuilder(final JsonMapper jsonMapper) {
+            this.jsonMapper = jsonMapper;
+        }
+
+        public CreateBucketCommandBuilder withBucketFsName(final String bucketFsName) {
+            this.bucketFsName = bucketFsName;
+            return this;
+        }
+
+        public CreateBucketCommandBuilder withBucketName(final String bucketName) {
+            this.bucketName = bucketName;
+            return this;
+        }
+
+        public CreateBucketCommandBuilder withIsPublic(final boolean isPublic) {
+            this.isPublic = isPublic;
+            return this;
+        }
+
+        public CreateBucketCommandBuilder withReadPassword(final String readPassword) {
+            this.readPassword = readPassword;
+            return this;
+        }
+
+        public CreateBucketCommandBuilder withWritePassword(final String writePassword) {
+            this.writePassword = writePassword;
+            return this;
+        }
+
+        public CreateBucketCommandBuilder withAdditionalFiles(final List<String> additionalFiles) {
+            this.additionalFiles = additionalFiles;
+            return this;
+        }
+
+        public CreateBucketCommand build() {
+            return new CreateBucketCommand(this.jsonMapper, new Request(this));
         }
     }
 

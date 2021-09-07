@@ -50,4 +50,8 @@ public class JsonMapper {
             return reader.readObject();
         }
     }
+
+    public <T> T deserialize(final JsonStructure json, final Class<T> type) {
+        return deserialize(json.toString(), type);
+    }
 }
