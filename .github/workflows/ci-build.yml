@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        docker-db-version: [ "6.2.14", "7.0.9" ]
+        docker-db-version: [ "6.2.14", "7.0.12", "7.1.0-d1" ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
