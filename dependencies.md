@@ -37,7 +37,7 @@
 | [Apache Maven Enforcer Plugin][41]                      | [Apache License, Version 2.0][12]              |
 | [error-code-crawler-maven-plugin][43]                   | [MIT][1]                                       |
 | [Reproducible Build Maven Plugin][45]                   | [Apache 2.0][40]                               |
-| [Apache Maven GPG Plugin][47]                           | [Apache License, Version 2.0][40]              |
+| [Apache Maven GPG Plugin][47]                           | [Apache License, Version 2.0][12]              |
 | [Apache Maven Deploy Plugin][49]                        | [Apache License, Version 2.0][12]              |
 | [Nexus Staging Maven Plugin][51]                        | [Eclipse Public License][52]                   |
 | [Apache Maven Source Plugin][53]                        | [Apache License, Version 2.0][12]              |
@@ -48,7 +48,6 @@
 | [Maven Install Plugin][63]                              | [The Apache Software License, Version 2.0][40] |
 | [Maven Site Plugin 3][65]                               | [The Apache Software License, Version 2.0][40] |
 
-[29]: https://www.eclemma.org/jacoco/index.html
 [35]: https://github.com/exasol/project-keeper-maven-plugin
 [0]: https://github.com/exasol/error-reporting-java
 [9]: http://www.eclipse.org/legal/epl-v20.html
@@ -66,12 +65,12 @@
 [18]: http://opensource.org/licenses/BSD-3-Clause
 [31]: https://maven.apache.org/plugins/maven-compiler-plugin/
 [24]: http://opensource.org/licenses/MIT
-[47]: http://maven.apache.org/plugins/maven-gpg-plugin/
 [33]: https://github.com/itsallcode/openfasttrace-maven-plugin
 [30]: https://www.eclipse.org/legal/epl-2.0/
 [49]: https://maven.apache.org/plugins/maven-deploy-plugin/
 [52]: http://www.eclipse.org/legal/epl-v10.html
 [21]: https://github.com/exasol/exasol-testcontainers
+[29]: https://www.jacoco.org/jacoco/trunk/doc/maven.html
 [20]: https://github.com/mockito/mockito/blob/main/LICENSE
 [45]: http://zlika.github.io/reproducible-build-maven-plugin
 [34]: https://www.gnu.org/licenses/gpl-3.0.html
@@ -84,6 +83,7 @@
 [63]: http://maven.apache.org/plugins/maven-install-plugin/
 [13]: https://junit.org/junit5/
 [39]: https://sonatype.github.io/ossindex-maven/maven-plugin/
+[47]: https://maven.apache.org/plugins/maven-gpg-plugin/
 [23]: https://testcontainers.org
 [2]: https://github.com/eclipse-ee4j/jsonp
 [53]: https://maven.apache.org/plugins/maven-source-plugin/
