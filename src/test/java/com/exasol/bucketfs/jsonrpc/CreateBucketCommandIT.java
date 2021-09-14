@@ -61,10 +61,9 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     private CommandFactory createCommandFactory() {
-        final String url = "https://" + EXASOL.getContainerIpAddress() + ":" + getMappedJsonRpcPort() + "/jrpc";
         final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
         return CommandFactory.builder() //
-                .serverUrl(url) //
+                .serverUrl(EXASOL.getRpcUrl()) //
                 .bearerTokenAuthentication(authenticationToken) //
                 .ignoreSslErrors().build();
     }

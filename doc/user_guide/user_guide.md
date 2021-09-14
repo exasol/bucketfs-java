@@ -80,7 +80,7 @@ import com.exasol.bucketfs.ReadOnlyBucket;
 import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
-final ReadOnlyBucket bucket=ReadEnabledBucket.builder()
+final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
         .ipAddress(ipAddress)
         .httpPort(port)
         .serviceName(serviceName)
@@ -104,7 +104,7 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
 If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
-final UnsychronizedBucket bucket=WriteEnabledBucket.builder()
+final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
         .ipAddress(ipAddress())
         .httpPort(port)
         .serviceName(serviceName)
@@ -121,7 +121,7 @@ Compared to creating the read-only bucket we have an additional setter here:
 As mentioned before, if you need a bucket that supports blocking calls, you need to inject a sync monitor.
 
 ```java
-final Bucket bucket=SyncAwareBucket.builder()
+final Bucket bucket = SyncAwareBucket.builder()
         .ipAddress(ipAddress())
         .httpPort(port)
         .serviceName(serviceName)
@@ -258,3 +258,55 @@ Here the source is a path inside the bucket and destination is a path on a local
 ### Managing Buckets and Services
 
 Creating and deleting buckets and BucketFS services is not yet supported by the BFSJ.
+
+## Working with the RPC API
+
+The RPC API allows you to manage buckets themselves, i.e. create new buckets.
+
+In order to work with the RPC API you first create a `CommandFactory`. This will allow you to execute commands, like create a new bucket.
+
+### Creating a `CommandFactory`
+
+We recommend using the [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers) because it simplifies getting the RPC URL and credentials.
+
+First create a new test container `CONTAINER` as described [in the exasol-testcontainer user guide](https://github.com/exasol/exasol-testcontainers/blob/main/doc/user_guide/user_guide.md#creating-an-exasol-testcontainer-in-a-junit-5-test). Then you can create a new `CommandFactory` like this:
+
+```java
+final CommandFactory commandFactory = CommandFactory.builder()
+        .serverUrl(CONTAINER.getRpcUrl())
+        .bearerTokenAuthentication(CONTAINER.getClusterConfiguration().getAuthenticationToken())
+        .ignoreSslErrors()
+        .build();
+```
+
+You can also build the server URL manually:
+
+```java
+.serverUrl("https://<hostname>:443/jrpc")
+```
+
+To use basic authentication instead of bearer token, replace `bearerTokenAuthentication(...)` with
+
+```java
+.basicAuthentication("username", "password")
+```
+
+### Creating a new bucket
+
+Using the `CommandFactory` you can now create a bucket:
+
+```java
+final String bucketName = "random_bucket_name_" + System.currentTimeMillis();
+
+commandFactory.makeCreateBucketCommand()
+        .bucketFsName("bfsdefault")
+        .bucketName(bucketName)
+        .isPublic(true)
+        .readPassword("readPassword")
+        .writePassword("writePassword")
+        .execute();
+```
+
+Afterwards you create a new bucket object as described above.
+
+**Note:** It may take some time until the bucket is available.
