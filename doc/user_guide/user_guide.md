@@ -23,7 +23,6 @@ We assume here that you are familiar with the basics.
 Just add the following dependency to add the Exasol test containers to your project.
 
 ```xml
-
 <dependency>
     <groupId>com.exasol</groupId>
     <artifactId>bucketfs-java</artifactId>
@@ -81,12 +80,12 @@ import com.exasol.bucketfs.ReadOnlyBucket;
 import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
-final ReadOnlyBucket bucket=ReadEnabledBucket.builder()//
-        .ipAddress(ipAddress) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
+final ReadOnlyBucket bucket=ReadEnabledBucket.builder()
+        .ipAddress(ipAddress)
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
         .build();
 ```
 
@@ -105,13 +104,13 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
 If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
-final UnsychronizedBucket bucket=WriteEnabledBucket.builder()//
-        .ipAddress(ipAddress()) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
-        .writePassword(writePassword) //
+final UnsychronizedBucket bucket=WriteEnabledBucket.builder()
+        .ipAddress(ipAddress())
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
+        .writePassword(writePassword)
         .build();
 ```
 
@@ -122,14 +121,14 @@ Compared to creating the read-only bucket we have an additional setter here:
 As mentioned before, if you need a bucket that supports blocking calls, you need to inject a sync monitor.
 
 ```java
-final Bucket bucket=SyncAwareBucket.builder()//
-        .ipAddress(ipAddress()) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
-        .writePassword(writePassword) //
-        .monitor(bucketFsMonitor) //
+final Bucket bucket=SyncAwareBucket.builder()
+        .ipAddress(ipAddress())
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
+        .writePassword(writePassword)
+        .monitor(bucketFsMonitor)
         .build();
 ```
 
@@ -165,7 +164,7 @@ EXAClusterOS/
 The following code lists the contents of a buckets root:
 
 ```java
-final List<String> bucketContents=bucket.listContents();
+final List<String> bucketContents = bucket.listContents();
 ```
 
 You can also list the contents of a "path" within a bucket. "Path" is set in quotes here since objects in buckets are &mdash; as mentioned earlier &mdash; all files directly in the root of the bucket.
@@ -175,7 +174,7 @@ You can also list the contents of a "path" within a bucket. "Path" is set in quo
 Especially when testing UDF scripts, this comes in handy. You can upload files from a local filesystem into a bucket as follows:
 
 ```java
-bucket.uploadFile(source,destination);
+bucket.uploadFile(source, destination);
 ```
 
 Where `source` is an object of type `Path` that points to a local file system and `destination` is a string defining the path relative to the bucket's root to where the file should be uploaded.
@@ -189,7 +188,7 @@ If you chose this variant, the original filename from the local path is appended
 As an example let's assume you want to upload a jar file from a local directory like this:
 
 ```java
-bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar","jars/");
+bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar", "jars/");
 ```
 
 In this case the `Bucket` treats the destination path in the bucket as if you wrote `jars/virtual-schemas-3.0.1.jar`.
@@ -219,7 +218,7 @@ It's a common use-case test scenarios to create small files of well-defined cont
 Use the following convenience method to write a string directly to a file in a bucket:
 
 ```java
-bucket.uploadStringContent(content,destination); 
+bucket.uploadStringContent(content, destination); 
 ```
 
 Here `content` is the `String` that you want to write an destination is again the path inside the bucket.
@@ -244,14 +243,14 @@ Deleting a file is straight forward:
 bucket.deleteFileNonBlocking(fileName);
 ```
 
-Warning: If you try to upload a file shortly after you deleted it (e.g. less than 30 seconds later), the upload will fail with access denied. This due to the implementation details of BucketFS.
+Warning: If you try to upload a file shortly after you deleted it (e.g. less than 30 seconds later), the upload will fail with access denied. This is due to the implementation details of BucketFS.
 
 ### Downloading a File from BucketFS
 
 Downloading a file is straight forward:
 
 ```java
-bucket.downloadFile(source,destination);
+bucket.downloadFile(source, destination);
 ```
 
 Here the source is a path inside the bucket and destination is a path on a local file system.
