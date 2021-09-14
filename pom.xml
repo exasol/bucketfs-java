@@ -2,15 +2,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.exasol</groupId>
 	<artifactId>bucketfs-java</artifactId>
-	<version>2.1.0</version>
+	<version>2.2.0</version>
 	<name>BucketFS Java</name>
 	<description>Java library for automating tasks on Exasol's BucketFS.
     </description>
 	<url>https://github.com/exasol/bucketfs-java</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8
-		</project.reporting.outputEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
 		<junit.version>5.7.2</junit.version>
 		<maven.surefire-and-failsafe.version>3.0.0-M3</maven.surefire-and-failsafe.version>
@@ -139,7 +138,7 @@
 		<dependency>
 			<groupId>com.exasol</groupId>
 			<artifactId>exasol-testcontainers</artifactId>
-			<version>4.0.1</version>
+			<version>5.0.0</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- explicit import to overwrite vulnerable transitive version from testcontainers -->
@@ -259,7 +258,7 @@
 			<plugin>
 				<groupId>com.exasol</groupId>
 				<artifactId>project-keeper-maven-plugin</artifactId>
-				<version>1.0.0</version>
+				<version>1.1.0</version>
 				<executions>
 					<execution>
 						<goals>
