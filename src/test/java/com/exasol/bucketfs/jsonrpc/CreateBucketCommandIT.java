@@ -26,7 +26,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
 
     @Test
-    void creatingBucketWithExistingNameFails() throws InterruptedException, BucketAccessException, TimeoutException {
+    void creatingBucketWithExistingNameFails() throws BucketAccessException, TimeoutException {
         assumeJsonRpcAvailable();
 
         final String randomBucketName = getRandomBucketName();
@@ -43,7 +43,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     @Test
-    void createdBucketIsWriteable() throws InterruptedException, BucketAccessException, TimeoutException {
+    void createdBucketIsWriteable() throws BucketAccessException, TimeoutException, InterruptedException {
         assumeJsonRpcAvailable();
 
         final String randomBucketName = getRandomBucketName();
@@ -76,7 +76,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     private void assertBucketWritable(final String randomBucketName)
-            throws InterruptedException, BucketAccessException, TimeoutException {
+            throws BucketAccessException, TimeoutException, InterruptedException {
         final SyncAwareBucket bucket = createBucket(randomBucketName);
 
         waitUntilBucketExists(bucket);
@@ -91,12 +91,17 @@ class CreateBucketCommandIT extends AbstractBucketIT {
         final Duration timeout = Duration.ofSeconds(5);
 
         while (!bucketExists(bucket)) {
-            Thread.sleep(100);
+            delayNextCheck();
             final Duration waitingTime = Duration.between(start, Instant.now());
             if (timeout.minus(waitingTime).isNegative()) {
                 fail("Bucket " + bucket.getBucketName() + " not available after " + waitingTime);
             }
         }
+    }
+
+    @SuppressWarnings("java:S2925") // Sleep required for waiting until bucket is available
+    private void delayNextCheck() throws InterruptedException {
+        Thread.sleep(100);
     }
 
     private boolean bucketExists(final SyncAwareBucket bucket) {
