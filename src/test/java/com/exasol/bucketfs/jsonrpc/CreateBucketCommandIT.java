@@ -20,6 +20,7 @@ import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 
 @Tag("slow")
+// [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
 
     // FIXME: Read token from EXAConf.

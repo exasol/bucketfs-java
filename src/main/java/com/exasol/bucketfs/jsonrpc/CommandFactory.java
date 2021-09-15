@@ -20,6 +20,7 @@ public class CommandFactory {
         this.jsonMapper = jsonMapper;
     }
 
+    // [impl->dsn~creating-new-bucket~1]
     public CreateBucketCommandBuilder makeCreateBucketCommand() {
         return CreateBucketCommand.builder(this.executor, this.jsonMapper);
     }
