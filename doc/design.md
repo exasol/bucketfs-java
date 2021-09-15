@@ -38,9 +38,9 @@ The `Bucket*Configuration` is a set of objects representing the setup of an Exas
 
 Needs: impl
 
-## `BucketCreator`
+## `CommandFactory`
 
-The `BucketCreator` building block allows creating new buckets.
+The `CommandFactory` building block allows executing RPC commands like creating new buckets.
 
 ## `Bucket`
 
@@ -52,9 +52,9 @@ This section describes the runtime behavior of the software.
 
 ## BucketFS Access
 
-### Creating a new `Bucket` using the `BucketCreator`
+### Creating a new `Bucket` using the `CommandFactory`
 
-The `BucketCreator` allows creating new buckets, specifying required arguments.
+The `CommandFactory` allows creating new buckets, specifying required arguments.
 
 `dsn~creating-new-bucket~1`
 

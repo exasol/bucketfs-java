@@ -6,6 +6,7 @@ import java.util.*;
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+// [impl->dsn~creating-new-bucket~1]
 public class CreateBucketCommand extends JsonResponseCommand<Void> {
 
     private final Request request;

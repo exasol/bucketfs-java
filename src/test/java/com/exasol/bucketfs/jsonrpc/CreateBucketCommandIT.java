@@ -20,6 +20,7 @@ import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilde
 import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
+// [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
 
     private static final String READ_PASSWORD = "READ_PASSWORD";
