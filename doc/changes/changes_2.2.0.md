@@ -1,4 +1,4 @@
-# BucketFS Java 2.2.0, released 2021-??-??
+# BucketFS Java 2.2.0, released 2021-09-16
 
 Code name: Create buckets
 
@@ -28,7 +28,7 @@ See the [user guide](https://github.com/exasol/bucketfs-java/blob/main/doc/user_
 ### Plugin Dependency Updates
 
 * Updated `com.exasol:error-code-crawler-maven-plugin:0.5.0` to `0.6.0`
-* Updated `com.exasol:project-keeper-maven-plugin:0.10.0` to `1.1.0`
+* Updated `com.exasol:project-keeper-maven-plugin:0.10.0` to `1.2.0`
 * Updated `org.apache.maven.plugins:maven-enforcer-plugin:3.0.0-M3` to `3.0.0`
 * Updated `org.apache.maven.plugins:maven-gpg-plugin:1.6` to `3.0.1`
 * Updated `org.apache.maven.plugins:maven-javadoc-plugin:3.2.0` to `3.3.1`
