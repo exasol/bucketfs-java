@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
+import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
 class CreateBucketCommandIT extends AbstractBucketIT {
@@ -25,12 +27,11 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     @Test
     void creatingBucketWithExistingNameFails() throws InterruptedException, BucketAccessException, TimeoutException {
-
-        final CommandFactory commandFactory = createCommandFactory();
+        assumeJsonRpcAvailable();
 
         final String randomBucketName = getRandomBucketName();
 
-        final CreateBucketCommandBuilder command = commandFactory.makeCreateBucketCommand()
+        final CreateBucketCommandBuilder command = createCommandFactory().makeCreateBucketCommand()
                 .bucketFsName(DEFAULT_BUCKETFS).bucketName(randomBucketName).isPublic(true).readPassword(READ_PASSWORD)
                 .writePassword(WRITE_PASSWORD);
 
@@ -43,17 +44,23 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     @Test
     void createdBucketIsWriteable() throws InterruptedException, BucketAccessException, TimeoutException {
-        final CommandFactory commandFactory = createCommandFactory();
+        assumeJsonRpcAvailable();
 
         final String randomBucketName = getRandomBucketName();
 
-        commandFactory.makeCreateBucketCommand().bucketFsName(DEFAULT_BUCKETFS) //
+        createCommandFactory().makeCreateBucketCommand().bucketFsName(DEFAULT_BUCKETFS) //
                 .bucketName(randomBucketName) //
                 .isPublic(true) //
                 .readPassword(READ_PASSWORD) //
                 .writePassword(WRITE_PASSWORD) //
                 .execute();
         assertBucketWritable(randomBucketName);
+    }
+
+    private void assumeJsonRpcAvailable() {
+        final ExasolDockerImageReference version = EXASOL.getDockerImageReference();
+        assumeTrue(version.getMajor() >= 7,
+                "JSON RPC only available with version >= 7, " + version + " is not supported.");
     }
 
     private String getRandomBucketName() {
