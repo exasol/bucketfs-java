@@ -20,7 +20,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     public boolean isObjectSynchronized(final ReadOnlyBucket bucket, final String pathInBucket, final Instant afterUTC)
             throws BucketAccessException {
         try {
-            return createBucketLogPatternDetector(pathInBucket).isPatternPresentAfter(afterUTC);
+            return createBucketLogPatternDetector(pathInBucket, afterUTC).isPatternPresent();
         } catch (final IOException exception) {
             throw new BucketAccessException("Unable to check if object '" + pathInBucket
                     + "' is synchronized in bucket '" + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "'.",
@@ -31,10 +31,10 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
         }
     }
 
-    private LogPatternDetector createBucketLogPatternDetector(final String pathInBucket) {
+    private LogPatternDetector createBucketLogPatternDetector(final String pathInBucket, final Instant afterUTC) {
         final var pattern = pathInBucket + ".*" + (isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
         return this.detectorFactory.createLogPatternDetector(EXASOL_CORE_DAEMON_LOGS_PATH,
-                BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern);
+                BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern, afterUTC);
     }
 
     private static boolean isSupportedArchiveFormat(final String pathInBucket) {

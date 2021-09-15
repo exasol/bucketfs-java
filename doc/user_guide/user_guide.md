@@ -23,7 +23,6 @@ We assume here that you are familiar with the basics.
 Just add the following dependency to add the Exasol test containers to your project.
 
 ```xml
-
 <dependency>
     <groupId>com.exasol</groupId>
     <artifactId>bucketfs-java</artifactId>
@@ -81,12 +80,12 @@ import com.exasol.bucketfs.ReadOnlyBucket;
 import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
-final ReadOnlyBucket bucket=ReadEnabledBucket.builder()//
-        .ipAddress(ipAddress) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
+final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
+        .ipAddress(ipAddress)
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
         .build();
 ```
 
@@ -105,13 +104,13 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
 If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
-final UnsychronizedBucket bucket=WriteEnabledBucket.builder()//
-        .ipAddress(ipAddress()) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
-        .writePassword(writePassword) //
+final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
+        .ipAddress(ipAddress())
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
+        .writePassword(writePassword)
         .build();
 ```
 
@@ -122,14 +121,14 @@ Compared to creating the read-only bucket we have an additional setter here:
 As mentioned before, if you need a bucket that supports blocking calls, you need to inject a sync monitor.
 
 ```java
-final Bucket bucket=SyncAwareBucket.builder()//
-        .ipAddress(ipAddress()) //
-        .httpPort(port) //
-        .serviceName(serviceName) //
-        .name(bucketName) //
-        .readPassword(readPassword) //
-        .writePassword(writePassword) //
-        .monitor(bucketFsMonitor) //
+final Bucket bucket = SyncAwareBucket.builder()
+        .ipAddress(ipAddress())
+        .httpPort(port)
+        .serviceName(serviceName)
+        .name(bucketName)
+        .readPassword(readPassword)
+        .writePassword(writePassword)
+        .monitor(bucketFsMonitor)
         .build();
 ```
 
@@ -165,7 +164,7 @@ EXAClusterOS/
 The following code lists the contents of a buckets root:
 
 ```java
-final List<String> bucketContents=bucket.listContents();
+final List<String> bucketContents = bucket.listContents();
 ```
 
 You can also list the contents of a "path" within a bucket. "Path" is set in quotes here since objects in buckets are &mdash; as mentioned earlier &mdash; all files directly in the root of the bucket.
@@ -175,7 +174,7 @@ You can also list the contents of a "path" within a bucket. "Path" is set in quo
 Especially when testing UDF scripts, this comes in handy. You can upload files from a local filesystem into a bucket as follows:
 
 ```java
-bucket.uploadFile(source,destination);
+bucket.uploadFile(source, destination);
 ```
 
 Where `source` is an object of type `Path` that points to a local file system and `destination` is a string defining the path relative to the bucket's root to where the file should be uploaded.
@@ -189,7 +188,7 @@ If you chose this variant, the original filename from the local path is appended
 As an example let's assume you want to upload a jar file from a local directory like this:
 
 ```java
-bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar","jars/");
+bucket.uploadFile("repo/virtual-schemas/3.0.1/virtual-schemas-3.0.1.jar", "jars/");
 ```
 
 In this case the `Bucket` treats the destination path in the bucket as if you wrote `jars/virtual-schemas-3.0.1.jar`.
@@ -219,7 +218,7 @@ It's a common use-case test scenarios to create small files of well-defined cont
 Use the following convenience method to write a string directly to a file in a bucket:
 
 ```java
-bucket.uploadStringContent(content,destination); 
+bucket.uploadStringContent(content, destination); 
 ```
 
 Here `content` is the `String` that you want to write an destination is again the path inside the bucket.
@@ -244,14 +243,14 @@ Deleting a file is straight forward:
 bucket.deleteFileNonBlocking(fileName);
 ```
 
-Warning: If you try to upload a file shortly after you deleted it (e.g. less than 30 seconds later), the upload will fail with access denied. This due to the implementation details of BucketFS.
+Warning: If you try to upload a file shortly after you deleted it (e.g. less than 30 seconds later), the upload will fail with access denied. This is due to the implementation details of BucketFS.
 
 ### Downloading a File from BucketFS
 
 Downloading a file is straight forward:
 
 ```java
-bucket.downloadFile(source,destination);
+bucket.downloadFile(source, destination);
 ```
 
 Here the source is a path inside the bucket and destination is a path on a local file system.
@@ -259,3 +258,55 @@ Here the source is a path inside the bucket and destination is a path on a local
 ### Managing Buckets and Services
 
 Creating and deleting buckets and BucketFS services is not yet supported by the BFSJ.
+
+## Working with the RPC API
+
+The RPC API allows you to manage buckets themselves, i.e. create new buckets.
+
+In order to work with the RPC API you first create a `CommandFactory`. This will allow you to execute commands, like create a new bucket.
+
+### Creating a `CommandFactory`
+
+We recommend using the [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers) because it simplifies getting the RPC URL and credentials.
+
+First create a new test container `CONTAINER` as described [in the exasol-testcontainer user guide](https://github.com/exasol/exasol-testcontainers/blob/main/doc/user_guide/user_guide.md#creating-an-exasol-testcontainer-in-a-junit-5-test). Then you can create a new `CommandFactory` like this:
+
+```java
+final CommandFactory commandFactory = CommandFactory.builder()
+        .serverUrl(CONTAINER.getRpcUrl())
+        .bearerTokenAuthentication(CONTAINER.getClusterConfiguration().getAuthenticationToken())
+        .ignoreSslErrors()
+        .build();
+```
+
+You can also build the server URL manually:
+
+```java
+.serverUrl("https://<hostname>:443/jrpc")
+```
+
+To use basic authentication instead of bearer token, replace `bearerTokenAuthentication(...)` with
+
+```java
+.basicAuthentication("username", "password")
+```
+
+### Creating a new bucket
+
+Using the `CommandFactory` you can now create a bucket:
+
+```java
+final String bucketName = "random_bucket_name_" + System.currentTimeMillis();
+
+commandFactory.makeCreateBucketCommand()
+        .bucketFsName("bfsdefault")
+        .bucketName(bucketName)
+        .isPublic(true)
+        .readPassword("readPassword")
+        .writePassword("writePassword")
+        .execute();
+```
+
+Afterwards you create a new bucket object as described above.
+
+**Note:** It may take some time until the bucket is available.

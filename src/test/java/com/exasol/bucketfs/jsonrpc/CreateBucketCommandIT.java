@@ -7,14 +7,12 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
@@ -23,15 +21,8 @@ import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilde
 // [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
 
-    // FIXME: Read token from EXAConf.
-    // See https://github.com/exasol/exasol-testcontainers/issues/161
-    private static final String TOKEN = "";
-
     private static final String READ_PASSWORD = "READ_PASSWORD";
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
-
-    @TempDir
-    Path tempDir;
 
     @Test
     void creatingBucketWithExistingNameFails() throws InterruptedException, BucketAccessException, TimeoutException {
@@ -41,10 +32,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
         final String randomBucketName = getRandomBucketName();
 
         final CreateBucketCommandBuilder command = commandFactory.makeCreateBucketCommand()
-                .bucketFsName(DEFAULT_BUCKETFS)
-                .bucketName(randomBucketName)
-                .isPublic(true)
-                .readPassword(READ_PASSWORD)
+                .bucketFsName(DEFAULT_BUCKETFS).bucketName(randomBucketName).isPublic(true).readPassword(READ_PASSWORD)
                 .writePassword(WRITE_PASSWORD);
 
         command.execute();
@@ -60,12 +48,11 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
         final String randomBucketName = getRandomBucketName();
 
-        commandFactory.makeCreateBucketCommand()
-                .bucketFsName(DEFAULT_BUCKETFS)
-                .bucketName(randomBucketName)
-                .isPublic(true)
-                .readPassword(READ_PASSWORD)
-                .writePassword(WRITE_PASSWORD)
+        commandFactory.makeCreateBucketCommand().bucketFsName(DEFAULT_BUCKETFS) //
+                .bucketName(randomBucketName) //
+                .isPublic(true) //
+                .readPassword(READ_PASSWORD) //
+                .writePassword(WRITE_PASSWORD) //
                 .execute();
         assertBucketWritable(randomBucketName);
     }
@@ -75,12 +62,11 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     private CommandFactory createCommandFactory() {
-        final String url = "https://" + EXASOL.getContainerIpAddress() + ":" + getMappedJsonRpcPort() + "/jrpc";
-        return CommandFactory.builder()
-                .serverUrl(url)
-                .bearerTokenAuthentication(TOKEN)
-                .ignoreSslErrors()
-                .build();
+        final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
+        return CommandFactory.builder() //
+                .serverUrl(EXASOL.getRpcUrl()) //
+                .bearerTokenAuthentication(authenticationToken) //
+                .ignoreSslErrors().build();
     }
 
     private void assertBucketWritable(final String randomBucketName)
@@ -117,14 +103,14 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     private SyncAwareBucket createBucket(final String bucketName) {
-        return SyncAwareBucket.builder()
-                .ipAddress(getContainerIpAddress())
-                .httpPort(getMappedDefaultBucketFsPort())
-                .serviceName(DEFAULT_BUCKETFS)
-                .name(bucketName)
-                .readPassword(READ_PASSWORD)
-                .writePassword(WRITE_PASSWORD)
-                .monitor(createBucketMonitor())
+        return SyncAwareBucket.builder() //
+                .ipAddress(getContainerIpAddress()) //
+                .httpPort(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(bucketName) //
+                .readPassword(READ_PASSWORD) //
+                .writePassword(WRITE_PASSWORD) //
+                .monitor(createBucketMonitor()) //
                 .build();
     }
 }
