@@ -3,7 +3,8 @@ package com.exasol.bucketfs.jsonrpc;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
@@ -149,7 +150,7 @@ public class CommandFactory {
 
         private void initializeSslContext(final SSLContext sslContext) {
             try {
-                sslContext.init(null, createSslTrustManagers().orElse(null), new SecureRandom());
+                sslContext.init(null, createSslTrustManagers().orElse(null), null);
             } catch (final KeyManagementException e) {
                 throw new IllegalStateException("Error initializing ssl context", e);
             }
