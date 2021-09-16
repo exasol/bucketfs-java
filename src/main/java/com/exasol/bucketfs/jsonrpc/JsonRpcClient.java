@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import com.exasol.bucketfs.jsonrpc.JsonRpcCommandExecutor.JsonRpcPayload;
+
 class JsonRpcClient {
     private static final Logger LOGGER = Logger.getLogger(JsonRpcClient.class.getName());
 

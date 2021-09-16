@@ -2,6 +2,8 @@ package com.exasol.bucketfs.jsonrpc;
 
 import java.io.StringReader;
 
+import com.exasol.bucketfs.jsonrpc.JsonRpcCommandExecutor.JsonRpcPayload;
+
 import jakarta.json.*;
 import jakarta.json.bind.*;
 
