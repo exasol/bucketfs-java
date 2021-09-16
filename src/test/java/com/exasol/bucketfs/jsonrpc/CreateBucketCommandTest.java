@@ -1,11 +1,10 @@
 package com.exasol.bucketfs.jsonrpc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,13 +43,12 @@ class CreateBucketCommandTest {
         assertThat(request.isPublic(), equalTo(false));
         assertThat(request.getReadPassword(), nullValue());
         assertThat(request.getWritePassword(), nullValue());
-        assertThat(request.getAdditionalFiles(), nullValue());
     }
 
     @Test
     void testExecutionWithCustomValues() {
         builder().bucketFsName("bfs").bucketName("bucket").isPublic(true).readPassword("read").writePassword("write")
-                .additionalFiles(List.of("a", "b")).execute();
+                .execute();
 
         final Request request = getRpcRequest();
         assertThat(request.getBucketFsName(), equalTo("bfs"));
@@ -58,7 +56,6 @@ class CreateBucketCommandTest {
         assertThat(request.isPublic(), equalTo(true));
         assertThat(request.getReadPassword(), equalTo("cmVhZA=="));
         assertThat(request.getWritePassword(), equalTo("d3JpdGU="));
-        assertThat(request.getAdditionalFiles(), contains("a", "b"));
     }
 
     private Request getRpcRequest() {

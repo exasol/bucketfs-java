@@ -1,7 +1,8 @@
 package com.exasol.bucketfs.jsonrpc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.Objects;
 
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
@@ -49,8 +50,6 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         private final String readPassword;
         @JsonbProperty("write_password")
         private final String writePassword;
-        @JsonbProperty("additional_files")
-        private final List<String> additionalFiles;
 
         private Request(final CreateBucketCommandBuilder builder) {
             this.bucketFsName = Objects.requireNonNull(builder.bucketFsName, "bucketFsName");
@@ -58,7 +57,6 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
             this.isPublic = builder.isPublic;
             this.readPassword = base64Encode(builder.readPassword);
             this.writePassword = base64Encode(builder.writePassword);
-            this.additionalFiles = builder.additionalFiles;
         }
 
         private static String base64Encode(final String value) {
@@ -87,10 +85,6 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         public String getWritePassword() {
             return this.writePassword;
         }
-
-        public List<String> getAdditionalFiles() {
-            return this.additionalFiles;
-        }
     }
 
     /**
@@ -112,7 +106,6 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         private boolean isPublic = false;
         private String readPassword = null;
         private String writePassword = null;
-        private List<String> additionalFiles = null;
 
         private CreateBucketCommandBuilder(final JsonRpcCommandExecutor executor, final JsonMapper jsonMapper) {
             this.executor = executor;
@@ -171,18 +164,6 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
          */
         public CreateBucketCommandBuilder writePassword(final String writePassword) {
             this.writePassword = writePassword;
-            return this;
-        }
-
-        /**
-         * Sets a list of additional files.
-         *
-         * @param additionalFiles the additional files for the new bucket or <code>null</code> for additional files
-         *                        (default)
-         * @return this instance for method chaining
-         */
-        public CreateBucketCommandBuilder additionalFiles(final List<String> additionalFiles) {
-            this.additionalFiles = additionalFiles;
             return this;
         }
 
