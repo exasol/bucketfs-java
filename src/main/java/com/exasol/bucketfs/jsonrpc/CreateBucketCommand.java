@@ -6,12 +6,16 @@ import java.util.*;
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+/**
+ * This command creates a new bucket in BucketFS. Create new instances using the builder created by
+ * {@link CommandFactory#makeCreateBucketCommand()}.
+ */
 // [impl->dsn~creating-new-bucket~1]
 public class CreateBucketCommand extends JsonResponseCommand<Void> {
 
     private final Request request;
 
-    protected CreateBucketCommand(final JsonMapper jsonMapper, final Request request) {
+    CreateBucketCommand(final JsonMapper jsonMapper, final Request request) {
         super(jsonMapper, "bucket_add");
         this.request = request;
     }
@@ -30,6 +34,7 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
+    // Must be public to allow json mapping. Not accessible for the user.
     public static class Request {
         // Mandatory values
         @JsonbProperty("bucketfs_name")
@@ -88,6 +93,16 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
     }
 
+    /**
+     * A builder for new {@link CreateBucketCommand}. Create a new instance using
+     * {@link CommandFactory#makeCreateBucketCommand()}.
+     * <p>
+     * Mandatory fields are
+     * <ul>
+     * <li>{@link #bucketFsName}</li>
+     * <li>{@link #bucketName}</li>
+     * </ul>
+     */
     public static final class CreateBucketCommandBuilder {
         private final JsonMapper jsonMapper;
         private final JsonRpcCommandExecutor executor;
@@ -104,36 +119,78 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
             this.jsonMapper = jsonMapper;
         }
 
+        /**
+         * Sets the name of the BucketFS in which to create the bucket, e.g. {@code "bfsdefault"}.
+         *
+         * @param bucketFsName the name of the BucketFS in which to create the bucket
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder bucketFsName(final String bucketFsName) {
             this.bucketFsName = bucketFsName;
             return this;
         }
 
+        /**
+         * Sets the name of bucket to create.
+         *
+         * @param bucketName the name of bucket to create
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder bucketName(final String bucketName) {
             this.bucketName = bucketName;
             return this;
         }
 
+        /**
+         * Defines if the new bucket should be public or not. Defaults to <code>false</code>.
+         *
+         * @param isPublic <code>true</code> if the bucket should be public, else <code>false</code> (default)
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder isPublic(final boolean isPublic) {
             this.isPublic = isPublic;
             return this;
         }
 
+        /**
+         * Sets the read password for the new bucket.
+         *
+         * @param readPassword the read password or <code>null</code> for no read password (default)
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder readPassword(final String readPassword) {
             this.readPassword = readPassword;
             return this;
         }
 
+        /**
+         * Sets the write password for the new bucket.
+         *
+         * @param writePassword the write password or <code>null</code> for no write password (default)
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder writePassword(final String writePassword) {
             this.writePassword = writePassword;
             return this;
         }
 
+        /**
+         * Sets a list of additional files.
+         *
+         * @param additionalFiles the additional files for the new bucket or <code>null</code> for additional files
+         *                        (default)
+         * @return this instance for method chaining
+         */
         public CreateBucketCommandBuilder additionalFiles(final List<String> additionalFiles) {
             this.additionalFiles = additionalFiles;
             return this;
         }
 
+        /**
+         * Creates a new bucket using the configured values.
+         *
+         * @throws NullPointerException in case mandatory fields are not defined
+         */
         public void execute() {
             this.executor.execute(new CreateBucketCommand(this.jsonMapper, new Request(this)));
         }

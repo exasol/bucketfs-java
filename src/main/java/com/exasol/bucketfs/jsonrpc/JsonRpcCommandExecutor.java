@@ -2,6 +2,9 @@ package com.exasol.bucketfs.jsonrpc;
 
 import jakarta.json.JsonObject;
 
+/**
+ * Executes {@link RpcCommand}s by converting them to a request, sending the request and processing the result.
+ */
 class JsonRpcCommandExecutor {
     private final JsonRpcClient client;
     private final JsonMapper jsonMapper;

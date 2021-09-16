@@ -11,6 +11,22 @@ import javax.net.ssl.TrustManager;
 
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 
+/**
+ * Creates commands that can be executed against the Exasol RPC interface.
+ *
+ * Create new instances by creating a builder using {@link #builder()}.
+ * <p>
+ * The following fields are required:
+ * <ul>
+ * <li>{@link Builder#serverUrl(String)}</li>
+ * <li>One of the two authentication methods:
+ * <ul>
+ * <li>{@link Builder#basicAuthentication(String, String)} or</li>
+ * <li>{@link Builder#bearerTokenAuthentication(String)}</li>
+ * </ul>
+ * </li>
+ * </ul>
+ */
 public class CommandFactory {
     private final JsonMapper jsonMapper;
     private final JsonRpcCommandExecutor executor;
@@ -20,15 +36,30 @@ public class CommandFactory {
         this.jsonMapper = jsonMapper;
     }
 
+    /**
+     * Creates a new builder for {@link CreateBucketCommand}.
+     *
+     * @return a new builder for {@link CreateBucketCommand}
+     */
     // [impl->dsn~creating-new-bucket~1]
     public CreateBucketCommandBuilder makeCreateBucketCommand() {
         return CreateBucketCommand.builder(this.executor, this.jsonMapper);
     }
 
+    /**
+     * Creates a new builder for {@link CommandFactory}.
+     *
+     * @return a new builder for {@link CommandFactory}
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Builder for a {@link CommandFactory}.
+     * <p>
+     * Call {@link CommandFactory#builder()} to create a new instance.
+     */
     public static class Builder {
 
         private boolean ignoreSslErrors = false;
@@ -36,26 +67,31 @@ public class CommandFactory {
         private Authenticator authenticator;
 
         private Builder() {
-
+            // empty by intention
         }
 
+        /**
+         * Ignore all SSL errors when executing requests. This is required as the docker-db uses a self-signed
+         * certificate.
+         * <p>
+         * Defaults to <em>not</em> ignoring SSL errors if not called.
+         *
+         * @return this instance for method chaining
+         */
         public Builder ignoreSslErrors() {
             this.ignoreSslErrors = true;
             return this;
         }
 
+        /**
+         * Sets the URL of the RPC interface, e.g. {@code "https://<hostname>:443/jrpc"}.
+         *
+         * @param serverUrl the RPC interface URL
+         * @return this instance for method chaining
+         * @throws IllegalArgumentException the URL has an invalid format
+         */
         public Builder serverUrl(final String serverUrl) {
             this.serviceUri = parseUri(serverUrl);
-            return this;
-        }
-
-        public Builder bearerTokenAuthentication(final String token) {
-            this.authenticator = new BearerTokenAuthenticator(token);
-            return this;
-        }
-
-        public Builder basicAuthentication(final String username, final String password) {
-            this.authenticator = new BasicAuthAuthenticator(username, password);
             return this;
         }
 
@@ -67,6 +103,35 @@ public class CommandFactory {
             }
         }
 
+        /**
+         * Authenticate via the given bearer token.
+         *
+         * @param token the bearer token
+         * @return this instance for method chaining
+         */
+        public Builder bearerTokenAuthentication(final String token) {
+            this.authenticator = new BearerTokenAuthenticator(token);
+            return this;
+        }
+
+        /**
+         * Authenticate via basic authentication.
+         *
+         * @param username the username
+         * @param password the password
+         * @return this instance for method chaining
+         */
+        public Builder basicAuthentication(final String username, final String password) {
+            this.authenticator = new BasicAuthAuthenticator(username, password);
+            return this;
+        }
+
+        /**
+         * Build a new {@link CommandFactory}.
+         *
+         * @return the new {@link CommandFactory}
+         * @throws NullPointerException in case not all mandatory fields where defined
+         */
         public CommandFactory build() {
             final JsonMapper jsonMapper = JsonMapper.create();
             final HttpClient httpClient = createHttpClient();

@@ -6,20 +6,23 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedTrustManager;
 
+/**
+ * A trust manager that ignores all SSL errors. This is required because the docker-db uses a self signed certificate.
+ */
 @SuppressWarnings("java:S4830") // Disabling certificate validation by intention
 final class DummyTrustManager extends X509ExtendedTrustManager {
     @Override
-    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-        return new java.security.cert.X509Certificate[0];
+    public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
     }
 
     @Override
-    public void checkServerTrusted(final java.security.cert.X509Certificate[] chain, final String authType) {
+    public void checkServerTrusted(final X509Certificate[] chain, final String authType) {
         // empty by intention
     }
 
     @Override
-    public void checkClientTrusted(final java.security.cert.X509Certificate[] chain, final String authType) {
+    public void checkClientTrusted(final X509Certificate[] chain, final String authType) {
         // empty by intention
     }
 

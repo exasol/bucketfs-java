@@ -19,12 +19,12 @@ class JsonRpcClient {
     private final Authenticator authenticator;
     private final URI serviceUri;
 
-    JsonRpcClient(final HttpClient httpClient, final JsonMapper serializer,
-            final Authenticator authenticator, final URI serviceUri) {
-        this.httpClient = Objects.requireNonNull(httpClient);
-        this.serializer = Objects.requireNonNull(serializer);
-        this.authenticator = Objects.requireNonNull(authenticator);
-        this.serviceUri = Objects.requireNonNull(serviceUri);
+    JsonRpcClient(final HttpClient httpClient, final JsonMapper serializer, final Authenticator authenticator,
+            final URI serviceUri) {
+        this.httpClient = Objects.requireNonNull(httpClient, "httpClient");
+        this.serializer = Objects.requireNonNull(serializer, "serializer");
+        this.authenticator = Objects.requireNonNull(authenticator, "authenticator");
+        this.serviceUri = Objects.requireNonNull(serviceUri, "serviceUri");
     }
 
     String sendRequest(final JsonRpcPayload payload) {

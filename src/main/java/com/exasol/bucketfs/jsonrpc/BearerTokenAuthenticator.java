@@ -2,6 +2,9 @@ package com.exasol.bucketfs.jsonrpc;
 
 import java.net.http.HttpRequest;
 
+/**
+ * Authenticates an HTTP request via a bearer token.
+ */
 class BearerTokenAuthenticator implements Authenticator {
 
     private final String token;

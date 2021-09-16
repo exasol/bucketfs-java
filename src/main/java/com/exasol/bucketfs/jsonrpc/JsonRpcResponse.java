@@ -3,6 +3,7 @@ package com.exasol.bucketfs.jsonrpc;
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+// Must be public to allow json mapping. Not used by the user.
 public class JsonRpcResponse {
     @JsonbProperty("result_jobid")
     private String jobId;
@@ -68,7 +69,6 @@ public class JsonRpcResponse {
     @Override
     public String toString() {
         return "Response [jobId=" + this.jobId + ", code=" + this.code + ", name=" + this.name + ", description="
-                + this.description
-                + ", revision=" + this.revision + ", output=" + this.output + "]";
+                + this.description + ", revision=" + this.revision + ", output=" + this.output + "]";
     }
 }

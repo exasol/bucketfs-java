@@ -5,6 +5,9 @@ import java.io.StringReader;
 import jakarta.json.*;
 import jakarta.json.bind.*;
 
+/**
+ * Converts model classes to json and back.
+ */
 class JsonMapper {
 
     private final Jsonb jsonb;

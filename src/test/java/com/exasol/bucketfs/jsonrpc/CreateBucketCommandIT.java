@@ -2,10 +2,8 @@ package com.exasol.bucketfs.jsonrpc;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
@@ -16,6 +14,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.*;
+import com.exasol.bucketfs.jsonrpc.CommandFactory.Builder;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 import com.exasol.containers.ExasolDockerImageReference;
 
@@ -27,13 +26,32 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
 
     @Test
+    void creatingBucketWithCheckingCertificateFails() throws BucketAccessException, TimeoutException {
+        assumeJsonRpcAvailable();
+
+        final String randomBucketName = getRandomBucketName();
+
+        final CreateBucketCommandBuilder command = createCommandFactory(false).makeCreateBucketCommand()
+                .bucketFsName(DEFAULT_BUCKETFS).bucketName(randomBucketName).isPublic(true).readPassword(READ_PASSWORD)
+                .writePassword(WRITE_PASSWORD);
+
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> command.execute());
+        assertThat(exception.getMessage(), containsString("Error executing request"));
+        assertThat(exception.getCause().getMessage(), equalTo(
+                "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target"));
+    }
+
+    @Test
     void creatingBucketWithExistingNameFails() throws BucketAccessException, TimeoutException {
         assumeJsonRpcAvailable();
 
         final String randomBucketName = getRandomBucketName();
 
         final CreateBucketCommandBuilder command = createCommandFactory().makeCreateBucketCommand()
-                .bucketFsName(DEFAULT_BUCKETFS).bucketName(randomBucketName).isPublic(true).readPassword(READ_PASSWORD)
+                .bucketFsName(DEFAULT_BUCKETFS) //
+                .bucketName(randomBucketName) //
+                .isPublic(true) //
+                .readPassword(READ_PASSWORD) //
                 .writePassword(WRITE_PASSWORD);
 
         command.execute();
@@ -49,13 +67,26 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
         final String randomBucketName = getRandomBucketName();
 
-        createCommandFactory().makeCreateBucketCommand().bucketFsName(DEFAULT_BUCKETFS) //
+        createCommandFactory().makeCreateBucketCommand() //
+                .bucketFsName(DEFAULT_BUCKETFS) //
                 .bucketName(randomBucketName) //
                 .isPublic(true) //
                 .readPassword(READ_PASSWORD) //
                 .writePassword(WRITE_PASSWORD) //
                 .execute();
         assertBucketWritable(randomBucketName);
+    }
+
+    @Test
+    void createdBucketWithDefaultValuesSucceeds() throws BucketAccessException, TimeoutException, InterruptedException {
+        assumeJsonRpcAvailable();
+
+        final String randomBucketName = getRandomBucketName();
+
+        assertDoesNotThrow(() -> createCommandFactory().makeCreateBucketCommand() //
+                .bucketFsName(DEFAULT_BUCKETFS) //
+                .bucketName(randomBucketName) //
+                .execute());
     }
 
     private void assumeJsonRpcAvailable() {
@@ -69,11 +100,18 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     private CommandFactory createCommandFactory() {
+        return createCommandFactory(true);
+    }
+
+    private CommandFactory createCommandFactory(final boolean ignoreSslErrors) {
         final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
-        return CommandFactory.builder() //
+        final Builder builder = CommandFactory.builder() //
                 .serverUrl(EXASOL.getRpcUrl()) //
-                .bearerTokenAuthentication(authenticationToken) //
-                .ignoreSslErrors().build();
+                .bearerTokenAuthentication(authenticationToken);
+        if (ignoreSslErrors) {
+            builder.ignoreSslErrors();
+        }
+        return builder.build();
     }
 
     private void assertBucketWritable(final String randomBucketName)

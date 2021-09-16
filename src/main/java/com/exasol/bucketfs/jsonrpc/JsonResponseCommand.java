@@ -2,9 +2,21 @@ package com.exasol.bucketfs.jsonrpc;
 
 import jakarta.json.JsonStructure;
 
+/**
+ * The base class for {@link RpcCommand} that expect a json response payload. This simplifies processing the result for
+ * child classes.
+ *
+ * @param <R> the result type
+ */
 abstract class JsonResponseCommand<R> extends RpcCommand<R> {
     protected final JsonMapper jsonMapper;
 
+    /**
+     * Creates a new {@link JsonResponseCommand}.
+     *
+     * @param jsonMapper the {@link JsonMapper} used for deserializing the response payload.
+     * @param jobName    the job name for the new command.
+     */
     protected JsonResponseCommand(final JsonMapper jsonMapper, final String jobName) {
         super(jobName);
         this.jsonMapper = jsonMapper;
@@ -26,5 +38,11 @@ abstract class JsonResponseCommand<R> extends RpcCommand<R> {
         }
     }
 
+    /**
+     * Processes the given response json payload and returns a result object.
+     *
+     * @param responsePayload the parsed response payload.
+     * @return result object
+     */
     abstract R processResult(JsonStructure responsePayload);
 }

@@ -3,6 +3,7 @@ package com.exasol.bucketfs.jsonrpc;
 import jakarta.json.JsonObject;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+// Must be public to allow json mapping. Not used by the user.
 public class JsonRpcPayload {
 
     @JsonbProperty("method")
@@ -12,7 +13,7 @@ public class JsonRpcPayload {
     @JsonbProperty("params")
     private final Parameters parameters;
 
-    public JsonRpcPayload(final String method, final String job, final JsonObject parameters) {
+    JsonRpcPayload(final String method, final String job, final JsonObject parameters) {
         this.method = method;
         this.job = job;
         this.parameters = new Parameters(parameters);
