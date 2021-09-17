@@ -35,8 +35,8 @@ class JsonRpcClient {
         final HttpResponse<String> response = sendRequest(request);
         verifySuccessResponse(request, response);
         final String responseBody = response.body();
-        LOGGER.fine(() -> "Received response " + response + " with body '" + responseBody + "' after "
-                + Duration.between(start, Instant.now()));
+        LOGGER.fine(() -> "Received response " + response + " for request " + request + " with body '" + responseBody
+                + "' after " + Duration.between(start, Instant.now()));
         return responseBody;
     }
 
@@ -51,22 +51,26 @@ class JsonRpcClient {
     }
 
     private void verifySuccessResponse(final HttpRequest request, final HttpResponse<String> response) {
-        if ((response.statusCode() / 100) != 2) {
-            final String message = "Received non-ok response status " + response.statusCode() + " for request "
-                    + request + ". Response body: '" + response.body() + "'";
+        if (hasErrorStatusCode(response)) {
+            final String message = "RPC request " + request + " failed with response code " + response.statusCode()
+                    + ". Response body was '" + response.body() + "'";
             LOGGER.warning(message);
             throw new JsonRpcException(message);
         }
     }
 
+    private boolean hasErrorStatusCode(final HttpResponse<String> response) {
+        return (response.statusCode() / 100) != 2;
+    }
+
     private HttpResponse<String> sendRequest(final HttpRequest request) {
         try {
             return this.httpClient.send(request, BodyHandlers.ofString());
-        } catch (final IOException e) {
-            throw new JsonRpcException("Error executing request '" + request + "'", e);
-        } catch (final InterruptedException e) {
+        } catch (final IOException exception) {
+            throw new JsonRpcException("Unable to execute RPC request '" + request + "'", exception);
+        } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new JsonRpcException("Error executing request '" + request + "'", e);
+            throw new IllegalStateException("InterruptedException when sending RPC request", exception);
         }
     }
 }

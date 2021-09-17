@@ -12,12 +12,13 @@ import jakarta.json.bind.annotation.JsonbProperty;
  * {@link CommandFactory#makeCreateBucketCommand()}.
  */
 // [impl->dsn~creating-new-bucket~1]
-public class CreateBucketCommand extends JsonResponseCommand<Void> {
+public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
+    private static final String JOB_NAME = "bucket_add";
     private final Request request;
 
     CreateBucketCommand(final JsonMapper jsonMapper, final Request request) {
-        super(jsonMapper, "bucket_add");
+        super(jsonMapper, JOB_NAME);
         this.request = request;
     }
 
@@ -88,8 +89,7 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
     }
 
     /**
-     * A builder for new {@link CreateBucketCommand}. Create a new instance using
-     * {@link CommandFactory#makeCreateBucketCommand()}.
+     * A builder for new {@link CreateBucketCommand}.
      * <p>
      * Mandatory fields are
      * <ul>
@@ -113,9 +113,9 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Sets the name of the BucketFS in which to create the bucket, e.g. {@code "bfsdefault"}.
+         * Set the name of the BucketFS in which to create the bucket, e.g. {@code "bfsdefault"}.
          *
-         * @param bucketFsName the name of the BucketFS in which to create the bucket
+         * @param bucketFsName name of the BucketFS in which to create the bucket
          * @return this instance for method chaining
          */
         public CreateBucketCommandBuilder bucketFsName(final String bucketFsName) {
@@ -124,9 +124,9 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Sets the name of bucket to create.
+         * Set the name of bucket to create.
          *
-         * @param bucketName the name of bucket to create
+         * @param bucketName name of bucket to create
          * @return this instance for method chaining
          */
         public CreateBucketCommandBuilder bucketName(final String bucketName) {
@@ -135,7 +135,7 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Defines if the new bucket should be public or not. Defaults to <code>false</code>.
+         * Define if the new bucket should be public or not. Defaults to <code>false</code>.
          *
          * @param isPublic <code>true</code> if the bucket should be public, else <code>false</code> (default)
          * @return this instance for method chaining
@@ -146,9 +146,9 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Sets the read password for the new bucket.
+         * Set the read password for the new bucket.
          *
-         * @param readPassword the read password or <code>null</code> for no read password (default)
+         * @param readPassword read password or <code>null</code> for no read password (default)
          * @return this instance for method chaining
          */
         public CreateBucketCommandBuilder readPassword(final String readPassword) {
@@ -157,9 +157,9 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Sets the write password for the new bucket.
+         * Set the write password for the new bucket.
          *
-         * @param writePassword the write password or <code>null</code> for no write password (default)
+         * @param writePassword write password or <code>null</code> for no write password (default)
          * @return this instance for method chaining
          */
         public CreateBucketCommandBuilder writePassword(final String writePassword) {
@@ -168,7 +168,7 @@ public class CreateBucketCommand extends JsonResponseCommand<Void> {
         }
 
         /**
-         * Creates a new bucket using the configured values.
+         * Create a new bucket using the configured values.
          *
          * @throws NullPointerException in case mandatory fields are not defined
          */

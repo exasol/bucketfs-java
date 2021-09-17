@@ -9,16 +9,18 @@ import jakarta.json.bind.annotation.JsonbProperty;
  *
  * @param <R> the result type
  */
-abstract class JsonResponseCommand<R> extends RpcCommand<R> {
+abstract class AbstractJsonResponseCommand<R> extends RpcCommand<R> {
+    private static final String SUCCESS_RESULT_NAME = "OK";
+    private static final int SUCCESS_RESULT_CODE = 0;
     protected final JsonMapper jsonMapper;
 
     /**
-     * Creates a new {@link JsonResponseCommand}.
+     * Create a new {@link AbstractJsonResponseCommand}.
      *
-     * @param jsonMapper the {@link JsonMapper} used for deserializing the response payload.
-     * @param jobName    the job name for the new command.
+     * @param jsonMapper {@link JsonMapper} used for deserializing the response payload.
+     * @param jobName    job name for the new command.
      */
-    protected JsonResponseCommand(final JsonMapper jsonMapper, final String jobName) {
+    protected AbstractJsonResponseCommand(final JsonMapper jsonMapper, final String jobName) {
         super(jobName);
         this.jsonMapper = jsonMapper;
     }
@@ -31,18 +33,18 @@ abstract class JsonResponseCommand<R> extends RpcCommand<R> {
     }
 
     private void verifySuccess(final JsonRpcResponse result) {
-        if (result.getCode() != 0) {
+        if (result.getCode() != SUCCESS_RESULT_CODE) {
             throw new JsonRpcException("Command returned non-zero result code: " + result);
         }
-        if (!"OK".equalsIgnoreCase(result.getName())) {
+        if (!SUCCESS_RESULT_NAME.equalsIgnoreCase(result.getName())) {
             throw new JsonRpcException("Command returned non-OK result name: " + result);
         }
     }
 
     /**
-     * Processes the given response json payload and returns a result object.
+     * Process the given response json payload and returns a result object.
      *
-     * @param responsePayload the parsed response payload.
+     * @param responsePayload parsed response payload.
      * @return result object
      */
     abstract R processResult(JsonStructure responsePayload);

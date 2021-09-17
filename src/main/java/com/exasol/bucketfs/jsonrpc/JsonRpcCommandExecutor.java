@@ -1,5 +1,7 @@
 package com.exasol.bucketfs.jsonrpc;
 
+import java.util.Objects;
+
 import jakarta.json.JsonObject;
 import jakarta.json.bind.annotation.JsonbProperty;
 
@@ -11,8 +13,8 @@ class JsonRpcCommandExecutor {
     private final JsonMapper jsonMapper;
 
     JsonRpcCommandExecutor(final JsonRpcClient client, final JsonMapper jsonMapper) {
-        this.client = client;
-        this.jsonMapper = jsonMapper;
+        this.client = Objects.requireNonNull(client, "client");
+        this.jsonMapper = Objects.requireNonNull(jsonMapper, "jsonMapper");
     }
 
     <R> R execute(final RpcCommand<R> command) {

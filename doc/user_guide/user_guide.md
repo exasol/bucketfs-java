@@ -275,7 +275,7 @@ First create a new test container `CONTAINER` as described [in the exasol-testco
 final CommandFactory commandFactory = CommandFactory.builder()
         .serverUrl(CONTAINER.getRpcUrl())
         .bearerTokenAuthentication(CONTAINER.getClusterConfiguration().getAuthenticationToken())
-        .ignoreSslErrors()
+        .raiseTlsErrors(false)
         .build();
 ```
 

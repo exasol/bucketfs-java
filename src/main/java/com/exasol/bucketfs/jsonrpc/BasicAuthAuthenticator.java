@@ -5,7 +5,7 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 
 /**
- * Authenticates an HTTP request via basic auth and given username and password.
+ * Authenticate an HTTP request via basic auth and given username and password.
  */
 class BasicAuthAuthenticator implements Authenticator {
 

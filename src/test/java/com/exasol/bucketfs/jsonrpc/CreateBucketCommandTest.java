@@ -25,12 +25,12 @@ class CreateBucketCommandTest {
 
     @Test
     void testExecutionFailsForMissingBucketFsName() {
-        asserExecutionFails(builder(), NullPointerException.class, "bucketFsName");
+        assertCreateBucketCommandThrowsExceptionWithMessage(builder(), NullPointerException.class, "bucketFsName");
     }
 
     @Test
     void testExecutionFailsForMissingBucketName() {
-        asserExecutionFails(builder().bucketFsName("bfs"), NullPointerException.class, "bucketName");
+        assertCreateBucketCommandThrowsExceptionWithMessage(builder().bucketFsName("bfs"), NullPointerException.class, "bucketName");
     }
 
     @Test
@@ -65,7 +65,7 @@ class CreateBucketCommandTest {
         return arg.getValue().getParameters();
     }
 
-    private void asserExecutionFails(final CreateBucketCommandBuilder builder,
+    private void assertCreateBucketCommandThrowsExceptionWithMessage(final CreateBucketCommandBuilder builder,
             final Class<? extends Throwable> expectedException, final String expectedMessage) {
         final Throwable exception = assertThrows(expectedException, builder::execute);
         assertThat(exception.getMessage(), equalTo(expectedMessage));

@@ -13,7 +13,7 @@ import javax.net.ssl.TrustManager;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 
 /**
- * Creates commands that can be executed against the Exasol RPC interface.
+ * Create commands that can be executed against the Exasol RPC interface.
  *
  * Create new instances by creating a builder using {@link #builder()}.
  * <p>
@@ -38,7 +38,7 @@ public class CommandFactory {
     }
 
     /**
-     * Creates a new builder for {@link CreateBucketCommand}.
+     * Create a new builder for {@link CreateBucketCommand}.
      *
      * @return a new builder for {@link CreateBucketCommand}
      */
@@ -48,7 +48,7 @@ public class CommandFactory {
     }
 
     /**
-     * Creates a new builder for {@link CommandFactory}.
+     * Create a new builder for {@link CommandFactory}.
      *
      * @return a new builder for {@link CommandFactory}
      */
@@ -63,7 +63,7 @@ public class CommandFactory {
      */
     public static class Builder {
 
-        private boolean ignoreSslErrors = false;
+        private boolean raiseTlsErrors = true;
         private URI serviceUri;
         private Authenticator authenticator;
 
@@ -72,22 +72,22 @@ public class CommandFactory {
         }
 
         /**
-         * Ignore all SSL errors when executing requests. This is required as the docker-db uses a self-signed
-         * certificate.
+         * Define if TLS errors should raise an error when executing requests or if they should be ignored. Setting this
+         * to <code>false</code> is required as the docker-db uses a self-signed certificate.
          * <p>
-         * Defaults to <em>not</em> ignoring SSL errors if not called.
+         * Defaults to raise TLS errors.
          *
          * @return this instance for method chaining
          */
-        public Builder ignoreSslErrors() {
-            this.ignoreSslErrors = true;
+        public Builder raiseTlsErrors(final boolean raise) {
+            this.raiseTlsErrors = raise;
             return this;
         }
 
         /**
-         * Sets the URL of the RPC interface, e.g. {@code "https://<hostname>:443/jrpc"}.
+         * Set the URL of the RPC interface, e.g. {@code "https://<hostname>:443/jrpc"}.
          *
-         * @param serverUrl the RPC interface URL
+         * @param serverUrl RPC interface URL
          * @return this instance for method chaining
          * @throws IllegalArgumentException the URL has an invalid format
          */
@@ -99,15 +99,15 @@ public class CommandFactory {
         private URI parseUri(final String uri) {
             try {
                 return new URI(uri);
-            } catch (final URISyntaxException e) {
-                throw new IllegalArgumentException("Error parsing uri '" + uri + "'", e);
+            } catch (final URISyntaxException exception) {
+                throw new IllegalArgumentException("Error parsing uri '" + uri + "'", exception);
             }
         }
 
         /**
          * Authenticate via the given bearer token.
          *
-         * @param token the bearer token
+         * @param token bearer token
          * @return this instance for method chaining
          */
         public Builder bearerTokenAuthentication(final String token) {
@@ -118,8 +118,8 @@ public class CommandFactory {
         /**
          * Authenticate via basic authentication.
          *
-         * @param username the username
-         * @param password the password
+         * @param username username for authenticating against the RPC interface
+         * @param password password for authenticating against the RPC interface
          * @return this instance for method chaining
          */
         public Builder basicAuthentication(final String username, final String password) {
@@ -151,23 +151,28 @@ public class CommandFactory {
         private void initializeSslContext(final SSLContext sslContext) {
             try {
                 sslContext.init(null, createSslTrustManagers().orElse(null), null);
-            } catch (final KeyManagementException e) {
-                throw new IllegalStateException("Error initializing ssl context", e);
+            } catch (final KeyManagementException exception) {
+                throw new IllegalStateException(
+                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.",
+                        exception);
             }
         }
 
         private Optional<TrustManager[]> createSslTrustManagers() {
-            if (this.ignoreSslErrors) {
+            if (this.raiseTlsErrors) {
+                return Optional.empty();
+            } else {
                 return Optional.of(new TrustManager[] { new DummyTrustManager() });
             }
-            return Optional.empty();
         }
 
         private SSLContext createSslContext() {
             try {
                 return SSLContext.getInstance("TLS");
-            } catch (final NoSuchAlgorithmException e) {
-                throw new IllegalStateException("Error creating ssl context", e);
+            } catch (final NoSuchAlgorithmException exception) {
+                throw new IllegalStateException(
+                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.",
+                        exception);
             }
         }
     }
