@@ -8,7 +8,7 @@ import jakarta.json.*;
 import jakarta.json.bind.*;
 
 /**
- * Converts model classes to json and back.
+ * Converts model classes to JSON and back.
  */
 class JsonMapper {
 

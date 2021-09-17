@@ -263,7 +263,7 @@ Creating and deleting buckets and BucketFS services is not yet supported by the 
 
 The RPC API allows you to manage buckets themselves, i.e. create new buckets.
 
-In order to work with the RPC API you first create a `CommandFactory`. This will allow you to execute commands, like create a new bucket.
+In order to work with the RPC API you first create a `CommandFactory`. This will allow you to execute commands, like creating a new bucket.
 
 ### Creating a `CommandFactory`
 
@@ -296,17 +296,18 @@ To use basic authentication instead of bearer token, replace `bearerTokenAuthent
 Using the `CommandFactory` you can now create a bucket:
 
 ```java
-final String bucketName = "random_bucket_name_" + System.currentTimeMillis();
+final String uniqueBucketName = "bucket_" + System.currentTimeMillis();
 
-commandFactory.makeCreateBucketCommand()
+CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketCommand()
         .bucketFsName("bfsdefault")
-        .bucketName(bucketName)
+        .bucketName(uniqueBucketName)
         .isPublic(true)
         .readPassword("readPassword")
-        .writePassword("writePassword")
-        .execute();
+        .writePassword("writePassword");
+        
+commandBuilder.execute();
 ```
 
-Afterwards you create a new bucket object as described above.
+After executing the command, you can create a new `WriteEnabledBucket` or `SyncAwareBucket` as described above.
 
 **Note:** It may take some time until the bucket is available.

@@ -39,7 +39,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
         final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> command.execute());
 
-        assertAll(() -> assertThat(exception.getMessage(), containsString("Error executing request")), //
+        assertAll(() -> assertThat(exception.getMessage(), containsString("Unable to execute RPC request 'https://")), //
                 () -> assertThat(exception.getCause().getMessage(), equalTo(
                         "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target")));
     }

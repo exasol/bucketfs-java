@@ -1,10 +1,12 @@
 package com.exasol.bucketfs.jsonrpc;
 
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.annotation.JsonbProperty;
 
 /**
- * The base class for {@link RpcCommand} that expect a json response payload. This simplifies processing the result for
+ * The base class for {@link RpcCommand} that expect a JSON response payload. This simplifies processing the result for
  * child classes.
  *
  * @param <R> the result type
@@ -33,23 +35,31 @@ abstract class AbstractJsonResponseCommand<R> extends RpcCommand<R> {
     }
 
     private void verifySuccess(final JsonRpcResponse result) {
-        if (result.getCode() != SUCCESS_RESULT_CODE) {
-            throw new JsonRpcException("Command returned non-zero result code: " + result);
-        }
-        if (!SUCCESS_RESULT_NAME.equalsIgnoreCase(result.getName())) {
-            throw new JsonRpcException("Command returned non-OK result name: " + result);
+        if (hasErrorCode(result) || hasErrorDescription(result)) {
+            throw new JsonRpcException(messageBuilder("E-BFSJ-18")
+                    .message("RPC command {{command}} failed, received error result {{result}} from server.",
+                            this.getClass().getName(), result)
+                    .toString());
         }
     }
 
+    private boolean hasErrorDescription(final JsonRpcResponse result) {
+        return !SUCCESS_RESULT_NAME.equalsIgnoreCase(result.getName());
+    }
+
+    private boolean hasErrorCode(final JsonRpcResponse result) {
+        return result.getCode() != SUCCESS_RESULT_CODE;
+    }
+
     /**
-     * Process the given response json payload and returns a result object.
+     * Process the given response JSON payload and returns a result object.
      *
      * @param responsePayload parsed response payload.
      * @return result object
      */
     abstract R processResult(JsonStructure responsePayload);
 
-    // Must be public for json mapping
+    // Must be public for JSON mapping
     public static class JsonRpcResponse {
         @JsonbProperty("result_jobid")
         private String jobId;

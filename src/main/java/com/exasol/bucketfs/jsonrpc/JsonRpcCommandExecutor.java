@@ -25,7 +25,7 @@ class JsonRpcCommandExecutor {
         return command.processResult(responseBody);
     }
 
-    // Must be public for json mapping
+    // Must be public for JSON mapping
     public static class JsonRpcPayload {
         @JsonbProperty("method")
         private final String method;
@@ -53,7 +53,7 @@ class JsonRpcCommandExecutor {
         }
     }
 
-    // Must be public for json mapping
+    // Must be public for JSON mapping
     public static class Parameters {
         @JsonbProperty("params")
         private final JsonObject params;

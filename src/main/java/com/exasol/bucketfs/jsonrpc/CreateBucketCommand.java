@@ -36,7 +36,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
-    // Must be public to allow json mapping. Not accessible for the user.
+    // Must be public to allow JSON mapping. Not accessible for the user.
     public static class Request {
         // Mandatory values
         @JsonbProperty("bucketfs_name")
