@@ -105,8 +105,8 @@ public class CommandFactory {
                 return new URI(uri);
             } catch (final URISyntaxException exception) {
                 throw new IllegalArgumentException(
-                        messageBuilder("E-BFSJ-19").message("Error parsing server URL {{serverUrl}}", uri)
-                                .mitigation("Use a valid format for the URL").toString(),
+                        messageBuilder("E-BFSJ-19").message("Error parsing server URL {{serverUrl}}.", uri)
+                                .mitigation("Use a valid format for the URL.").toString(),
                         exception);
             }
         }

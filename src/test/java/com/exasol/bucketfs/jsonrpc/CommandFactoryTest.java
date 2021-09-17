@@ -24,7 +24,8 @@ class CommandFactoryTest {
         final var builder = CommandFactory.builder();
         final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> builder.serverUrl("invalid url"));
-        assertThat(exception.getMessage(), equalTo("E-BFSJ-19: Error parsing server URL 'invalid url'"));
+        assertThat(exception.getMessage(),
+                equalTo("E-BFSJ-19: Error parsing server URL 'invalid url'. Use a valid format for the URL."));
     }
 
     private void asserBuildingFails(final CommandFactory.Builder builder,
