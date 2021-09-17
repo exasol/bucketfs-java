@@ -34,7 +34,7 @@ class JsonRpcCommandExecutor {
         @JsonbProperty("params")
         private final Parameters parameters;
 
-        private JsonRpcPayload(final String method, final String job, final JsonObject parameters) {
+        JsonRpcPayload(final String method, final String job, final JsonObject parameters) {
             this.method = method;
             this.job = job;
             this.parameters = new Parameters(parameters);

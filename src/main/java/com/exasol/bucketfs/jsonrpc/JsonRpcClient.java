@@ -1,5 +1,7 @@
 package com.exasol.bucketfs.jsonrpc;
 
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
@@ -52,10 +54,9 @@ class JsonRpcClient {
 
     private void verifySuccessResponse(final HttpRequest request, final HttpResponse<String> response) {
         if (hasErrorStatusCode(response)) {
-            final String message = "RPC request " + request + " failed with response code " + response.statusCode()
-                    + ". Response body was '" + response.body() + "'";
-            LOGGER.warning(message);
-            throw new JsonRpcException(message);
+            throw new JsonRpcException(messageBuilder("E-BFSJ-22").message(
+                    "RPC request {{request}} failed with response code {{responseCode}}. Response body was {{responseBody}}",
+                    request, response.statusCode(), response.body()).toString());
         }
     }
 
@@ -67,10 +68,12 @@ class JsonRpcClient {
         try {
             return this.httpClient.send(request, BodyHandlers.ofString());
         } catch (final IOException exception) {
-            throw new JsonRpcException("Unable to execute RPC request '" + request + "'", exception);
+            throw new JsonRpcException(messageBuilder("E-BFSJ-23")
+                    .message("Unable to execute RPC request {{request}}", request).toString(), exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("InterruptedException when sending RPC request", exception);
+            throw new IllegalStateException(messageBuilder("E-BFSJ-24")
+                    .message("Interrupted when sending RPC request {{request}}", request).toString(), exception);
         }
     }
 }

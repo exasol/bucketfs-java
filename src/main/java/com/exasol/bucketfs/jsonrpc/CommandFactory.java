@@ -1,5 +1,7 @@
 package com.exasol.bucketfs.jsonrpc;
 
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -100,7 +102,10 @@ public class CommandFactory {
             try {
                 return new URI(uri);
             } catch (final URISyntaxException exception) {
-                throw new IllegalArgumentException("Error parsing uri '" + uri + "'", exception);
+                throw new IllegalArgumentException(
+                        messageBuilder("E-BFSJ-19").message("Error parsing server URL {{serverUrl}}", uri)
+                                .mitigation("Use a valid format for the URL").toString(),
+                        exception);
             }
         }
 
@@ -152,9 +157,9 @@ public class CommandFactory {
             try {
                 sslContext.init(null, createSslTrustManagers().orElse(null), null);
             } catch (final KeyManagementException exception) {
-                throw new IllegalStateException(
-                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.",
-                        exception);
+                throw new IllegalStateException(messageBuilder("E-BFSJ-20").message(
+                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.")
+                        .toString(), exception);
             }
         }
 
@@ -170,9 +175,9 @@ public class CommandFactory {
             try {
                 return SSLContext.getInstance("TLS");
             } catch (final NoSuchAlgorithmException exception) {
-                throw new IllegalStateException(
-                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.",
-                        exception);
+                throw new IllegalStateException(messageBuilder("E-BFSJ-21").message(
+                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.")
+                        .toString(), exception);
             }
         }
     }
