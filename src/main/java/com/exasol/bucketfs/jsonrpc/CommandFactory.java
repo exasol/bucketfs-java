@@ -79,6 +79,8 @@ public class CommandFactory {
          * <p>
          * Defaults to raise TLS errors.
          *
+         * @param raise <code>true</code> if the {@link CommandFactory} should fail for TLS errors, <code>false</code>
+         *              if it should ignore TLS errors.
          * @return this instance for method chaining
          */
         public Builder raiseTlsErrors(final boolean raise) {
