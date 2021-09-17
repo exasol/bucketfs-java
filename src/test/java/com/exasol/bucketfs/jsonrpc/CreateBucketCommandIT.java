@@ -12,12 +12,14 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
+@Testcontainers
 // [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
 
@@ -39,7 +41,9 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
         final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> command.execute());
 
-        assertAll(() -> assertThat(exception.getMessage(), containsString("Unable to execute RPC request 'https://")), //
+        assertAll(
+                () -> assertThat(exception.getMessage(),
+                        containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
                 () -> assertThat(exception.getCause().getMessage(), equalTo(
                         "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target")));
     }
