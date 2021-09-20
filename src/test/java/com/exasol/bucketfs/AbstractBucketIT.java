@@ -13,6 +13,7 @@ import com.exasol.containers.ExasolContainer;
 
 @Testcontainers
 public abstract class AbstractBucketIT {
+
     @Container
     protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>() //
             .withReuse(true);
@@ -23,6 +24,10 @@ public abstract class AbstractBucketIT {
 
     protected Integer getMappedDefaultBucketFsPort() {
         return EXASOL.getMappedPort(EXASOL.getDefaultInternalBucketfsPort());
+    }
+
+    protected Integer getMappedJsonRpcPort() {
+        return EXASOL.getMappedPort(EXASOL.getDefaultInternalRpcPort());
     }
 
     protected BucketConfiguration getDefaultBucketConfiguration() {
