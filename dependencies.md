@@ -57,7 +57,6 @@
 [57]: http://maven.apache.org/plugins/maven-clean-plugin/
 [8]: https://projects.eclipse.org/projects/ee4j.yasson
 [1]: https://opensource.org/licenses/MIT
-[5]: https://eclipse-ee4j.github.io/jsonb-api
 [19]: https://github.com/mockito/mockito
 [27]: https://maven.apache.org/surefire/maven-failsafe-plugin/
 [11]: https://commons.apache.org/proper/commons-compress/
@@ -87,6 +86,7 @@
 [23]: https://testcontainers.org
 [2]: https://github.com/eclipse-ee4j/jsonp
 [53]: https://maven.apache.org/plugins/maven-source-plugin/
+[5]: https://github.com/eclipse-ee4j/jsonb-api
 [4]: https://projects.eclipse.org/license/secondary-gpl-2.0-cp
 [17]: http://hamcrest.org/JavaHamcrest/
 [65]: http://maven.apache.org/plugins/maven-site-plugin/

@@ -271,6 +271,11 @@
 						<module>maven_central</module>
 						<module>integration_tests</module>
 					</modules>
+					<linkReplacements>
+                        <linkReplacement>
+                            https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api
+                        </linkReplacement>
+                    </linkReplacements>
 				</configuration>
 			</plugin>
 			<plugin>
