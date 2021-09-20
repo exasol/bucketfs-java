@@ -22,7 +22,6 @@ import com.exasol.containers.ExasolDockerImageReference;
 @Testcontainers
 // [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
-
     private static final String READ_PASSWORD = "READ_PASSWORD";
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
 

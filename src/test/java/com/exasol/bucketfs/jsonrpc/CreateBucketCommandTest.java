@@ -21,7 +21,6 @@ import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.Request;
 
 @ExtendWith(MockitoExtension.class)
 class CreateBucketCommandTest {
-
     @Mock
     private JsonRpcCommandExecutor commandExcecutorMock;
     private final JsonMapper jsonMapper = JsonMapper.create();

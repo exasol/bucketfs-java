@@ -7,7 +7,6 @@ import java.net.http.HttpRequest;
 import org.junit.jupiter.api.Test;
 
 class BearerTokenAuthenticatorTest {
-
     @Test
     void testAuthenticate() throws URISyntaxException {
         final var requestBuilder = HttpRequest.newBuilder(new URI("http://localhost"));

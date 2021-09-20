@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 class CommandFactoryTest {
-
     @Test
     void testCreatingCommandFactoryWithoutAuthenticatorFails() {
         asserBuildingFails(CommandFactory.builder(), NullPointerException.class, "authenticator");

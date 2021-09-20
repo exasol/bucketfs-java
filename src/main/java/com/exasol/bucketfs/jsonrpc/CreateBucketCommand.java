@@ -13,7 +13,6 @@ import jakarta.json.bind.annotation.JsonbProperty;
  */
 // [impl->dsn~creating-new-bucket~1]
 public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
-
     private static final String JOB_NAME = "bucket_add";
     private final Request request;
 

@@ -11,7 +11,6 @@ import jakarta.json.bind.*;
  * Converts model classes to JSON and back.
  */
 class JsonMapper {
-
     private final Jsonb jsonb;
 
     private JsonMapper(final Jsonb jsonb) {

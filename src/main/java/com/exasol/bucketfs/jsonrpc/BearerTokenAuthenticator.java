@@ -6,7 +6,6 @@ import java.net.http.HttpRequest;
  * Authenticate an HTTP request via a bearer token.
  */
 class BearerTokenAuthenticator implements Authenticator {
-
     private final String token;
 
     BearerTokenAuthenticator(final String token) {

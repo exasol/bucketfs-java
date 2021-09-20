@@ -7,7 +7,6 @@ import java.net.http.HttpRequest;
  * authentication.
  */
 interface Authenticator {
-
     /**
      * Authenticate the given request builder e.g. by adding an {@code Authorization} header.
      *

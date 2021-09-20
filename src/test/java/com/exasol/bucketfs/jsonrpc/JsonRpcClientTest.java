@@ -22,7 +22,6 @@ import com.exasol.bucketfs.jsonrpc.JsonRpcCommandExecutor.JsonRpcPayload;
 
 @ExtendWith(MockitoExtension.class)
 class JsonRpcClientTest {
-
     private static final String SERVICE_URI = "http://localhost";
     private static final String RPC_METHOD = "method";
     private static final String RPC_JOB = "job";

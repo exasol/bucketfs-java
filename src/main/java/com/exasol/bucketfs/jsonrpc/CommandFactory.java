@@ -64,7 +64,6 @@ public class CommandFactory {
      * Call {@link CommandFactory#builder()} to create a new instance.
      */
     public static class Builder {
-
         private boolean raiseTlsErrors = true;
         private URI serviceUri;
         private Authenticator authenticator;
@@ -145,7 +144,6 @@ public class CommandFactory {
             final HttpClient httpClient = createHttpClient();
             final JsonRpcClient client = new JsonRpcClient(httpClient, jsonMapper, this.authenticator, this.serviceUri);
             final JsonRpcCommandExecutor executor = new JsonRpcCommandExecutor(client, jsonMapper);
-
             return new CommandFactory(executor, jsonMapper);
         }
 
