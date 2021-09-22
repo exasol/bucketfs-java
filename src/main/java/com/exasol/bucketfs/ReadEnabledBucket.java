@@ -1,5 +1,10 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
+import static com.exasol.bucketfs.BucketOperation.LIST;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+import static java.net.HttpURLConnection.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
@@ -9,10 +14,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
-import static com.exasol.bucketfs.BucketOperation.LIST;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
-import static java.net.HttpURLConnection.*;
+import com.exasol.bucketfs.http.HttpClientBuilder;
+import com.exasol.bucketfs.jsonrpc.CommandFactory;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -20,20 +23,24 @@ import static java.net.HttpURLConnection.*;
 public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
+
     protected final String bucketFsName;
     protected final String bucketName;
+    private final String protocol;
     protected final String ipAddress;
     protected final int port;
     protected final String readPassword;
-    private final HttpClient client = HttpClient.newBuilder().build();
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
+    private final HttpClient client;
 
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
         this.bucketFsName = builder.bucketFsName;
         this.bucketName = builder.bucketName;
+        this.protocol = builder.protocol;
         this.ipAddress = builder.ipAddress;
         this.port = builder.port;
         this.readPassword = builder.readPassword;
+        this.client = builder.httpClientBuilder.build();
     }
 
     @Override
@@ -104,7 +111,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private URI createPublicReadURI(final String pathInBucket) {
-        return URI.create("http://" + this.ipAddress + ":" + this.port + "/" + this.bucketName + "/"
+        return URI.create(this.protocol + "://" + this.ipAddress + ":" + this.port + "/" + this.bucketName + "/"
                 + removeLeadingSlash(pathInBucket));
     }
 
@@ -163,7 +170,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
-                                                            final IOException exception) {
+            final IOException exception) {
         return new BucketAccessException(messageBuilder("E-BFSJ-5")
                 .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
     }
@@ -198,19 +205,19 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
             throws BucketAccessException {
         switch (statusCode) {
-            case HTTP_OK:
-                return;
-            case HTTP_NOT_FOUND:
-                throw new BucketAccessException(messageBuilder("E-BFSJ-2")
-                        .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
-                        .toString());
-            case HTTP_FORBIDDEN:
-                throw new BucketAccessException(messageBuilder("E-BFSJ-3")
-                        .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
-            default:
-                throw new BucketAccessException(messageBuilder("E-BFSJ-1")
-                        .message("Unable do {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
-                        .toString());
+        case HTTP_OK:
+            return;
+        case HTTP_NOT_FOUND:
+            throw new BucketAccessException(messageBuilder("E-BFSJ-2")
+                    .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
+                    .toString());
+        case HTTP_FORBIDDEN:
+            throw new BucketAccessException(messageBuilder("E-BFSJ-3")
+                    .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
+        default:
+            throw new BucketAccessException(messageBuilder("E-BFSJ-1")
+                    .message("Unable do {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
+                    .toString());
         }
     }
 
@@ -224,7 +231,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @return http client
      */
     protected HttpClient getClient() {
-        return client;
+        return this.client;
     }
 
     @Override
@@ -243,11 +250,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @param <T> type for self pointer to inheritable builder
      */
     public static class Builder<T extends Builder<T>> {
+        private String protocol = "http";
         private String bucketFsName;
         private String bucketName;
         private String ipAddress;
         private int port;
         private String readPassword;
+        private final HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
 
         @SuppressWarnings("unchecked")
         protected T self() {
@@ -273,6 +282,17 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          */
         public T name(final String bucketName) {
             this.bucketName = bucketName;
+            return self();
+        }
+
+        /**
+         * Define if you want to use TLS/HTTPS for connecting to the server. Defaults to plain text HTTP.
+         *
+         * @param useTls {@code true} to use the TLS/HTTPS protocol, {@code false} to use plain text HTTP (default)
+         * @return Builder instance for fluent programming
+         */
+        public T useTls(final boolean useTls) {
+            this.protocol = useTls ? "https" : "http";
             return self();
         }
 
@@ -306,6 +326,21 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          */
         public T readPassword(final String readPassword) {
             this.readPassword = readPassword;
+            return self();
+        }
+
+        /**
+         * Define if TLS errors should raise an error when executing requests or if they should be ignored. Setting this
+         * to <code>false</code> is required as the docker-db uses a self-signed certificate.
+         * <p>
+         * Defaults to raise TLS errors.
+         *
+         * @param raise <code>true</code> if the {@link CommandFactory} should fail for TLS errors, <code>false</code>
+         *              if it should ignore TLS errors.
+         * @return Builder instance for fluent programming
+         */
+        public T raiseTlsErrors(final boolean raise) {
+            this.httpClientBuilder.raiseTlsErrors(raise);
             return self();
         }
 

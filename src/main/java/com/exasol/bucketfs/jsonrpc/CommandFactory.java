@@ -5,13 +5,8 @@ import static com.exasol.errorreporting.ExaError.messageBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-
+import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 
 /**
@@ -64,7 +59,7 @@ public class CommandFactory {
      * Call {@link CommandFactory#builder()} to create a new instance.
      */
     public static class Builder {
-        private boolean raiseTlsErrors = true;
+        private final HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         private URI serviceUri;
         private Authenticator authenticator;
 
@@ -83,7 +78,7 @@ public class CommandFactory {
          * @return this instance for method chaining
          */
         public Builder raiseTlsErrors(final boolean raise) {
-            this.raiseTlsErrors = raise;
+            this.httpClientBuilder.raiseTlsErrors(raise);
             return this;
         }
 
@@ -141,44 +136,10 @@ public class CommandFactory {
          */
         public CommandFactory build() {
             final JsonMapper jsonMapper = JsonMapper.create();
-            final HttpClient httpClient = createHttpClient();
+            final HttpClient httpClient = this.httpClientBuilder.build();
             final JsonRpcClient client = new JsonRpcClient(httpClient, jsonMapper, this.authenticator, this.serviceUri);
             final JsonRpcCommandExecutor executor = new JsonRpcCommandExecutor(client, jsonMapper);
             return new CommandFactory(executor, jsonMapper);
-        }
-
-        private HttpClient createHttpClient() {
-            final SSLContext sslContext = createSslContext();
-            initializeSslContext(sslContext);
-            return HttpClient.newBuilder().sslContext(sslContext).build();
-        }
-
-        private void initializeSslContext(final SSLContext sslContext) {
-            try {
-                sslContext.init(null, createSslTrustManagers().orElse(null), null);
-            } catch (final KeyManagementException exception) {
-                throw new IllegalStateException(messageBuilder("E-BFSJ-20").message(
-                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.")
-                        .toString(), exception);
-            }
-        }
-
-        private Optional<TrustManager[]> createSslTrustManagers() {
-            if (this.raiseTlsErrors) {
-                return Optional.empty();
-            } else {
-                return Optional.of(new TrustManager[] { new DummyTrustManager() });
-            }
-        }
-
-        private SSLContext createSslContext() {
-            try {
-                return SSLContext.getInstance("TLS");
-            } catch (final NoSuchAlgorithmException exception) {
-                throw new IllegalStateException(messageBuilder("E-BFSJ-21").message(
-                        "Unable to initialize TLS context while trying to create HTTP client for RPC communication.")
-                        .toString(), exception);
-            }
         }
     }
 }
