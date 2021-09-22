@@ -81,6 +81,8 @@ import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
 final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
         .ipAddress(ipAddress)
         .httpPort(port)
         .serviceName(serviceName)
@@ -95,6 +97,8 @@ Each bucket implementation comes with a builder that you create by calling the s
 
 The builder for the `ReadEnalbedBucket` has the following parameter setters:
 
+* `useTls`: `true` to use HTTPS, `false` to use HTTP (default)
+* `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
 * `ipAddress`: IP address of the cluster node to which you want to connect
 * `httpPort`: number of the port the BucketFS service listens on
 * `serviceName`: name of the service that hosts the bucket
@@ -105,6 +109,8 @@ If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
 final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
         .ipAddress(ipAddress())
         .httpPort(port)
         .serviceName(serviceName)
@@ -122,6 +128,8 @@ As mentioned before, if you need a bucket that supports blocking calls, you need
 
 ```java
 final Bucket bucket = SyncAwareBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
         .ipAddress(ipAddress())
         .httpPort(port)
         .serviceName(serviceName)
