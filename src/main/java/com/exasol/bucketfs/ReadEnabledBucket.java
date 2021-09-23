@@ -256,7 +256,15 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         private String ipAddress;
         private int port;
         private String readPassword;
-        private final HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
+        private final HttpClientBuilder httpClientBuilder;
+
+        Builder(final HttpClientBuilder httpClientBuilder) {
+            this.httpClientBuilder = httpClientBuilder;
+        }
+
+        private Builder() {
+            this(new HttpClientBuilder());
+        }
 
         @SuppressWarnings("unchecked")
         protected T self() {

@@ -5,7 +5,6 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Path;
 
@@ -15,13 +14,17 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.exasol.bucketfs.testutil.ExceptionAssertions;
+
 // Note that some of the download integration tests are conducted through the write-enabled version of the bucket.
 // This allows uploading the expected file first. Otherwise the test would contain too much duplication.
 @Tag("slow")
 class ReadEnabledBucketIT extends AbstractBucketIT {
     private ReadOnlyBucket getDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
-        return ReadEnabledBucket.builder()//
+        return ReadEnabledBucket.builder() //
+                .raiseTlsErrors(true) //
+                .useTls(false) //
                 .ipAddress(getContainerIpAddress()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
@@ -53,10 +56,10 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     @Test
     void testListBucketContentsOfIllegalPathThrowsException() {
         final var nonExistentPath = "illegal%path";
-        final BucketAccessException exception = assertThrows(BucketAccessException.class,
-                () -> getDefaultBucket().listContents(nonExistentPath));
-        assertThat(exception.getMessage(), equalTo("E-BFSJ-11: Unable to list contents of '" + nonExistentPath
-                + "' in bucket bfsdefault/default: No such file or directory."));
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
+                () -> getDefaultBucket().listContents(nonExistentPath), //
+                "E-BFSJ-11: Unable to list contents of '" + nonExistentPath
+                        + "' in bucket bfsdefault/default: No such file or directory.");
     }
 
     @Test
@@ -64,9 +67,9 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final var pathToFile = tempDir.resolve("irrelevant");
         final var pathInBucket = "this/path/does/not/exist";
         final var bucket = getDefaultBucket();
-        final var exception = assertThrows(BucketAccessException.class,
-                () -> bucket.downloadFile(pathInBucket, pathToFile));
-        assertThat(exception.getMessage(), matchesPattern(
-                "E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
+                () -> bucket.downloadFile(pathInBucket, pathToFile), //
+                matchesPattern(
+                        "E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
     }
 }
