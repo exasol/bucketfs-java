@@ -24,7 +24,7 @@ See the [user guide](https://github.com/exasol/bucketfs-java/blob/main/doc/user_
 
 ### Test Dependency Updates
 
-* Updated `com.exasol:exasol-testcontainers:3.5.3` to `5.0.0`
+* Updated `com.exasol:exasol-testcontainers:3.5.3` to `5.1.0`
 * Updated `org.mockito:mockito-junit-jupiter:3.11.2` to `3.12.4`
 
 ### Plugin Dependency Updates
