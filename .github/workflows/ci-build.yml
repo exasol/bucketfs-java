@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        docker_db_version: [ "6.2.16-d1", "6.2.17-d1", "7.1.1" ]
+        docker_db_version: [ "6.2.17-d1", "7.0.13", "7.1.1" ]
     env:
       DEFAULT_DB_VERSION: "7.1.1"
     runs-on: ubuntu-latest
