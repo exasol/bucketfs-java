@@ -30,7 +30,7 @@ class HttpClientBuilderTest {
                 .raiseTlsErrors(false) //
                 .certificate(mock(X509Certificate.class));
         ExceptionAssertions.assertThrowsWithMessage(IllegalStateException.class, builder::build,
-                "E-BFSJ-23: Setting raiseTlsErrors to false and using a certificate is mutually exclusive. Either set raiseTlsErrors to true or remove the certificate.");
+                "E-BFSJ-27: Setting raiseTlsErrors to false and using a certificate is mutually exclusive. Either set raiseTlsErrors to true or remove the certificate.");
     }
 
     @Test

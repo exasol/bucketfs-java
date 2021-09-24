@@ -76,7 +76,7 @@ public class HttpClientBuilder {
 
     private Optional<TrustManager[]> createTrustManagers() {
         if (!this.raiseTlsErrors && (this.certificate != null)) {
-            throw new IllegalStateException(messageBuilder("E-BFSJ-23")
+            throw new IllegalStateException(messageBuilder("E-BFSJ-27")
                     .message("Setting raiseTlsErrors to false and using a certificate is mutually exclusive.")
                     .mitigation("Either set raiseTlsErrors to true or remove the certificate.").toString());
         }
@@ -104,7 +104,7 @@ public class HttpClientBuilder {
             trustManagerFactory.init(keyStore);
             return trustManagerFactory.getTrustManagers();
         } catch (final KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException exception) {
-            throw new IllegalStateException(messageBuilder("E-BFSJ-22")
+            throw new IllegalStateException(messageBuilder("E-BFSJ-25")
                     .message("Unable to create trust manager for given certificate").toString());
         }
     }
@@ -113,7 +113,7 @@ public class HttpClientBuilder {
         try {
             return SSLContext.getInstance("TLS");
         } catch (final NoSuchAlgorithmException exception) {
-            throw new IllegalStateException(messageBuilder("E-BFSJ-21").message(
+            throw new IllegalStateException(messageBuilder("E-BFSJ-26").message(
                     "Unable to initialize TLS context while trying to create HTTP client for RPC communication.")
                     .toString(), exception);
         }
