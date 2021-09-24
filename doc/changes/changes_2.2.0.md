@@ -1,4 +1,4 @@
-# BucketFS Java 2.2.0, released 2021-09-24
+# BucketFS Java 2.2.0, released 2021-09-27
 
 Code name: Create buckets
 
