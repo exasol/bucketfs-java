@@ -263,7 +263,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             this.httpClientBuilder = httpClientBuilder;
         }
 
-        private Builder() {
+        protected Builder() {
             this(new HttpClientBuilder());
         }
 

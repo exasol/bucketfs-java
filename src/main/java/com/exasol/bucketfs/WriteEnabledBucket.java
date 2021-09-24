@@ -18,7 +18,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.uploadnecessity.UploadAlwaysStrategy;
 import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 
@@ -185,10 +184,6 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
      */
     public static class Builder<T extends Builder<T>> extends ReadEnabledBucket.Builder<Builder<T>> {
         private String writePassword;
-
-        protected Builder() {
-            super(new HttpClientBuilder());
-        }
 
         @SuppressWarnings("unchecked")
         @Override
