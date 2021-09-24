@@ -47,6 +47,36 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                         "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target")));
     }
 
+    @Test
+    void testCreatingBucketWithCertificateFailsHostnameValidation() throws BucketAccessException, TimeoutException {
+        assumeJsonRpcAvailable();
+
+        final String randomBucketName = getUniqueBucketName();
+        final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
+
+        final CommandFactory commandFactory = CommandFactory.builder() //
+                .serverUrl(EXASOL.getRpcUrl()) //
+                .bearerTokenAuthentication(authenticationToken) //
+                .raiseTlsErrors(true) //
+                .certificate(EXASOL.getTlsCertificate().get()) //
+                .build();
+        final CreateBucketCommandBuilder command = commandFactory.makeCreateBucketCommand() //
+                .bucketFsName(DEFAULT_BUCKETFS) //
+                .bucketName(randomBucketName) //
+                .isPublic(true) //
+                .readPassword(READ_PASSWORD) //
+                .writePassword(WRITE_PASSWORD);
+
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> command.execute());
+
+        assertAll(
+                () -> assertThat(exception.getMessage(),
+                        containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
+                () -> assertThat(exception.getCause().getMessage(),
+                        either(equalTo("No subject alternative names present"))
+                                .or(equalTo("No name matching localhost found"))));
+    }
+
     private void assumeJsonRpcAvailable() {
         final ExasolDockerImageReference version = EXASOL.getDockerImageReference();
         assumeTrue(version.getMajor() >= 7,

@@ -5,6 +5,7 @@ import static com.exasol.errorreporting.ExaError.messageBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.security.cert.X509Certificate;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
@@ -79,6 +80,21 @@ public class CommandFactory {
          */
         public Builder raiseTlsErrors(final boolean raise) {
             this.httpClientBuilder.raiseTlsErrors(raise);
+            return this;
+        }
+
+        /**
+         * Use the given certificate for TLS connections.
+         * <p>
+         * Defaults to using the certificates from the JVMs default key store.
+         * <p>
+         * Mutually exclusive with setting {@link #raiseTlsErrors} to {@code false}.
+         *
+         * @param certificate certificate to use
+         * @return this instance for method chaining
+         */
+        public Builder certificate(final X509Certificate certificate) {
+            this.httpClientBuilder.certificate(certificate);
             return this;
         }
 

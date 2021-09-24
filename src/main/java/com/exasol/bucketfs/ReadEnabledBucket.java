@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.*;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Path;
+import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
@@ -342,6 +343,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          * to <code>false</code> is required as the docker-db uses a self-signed certificate.
          * <p>
          * Defaults to raise TLS errors.
+         * <p>
+         * Mutually exclusive with setting {@link #raiseTlsErrors} to {@code false}.
          *
          * @param raise <code>true</code> if the {@link CommandFactory} should fail for TLS errors, <code>false</code>
          *              if it should ignore TLS errors.
@@ -349,6 +352,21 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          */
         public T raiseTlsErrors(final boolean raise) {
             this.httpClientBuilder.raiseTlsErrors(raise);
+            return self();
+        }
+
+        /**
+         * Use the given certificate for TLS connections.
+         * <p>
+         * Defaults to using the certificates from the JVMs default key store.
+         * <p>
+         * Mutually exclusive with setting {@link #raiseTlsErrors} to {@code false}.
+         *
+         * @param certificate certificate to use
+         * @return Builder instance for fluent programming
+         */
+        public T certificate(final X509Certificate certificate) {
+            this.httpClientBuilder.certificate(certificate);
             return self();
         }
 
