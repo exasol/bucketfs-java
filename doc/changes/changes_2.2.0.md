@@ -1,4 +1,4 @@
-# BucketFS Java 2.2.0, released 2021-09-23
+# BucketFS Java 2.2.0, released 2021-09-24
 
 Code name: Create buckets
 
@@ -12,6 +12,7 @@ See the [user guide](https://github.com/exasol/bucketfs-java/blob/main/doc/user_
 
 * [#17](https://github.com/exasol/bucketfs-java/issues/17): Added support for creating new buckets
 * [#35](https://github.com/exasol/bucketfs-java/issues/35): Added support using self-signed certificates and ignoring TLS errors
+* Increase upload timeout for `SyncAwareBucket` from 60s to 120s.
 
 ## Dependency Updates
 

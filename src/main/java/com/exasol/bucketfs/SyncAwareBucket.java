@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     private static final Logger LOGGER = Logger.getLogger(SyncAwareBucket.class.getName());
-    private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 60000;
+    private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 2 * 60000L;
     private static final long FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS = 200;
     private final BucketFsMonitor monitor;
 
