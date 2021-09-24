@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.exasol.bucketfs.*;
 
+@Tag("slow")
 class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     private static Connection connection;
     private static ChecksumUploadNecessityCheckStrategy uploadCheck;
