@@ -12,7 +12,7 @@ This version also adds support for using TLS for connecting to Buckets and the R
 
 * [#17](https://github.com/exasol/bucketfs-java/issues/17): Added support for creating new buckets
 * [#35](https://github.com/exasol/bucketfs-java/issues/35): Added support using self-signed certificates and ignoring TLS errors
-* Increase upload timeout for `SyncAwareBucket` from 60s to 120s.
+* Increased upload timeout for `SyncAwareBucket` from 60s to 120s.
 
 ## Dependency Updates
 

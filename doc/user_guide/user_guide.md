@@ -98,7 +98,7 @@ Each bucket implementation comes with a builder that you create by calling the s
 
 The builder for the `ReadEnalbedBucket` has the following parameter setters:
 
-* Configure TLS havior. See [below](#configuring-tls) for details.
+* Configure TLS behavior. See [below](#configuring-tls) for details.
     * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
@@ -295,7 +295,7 @@ final CommandFactory commandFactory = CommandFactory.builder()
 
 The builder for `CommandFactory` has the following parameter setters:
 
-* Configure TLS havior. See [below](#configuring-tls) for details.
+* Configure TLS behavior. See [below](#configuring-tls) for details.
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
 * `serverUrl`: Configure the server URL, e.g. `https://<hostname>:443/jrpc` or `CONTAINER.getRpcUrl()` when using [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers/).

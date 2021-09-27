@@ -75,7 +75,7 @@ public class HttpClientBuilder {
     }
 
     private Optional<TrustManager[]> createTrustManagers() {
-        if (!this.raiseTlsErrors && (this.certificate != null)) {
+        if (!this.raiseTlsErrors && this.certificate != null) {
             throw new IllegalStateException(messageBuilder("E-BFSJ-27")
                     .message("Setting raiseTlsErrors to false and using a certificate is mutually exclusive.")
                     .mitigation("Either set raiseTlsErrors to true or remove the certificate.").toString());
