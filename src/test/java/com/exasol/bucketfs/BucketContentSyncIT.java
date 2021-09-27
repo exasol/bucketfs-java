@@ -15,10 +15,8 @@ import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Tag("slow")
-@Testcontainers
 class BucketContentSyncIT extends AbstractBucketIT {
     private static RandomFileGenerator GENERATOR = new RandomFileGenerator();
 
@@ -26,7 +24,7 @@ class BucketContentSyncIT extends AbstractBucketIT {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         return SyncAwareBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
-                .httpPort(getMappedDefaultBucketFsPort()) //
+                .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //

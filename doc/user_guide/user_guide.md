@@ -81,8 +81,11 @@ import com.exasol.bucketfs.ReadEnabledBucket;
 
 // ...
 final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
+        .certificate(certificate)
         .ipAddress(ipAddress)
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
@@ -95,8 +98,12 @@ Each bucket implementation comes with a builder that you create by calling the s
 
 The builder for the `ReadEnalbedBucket` has the following parameter setters:
 
+* Configure TLS behavior. See [below](#configuring-tls) for details.
+    * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
+    * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
+    * `certificate`: `X509Certificate` to use when connecting via TLS
 * `ipAddress`: IP address of the cluster node to which you want to connect
-* `httpPort`: number of the port the BucketFS service listens on
+* `port`: number of the port the BucketFS service listens on
 * `serviceName`: name of the service that hosts the bucket
 * `name`: name of the bucket
 * `readPassword`: in case the bucket is not public, this is the password that users need to supply in order to gain access (optional)
@@ -105,8 +112,11 @@ If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
 final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
+        .certificate(certificate)
         .ipAddress(ipAddress())
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
@@ -122,8 +132,11 @@ As mentioned before, if you need a bucket that supports blocking calls, you need
 
 ```java
 final Bucket bucket = SyncAwareBucket.builder()
+        .useTls(useTls)
+        .raiseTlsErrors(raiseTlsErrors)
+        .certificate(certificate)
         .ipAddress(ipAddress())
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
@@ -273,27 +286,26 @@ First create a new test container `CONTAINER` as described [in the exasol-testco
 
 ```java
 final CommandFactory commandFactory = CommandFactory.builder()
+        .raiseTlsErrors(true)
+        .certificate(certificate)
         .serverUrl(CONTAINER.getRpcUrl())
         .bearerTokenAuthentication(CONTAINER.getClusterConfiguration().getAuthenticationToken())
-        .raiseTlsErrors(false)
         .build();
 ```
 
-You can also build the server URL manually:
+The builder for `CommandFactory` has the following parameter setters:
 
-```java
-.serverUrl("https://<hostname>:443/jrpc")
-```
-
-To use basic authentication instead of bearer token, replace `bearerTokenAuthentication(...)` with
-
-```java
-.basicAuthentication("username", "password")
-```
+* Configure TLS behavior. See [below](#configuring-tls) for details.
+    * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
+    * `certificate`: `X509Certificate` to use when connecting via TLS
+* `serverUrl`: Configure the server URL, e.g. `https://<hostname>:443/jrpc` or `CONTAINER.getRpcUrl()` when using [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers/).
+* Configure authentication:
+    * `bearerTokenAuthentication`: use bearer token authentication. When using [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers/) you can retrieve the token via `CONTAINER.getClusterConfiguration().getAuthenticationToken()`.
+    * `basicAuthentication`: use basic authentication with username and password, e.g. `basicAuthentication("username", "password")`.
 
 ### Creating a new bucket
 
-Using the `CommandFactory` you can now create a bucket:
+First [create a new `CommandFactory`](#creating-a-commandfactory). Then you can use it to create a bucket:
 
 ```java
 final String uniqueBucketName = "bucket_" + System.currentTimeMillis();
@@ -311,3 +323,11 @@ commandBuilder.execute();
 After executing the command, you can create a new `WriteEnabledBucket` or `SyncAwareBucket` as described above.
 
 **Note:** It may take some time until the bucket is available.
+
+#### Configuring TLS
+
+There are two methods in the `CommandFactory.Builder` and the `ReadEnabledBucket.Builder` that control how TLS certificates are verified: `raiseTlsErrors()` and `certificate()`. You have these three options depending on your setup:
+
+* With `raiseTlsErrors(true)` the HTTP client will throw an exception for any TLS errors (e.g. unknown certificate or invalid hostname). Use this when the database has an CA-signed certificate. This is the default.
+* With `raiseTlsErrors(true).certificate(<certificate>)` you can specify a custom `X509Certificate`. This is useful when the database has a self-signed certificate with correct hostname.
+* With `raiseTlsErrors(false)` the HTTP client will ignore any TLS errors. Use this when the database has a self-signed certificate with an invalid hostname. This is usually the case with the Exasol docker container that generates a self-signed certificate that is not valid when connecting to hostname `localhost`.

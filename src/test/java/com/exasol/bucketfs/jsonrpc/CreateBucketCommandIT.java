@@ -12,14 +12,12 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
-@Testcontainers
 // [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
     private static final String READ_PASSWORD = "READ_PASSWORD";
@@ -45,6 +43,36 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                         containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
                 () -> assertThat(exception.getCause().getMessage(), equalTo(
                         "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target")));
+    }
+
+    @Test
+    void testCreatingBucketWithCertificateFailsHostnameValidation() throws BucketAccessException, TimeoutException {
+        assumeJsonRpcAvailable();
+
+        final String randomBucketName = getUniqueBucketName();
+        final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
+
+        final CommandFactory commandFactory = CommandFactory.builder() //
+                .serverUrl(EXASOL.getRpcUrl()) //
+                .bearerTokenAuthentication(authenticationToken) //
+                .raiseTlsErrors(true) //
+                .certificate(EXASOL.getTlsCertificate().get()) //
+                .build();
+        final CreateBucketCommandBuilder command = commandFactory.makeCreateBucketCommand() //
+                .bucketFsName(DEFAULT_BUCKETFS) //
+                .bucketName(randomBucketName) //
+                .isPublic(true) //
+                .readPassword(READ_PASSWORD) //
+                .writePassword(WRITE_PASSWORD);
+
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> command.execute());
+
+        assertAll(
+                () -> assertThat(exception.getMessage(),
+                        containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
+                () -> assertThat(exception.getCause().getMessage(),
+                        either(equalTo("No subject alternative names present"))
+                                .or(equalTo("No name matching localhost found"))));
     }
 
     private void assumeJsonRpcAvailable() {
@@ -119,7 +147,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     private SyncAwareBucket createBucket(final String bucketName) {
         return SyncAwareBucket.builder() //
                 .ipAddress(getContainerIpAddress()) //
-                .httpPort(getMappedDefaultBucketFsPort()) //
+                .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(bucketName) //
                 .readPassword(READ_PASSWORD) //

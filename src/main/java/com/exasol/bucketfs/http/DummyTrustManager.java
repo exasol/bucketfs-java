@@ -1,4 +1,4 @@
-package com.exasol.bucketfs.jsonrpc;
+package com.exasol.bucketfs.http;
 
 import java.net.Socket;
 import java.security.cert.X509Certificate;
