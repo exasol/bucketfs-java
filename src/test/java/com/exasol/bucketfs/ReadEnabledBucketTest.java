@@ -91,7 +91,7 @@ class ReadEnabledBucketTest {
     @CsvSource({ //
             "404, 'E-BFSJ-2: File or directory not found trying to list http://192.168.1.1:1234/bucket/.'",
             "403, 'E-BFSJ-3: Access denied trying to list http://192.168.1.1:1234/bucket/.'",
-            "500, 'E-BFSJ-1: Unable do list http://192.168.1.1:1234/bucket/. HTTP status 500.'" })
+            "500, 'E-BFSJ-1: Unable to perform list http://192.168.1.1:1234/bucket/. HTTP status 500.'" })
     @ParameterizedTest
     void testRequestListingThrowsException(final int responseStatus, final String expectedExceptionMessage)
             throws BucketAccessException, IOException, InterruptedException {
