@@ -98,7 +98,7 @@ Each bucket implementation comes with a builder that you create by calling the s
 
 The builder for the `ReadEnalbedBucket` has the following parameter setters:
 
-* Configure TLS havior. See [below](#configure_tls) for details.
+* Configure TLS havior. See [below](#configuring-tls) for details.
     * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
@@ -295,7 +295,7 @@ final CommandFactory commandFactory = CommandFactory.builder()
 
 The builder for `CommandFactory` has the following parameter setters:
 
-* Configure TLS havior. See [below](#configure_tls) for details.
+* Configure TLS havior. See [below](#configuring-tls) for details.
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
 * `serverUrl`: Configure the server URL, e.g. `https://<hostname>:443/jrpc` or `CONTAINER.getRpcUrl()` when using [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers/).
@@ -305,7 +305,7 @@ The builder for `CommandFactory` has the following parameter setters:
 
 ### Creating a new bucket
 
-Using the `CommandFactory` you can now create a bucket:
+First [create a new `CommandFactory`](#creating-a-commandfactory). Then you can use it to create a bucket:
 
 ```java
 final String uniqueBucketName = "bucket_" + System.currentTimeMillis();
@@ -324,7 +324,7 @@ After executing the command, you can create a new `WriteEnabledBucket` or `SyncA
 
 **Note:** It may take some time until the bucket is available.
 
-#### <a name="configure_tls"></>Configuring TLS
+#### Configuring TLS
 
 There are two methods in the `CommandFactory.Builder` and the `ReadEnabledBucket.Builder` that control how TLS certificates are verified: `raiseTlsErrors()` and `certificate()`. You have these three options depending on your setup:
 
