@@ -46,7 +46,7 @@ class ReadEnabledBucketTest {
     void toString(final int port, final String serviceName, final String bucketName, final String expectedOutput) {
         final var bucket = bucketBuilder() //
                 .ipAddress(IP_ADDRESS) //
-                .httpPort(port) //
+                .port(port) //
                 .serviceName(serviceName) //
                 .name(bucketName).build();
         assertThat(bucket.toString(), equalTo(expectedOutput));
@@ -65,7 +65,7 @@ class ReadEnabledBucketTest {
 
     private ReadOnlyBucket createBucket() {
         return bucketBuilder().ipAddress(IP_ADDRESS) //
-                .httpPort(PORT) //
+                .port(PORT) //
                 .serviceName(BUCKET_FS_NAME) //
                 .name(BUCKET_NAME) //
                 .build();
@@ -132,8 +132,13 @@ class ReadEnabledBucketTest {
             throws BucketAccessException, IOException, InterruptedException {
         simulateResponse("", 200);
 
-        bucketBuilder().useTls(useTls).ipAddress(IP_ADDRESS).httpPort(PORT).serviceName(BUCKET_FS_NAME)
-                .name(BUCKET_NAME).build().listContents();
+        bucketBuilder().useTls(useTls) //
+                .ipAddress(IP_ADDRESS) //
+                .port(PORT) //
+                .serviceName(BUCKET_FS_NAME) //
+                .name(BUCKET_NAME) //
+                .build() //
+                .listContents();
 
         final ArgumentCaptor<HttpRequest> arg = ArgumentCaptor.forClass(HttpRequest.class);
         verify(this.httpClientMock).send(arg.capture(), any());

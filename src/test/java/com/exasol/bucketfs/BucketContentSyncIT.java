@@ -24,7 +24,7 @@ class BucketContentSyncIT extends AbstractBucketIT {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         return SyncAwareBucket.builder()//
                 .ipAddress(getContainerIpAddress()) //
-                .httpPort(getMappedDefaultBucketFsPort()) //
+                .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //

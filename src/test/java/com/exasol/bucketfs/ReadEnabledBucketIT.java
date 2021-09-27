@@ -26,7 +26,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .raiseTlsErrors(true) //
                 .useTls(false) //
                 .ipAddress(getContainerIpAddress()) //
-                .httpPort(getMappedDefaultBucketFsPort()) //
+                .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
@@ -71,5 +71,20 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 () -> bucket.downloadFile(pathInBucket, pathToFile), //
                 matchesPattern(
                         "E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
+    }
+
+    @Test
+    void testDeprecatedHttpPortBuilderMethodWorks() throws BucketAccessException {
+        @SuppressWarnings("deprecation")
+        final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
+                .raiseTlsErrors(true) //
+                .useTls(false) //
+                .ipAddress(getContainerIpAddress()) //
+                .httpPort(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(DEFAULT_BUCKET) //
+                .readPassword(getDefaultBucketConfiguration().getReadPassword()) //
+                .build();
+        assertThat(bucket.listContents(), hasItem("EXAClusterOS"));
     }
 }

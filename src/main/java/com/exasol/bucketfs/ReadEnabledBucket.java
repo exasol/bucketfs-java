@@ -317,14 +317,28 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-         * Set the port the BucketFS service listens on.
+         * Set the port the BucketFS service listens on. Make sure to also call {@link #useTls(boolean)} with argument
+         * {@code false} if this is an HTTP port or {@code true} if this is an HTTPS port.
          *
-         * @param port HTTP port the BucketFS service listens on
+         * @param port HTTP or HTTPS port the BucketFS service listens on
          * @return Builder instance for fluent programming
          */
-        public T httpPort(final int port) {
+        public T port(final int port) {
             this.port = port;
             return self();
+        }
+
+        /**
+         * Set the port the BucketFS service listens on. Make sure to also call {@link #useTls(boolean)} with argument
+         * {@code false} if this is an HTTP port or {@code true} if this is an HTTPS port.
+         *
+         * @param port HTTP or HTTPS port the BucketFS service listens on
+         * @return Builder instance for fluent programming
+         * @deprecated use {@link #port(int)} instead.
+         */
+        @Deprecated
+        public T httpPort(final int port) {
+            return this.port(port);
         }
 
         /**

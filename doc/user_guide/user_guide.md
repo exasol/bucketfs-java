@@ -85,7 +85,7 @@ final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
         .ipAddress(ipAddress)
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
@@ -103,7 +103,7 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
 * `ipAddress`: IP address of the cluster node to which you want to connect
-* `httpPort`: number of the port the BucketFS service listens on
+* `port`: number of the port the BucketFS service listens on
 * `serviceName`: name of the service that hosts the bucket
 * `name`: name of the bucket
 * `readPassword`: in case the bucket is not public, this is the password that users need to supply in order to gain access (optional)
@@ -116,7 +116,7 @@ final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
         .ipAddress(ipAddress())
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
@@ -136,7 +136,7 @@ final Bucket bucket = SyncAwareBucket.builder()
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
         .ipAddress(ipAddress())
-        .httpPort(port)
+        .port(port)
         .serviceName(serviceName)
         .name(bucketName)
         .readPassword(readPassword)
