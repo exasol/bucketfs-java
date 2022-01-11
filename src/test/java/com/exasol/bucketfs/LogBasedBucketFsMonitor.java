@@ -9,9 +9,15 @@ import java.time.Instant;
 import com.exasol.clusterlogs.LogPatternDetector;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
 
+/**
+ * LogBasedBucketFsMonitor
+ */
 public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     private final LogPatternDetectorFactory detectorFactory;
 
+    /**
+     * @param detectorFactory detectorFactory
+     */
     public LogBasedBucketFsMonitor(final LogPatternDetectorFactory detectorFactory) {
         this.detectorFactory = detectorFactory;
     }

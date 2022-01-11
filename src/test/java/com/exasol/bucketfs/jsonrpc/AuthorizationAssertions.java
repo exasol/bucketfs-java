@@ -5,6 +5,9 @@ import static org.hamcrest.Matchers.contains;
 
 import java.net.http.HttpRequest.Builder;
 
+/**
+ * Authorization assertions
+ */
 public class AuthorizationAssertions {
     private AuthorizationAssertions() {
         // Not instantiable

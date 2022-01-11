@@ -35,7 +35,10 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
-    // Must be public to allow JSON mapping. Not accessible for the user.
+
+    /**
+     * Must be public to allow JSON mapping. Not accessible for the user.
+     */
     public static class Request {
         // Mandatory values
         @JsonbProperty("bucketfs_name")
@@ -66,22 +69,37 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
             return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
         }
 
+        /**
+         * @return bucket fs name
+         */
         public String getBucketFsName() {
             return this.bucketFsName;
         }
 
+        /**
+         * @return bucket name
+         */
         public String getBucketName() {
             return this.bucketName;
         }
 
+        /**
+         * @return public
+         */
         public boolean isPublic() {
             return this.isPublic;
         }
 
+        /**
+         * @return read password
+         */
         public String getReadPassword() {
             return this.readPassword;
         }
 
+        /**
+         * @return write password
+         */
         public String getWritePassword() {
             return this.writePassword;
         }

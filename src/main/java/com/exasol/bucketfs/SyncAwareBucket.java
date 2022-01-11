@@ -20,6 +20,9 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     private static final long FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS = 200;
     private final BucketFsMonitor monitor;
 
+    /**
+     * @param builder builder
+     */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
         this.monitor = builder.monitor;

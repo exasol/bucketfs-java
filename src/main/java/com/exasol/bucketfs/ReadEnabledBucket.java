@@ -25,15 +25,36 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
 
+    /**
+     * bucketFs name
+     */
     protected final String bucketFsName;
+    /**
+     * bucket name
+     */
     protected final String bucketName;
     private final String protocol;
+    /**
+     *  ip address
+     */
     protected final String ipAddress;
+    /**
+     * port
+     */
     protected final int port;
+    /**
+     * read password
+     */
     protected final String readPassword;
+    /**
+     * upload history
+     */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
     private final HttpClient client;
 
+    /**
+     * @param builder builder
+     */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
         this.bucketFsName = builder.bucketFsName;
         this.bucketName = builder.bucketName;
@@ -136,6 +157,11 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
     }
 
+    /**
+     * @param localPath localPath
+     * @param pathInBucket pathInBucket
+     * @return String
+     */
     protected String extendPathInBucketDownToFilename(final Path localPath, final String pathInBucket) {
         return pathInBucket.endsWith(BucketConstants.PATH_SEPARATOR) ? pathInBucket + localPath.getFileName()
                 : pathInBucket;
@@ -203,6 +229,12 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
     }
 
+    /**
+     * @param uri uri
+     * @param operation operation
+     * @param statusCode statusCode
+     * @throws BucketAccessException BucketAccessException
+     */
     protected void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
             throws BucketAccessException {
         switch (statusCode) {
@@ -240,6 +272,9 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         return (this.bucketFsName == null ? (this.port + ":") : (this.bucketFsName + "/")) + this.bucketName;
     }
 
+    /**
+     * @return builder
+     */
     @SuppressWarnings("squid:S1452")
     public static Builder<? extends Builder<?>> builder() {
         return new Builder<>();
@@ -263,10 +298,16 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             this.httpClientBuilder = httpClientBuilder;
         }
 
+        /**
+         * c'tor
+         */
         protected Builder() {
             this(new HttpClientBuilder());
         }
 
+        /**
+         * @return self
+         */
         @SuppressWarnings("unchecked")
         protected T self() {
             return (T) this;
