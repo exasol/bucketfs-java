@@ -12,3 +12,7 @@ Code name: json dependency updates
 ### Runtime Dependency Updates
 
 * Added `org.glassfish:jakarta.json:2.0.1`
+
+### Plugin Dependency Updates
+
+* Updated `com.exasol:project-keeper-maven-plugin:1.2.0` to `1.3.4`
