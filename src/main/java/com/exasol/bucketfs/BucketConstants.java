@@ -4,17 +4,11 @@ package com.exasol.bucketfs;
  * BucketFS constants.
  */
 public final class BucketConstants {
-    /**
-     * path separator
-     */
+    /** Path separator */
     public static final String PATH_SEPARATOR = "/";
-    /**
-     * default bucket fs
-     */
+    /** Default bucket fs */
     public static final String DEFAULT_BUCKETFS = "bfsdefault";
-    /**
-     * default bucket
-     */
+    /** Default bucket */
     public static final String DEFAULT_BUCKET = "default";
 
     private BucketConstants() {
