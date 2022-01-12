@@ -48,6 +48,12 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         return serviceName + BucketConstants.PATH_SEPARATOR + bucketName;
     }
 
+    /**
+     * Returns bucket from cache.
+     * 
+     * @param cacheKey cache key
+     * @return bucket
+     */
     public Bucket getBucketFromCache(final String cacheKey) {
         return this.bucketsCache.get(cacheKey);
     }

@@ -35,7 +35,11 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
-    // Must be public to allow JSON mapping. Not accessible for the user.
+    /**
+     * This class represents the create bucket request to the JSON rpc API of the Exasol database.
+     * 
+     * Must be public to allow JSON mapping. Not accessible for the user.
+     */
     public static class Request {
         // Mandatory values
         @JsonbProperty("bucketfs_name")
@@ -66,22 +70,47 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
             return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
         }
 
+        /**
+         * Get BucketFsName.
+         * 
+         * @return bucket fs name
+         */
         public String getBucketFsName() {
             return this.bucketFsName;
         }
 
+        /**
+         * Get BucketName.
+         * 
+         * @return bucket name
+         */
         public String getBucketName() {
             return this.bucketName;
         }
 
+        /**
+         * Get IsPublic.
+         * 
+         * @return public
+         */
         public boolean isPublic() {
             return this.isPublic;
         }
 
+        /**
+         * Get ReadPassword.
+         * 
+         * @return read password
+         */
         public String getReadPassword() {
             return this.readPassword;
         }
 
+        /**
+         * Get WritePassword.
+         * 
+         * @return write password
+         */
         public String getWritePassword() {
             return this.writePassword;
         }

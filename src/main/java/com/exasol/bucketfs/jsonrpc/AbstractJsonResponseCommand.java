@@ -14,6 +14,9 @@ import jakarta.json.bind.annotation.JsonbProperty;
 abstract class AbstractJsonResponseCommand<R> extends RpcCommand<R> {
     private static final String SUCCESS_RESULT_NAME = "OK";
     private static final int SUCCESS_RESULT_CODE = 0;
+    /**
+     * JSON mapper
+     */
     protected final JsonMapper jsonMapper;
 
     /**

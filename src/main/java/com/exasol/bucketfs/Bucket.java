@@ -7,6 +7,9 @@ import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+/**
+ * Interface for accessing BucketFS buckets.
+ */
 public interface Bucket extends UnsynchronizedBucket {
     /**
      * Check if the object with the given path is marked as synchronized after a given point in time.

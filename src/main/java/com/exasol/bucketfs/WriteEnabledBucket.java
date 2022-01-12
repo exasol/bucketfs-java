@@ -29,6 +29,9 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     private final String writePassword;
     private UploadNecessityCheckStrategy uploadNecessityCheckStrategy = new UploadAlwaysStrategy();
 
+    /**
+     * @param builder builder
+     */
     protected WriteEnabledBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
         this.writePassword = builder.writePassword;
@@ -56,6 +59,14 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         }
     }
 
+    /**
+     * Upload with body publisher.
+     * 
+     * @param uri       uri
+     * @param publisher publisher
+     * @param what      what
+     * @throws BucketAccessException BucketAccessException
+     */
     protected void uploadWithBodyPublisher(final URI uri, final BodyPublisher publisher, final String what)
             throws BucketAccessException {
         LOGGER.fine(() -> "Uploading " + what + " to bucket '" + this + "' at '" + uri + "'");
@@ -89,11 +100,24 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         }
     }
 
+    /**
+     * Create UploadIoException.
+     * 
+     * @param uri       uri
+     * @param exception exception
+     * @return BucketAccessException
+     */
     protected BucketAccessException createUploadIoException(final URI uri, final IOException exception) {
         return new BucketAccessException(
                 messageBuilder("E-BFSJ-7").message("I/O error trying to upload to {{URI}}", uri).toString(), exception);
     }
 
+    /**
+     * Create UploadInterruptedException.
+     * 
+     * @param uri uri
+     * @return BucketAccessException
+     */
     protected BucketAccessException createUploadInterruptedException(final URI uri) {
         return new BucketAccessException(
                 messageBuilder("E-BFSJ-6").message("Interrupted trying to upload {{URI}}.", uri).toString());
