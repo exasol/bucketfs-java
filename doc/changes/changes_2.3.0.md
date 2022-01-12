@@ -1,4 +1,4 @@
-# BucketFS Java 2.3.0, released 2022-01-11
+# BucketFS Java 2.3.0, released 2022-01-12
 
 Code name: json dependency updates
 
