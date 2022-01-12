@@ -306,13 +306,14 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-         * c'tor
+         * Create a new instance of {@link Builder}.
          */
         protected Builder() {
             this(new HttpClientBuilder());
         }
 
         /**
+* Get self.
          * @return self
          */
         @SuppressWarnings("unchecked")
