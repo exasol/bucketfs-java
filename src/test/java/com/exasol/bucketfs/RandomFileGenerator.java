@@ -9,6 +9,7 @@ import java.util.Random;
  */
 public final class RandomFileGenerator {
     /**
+     * Creates a random file.
      * @param file file
      * @param sizeInKiB size in kb
      * @throws FileNotFoundException FileNotFoundException
@@ -21,6 +22,7 @@ public final class RandomFileGenerator {
     }
 
     /**
+     * Writes random bytes to stream.
      * @param stream stream
      * @param sizeInKiB size in kb
      * @throws IOException io exception

@@ -70,6 +70,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Gets BucketFsName.
          * @return bucket fs name
          */
         public String getBucketFsName() {
@@ -77,6 +78,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Gets BucketName.
          * @return bucket name
          */
         public String getBucketName() {
@@ -84,6 +86,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Gets IsPublic. 
          * @return public
          */
         public boolean isPublic() {
@@ -91,6 +94,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Gets ReadPassword.
          * @return read password
          */
         public String getReadPassword() {
@@ -98,6 +102,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Gets WritePassword.
          * @return write password
          */
         public String getWritePassword() {

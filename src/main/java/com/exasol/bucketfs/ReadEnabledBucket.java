@@ -158,6 +158,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     /**
+     * Extends path in bucket down to filename.
      * @param localPath localPath
      * @param pathInBucket pathInBucket
      * @return String
@@ -230,6 +231,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     /**
+     * Evaluates the request status.
      * @param uri uri
      * @param operation operation
      * @param statusCode statusCode
@@ -273,6 +275,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     /**
+     * Returns a builder.
      * @return builder
      */
     @SuppressWarnings("squid:S1452")

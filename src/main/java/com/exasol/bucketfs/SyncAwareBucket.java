@@ -21,6 +21,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     private final BucketFsMonitor monitor;
 
     /**
+     * Sync aware bucket.
      * @param builder builder
      */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
