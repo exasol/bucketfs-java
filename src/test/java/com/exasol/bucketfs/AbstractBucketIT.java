@@ -12,7 +12,7 @@ import com.exasol.config.BucketFsServiceConfiguration;
 import com.exasol.containers.ExasolContainer;
 
 /**
- * Abstract class used for integration tests
+ * Abstract base for bucket integration tests.
  */
 @Testcontainers
 public abstract class AbstractBucketIT {

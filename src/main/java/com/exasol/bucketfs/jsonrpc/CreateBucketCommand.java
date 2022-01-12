@@ -37,6 +37,8 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
 
     /**
+     * This class represents the create bucket request to the JSON rpc API of the Exasol database.
+     * 
      * Must be public to allow JSON mapping. Not accessible for the user.
      */
     public static class Request {
@@ -70,7 +72,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
-         * Gets BucketFsName.
+         * Get BucketFsName.
          * @return bucket fs name
          */
         public String getBucketFsName() {

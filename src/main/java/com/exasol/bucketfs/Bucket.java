@@ -8,7 +8,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 /**
- * Bucket
+ * Interface for accessing BucketFS buckets.
  */
 public interface Bucket extends UnsynchronizedBucket {
     /**

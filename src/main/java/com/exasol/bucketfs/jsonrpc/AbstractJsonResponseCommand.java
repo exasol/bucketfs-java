@@ -15,7 +15,7 @@ abstract class AbstractJsonResponseCommand<R> extends RpcCommand<R> {
     private static final String SUCCESS_RESULT_NAME = "OK";
     private static final int SUCCESS_RESULT_CODE = 0;
     /**
-     * json mapper
+     * JSON mapper
      */
     protected final JsonMapper jsonMapper;
 
