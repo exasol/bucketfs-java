@@ -50,6 +50,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
 
     /**
      * Returns bucket from cache.
+     * 
      * @param cacheKey cache key
      * @return bucket
      */

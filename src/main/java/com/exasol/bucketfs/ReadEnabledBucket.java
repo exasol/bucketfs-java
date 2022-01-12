@@ -35,7 +35,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String bucketName;
     private final String protocol;
     /**
-     *  ip address
+     * ip address
      */
     protected final String ipAddress;
     /**
@@ -159,7 +159,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Extends path in bucket down to filename.
-     * @param localPath localPath
+     * 
+     * @param localPath    localPath
      * @param pathInBucket pathInBucket
      * @return String
      */
@@ -232,8 +233,9 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Evaluates the request status.
-     * @param uri uri
-     * @param operation operation
+     * 
+     * @param uri        uri
+     * @param operation  operation
      * @param statusCode statusCode
      * @throws BucketAccessException BucketAccessException
      */
@@ -251,7 +253,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                     .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
         default:
             throw new BucketAccessException(messageBuilder("E-BFSJ-1")
-                    .message("Unable to perform {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri, statusCode)
+                    .message("Unable to perform {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri,
+                            statusCode)
                     .toString());
         }
     }
@@ -276,6 +279,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Returns a builder.
+     * 
      * @return builder
      */
     @SuppressWarnings("squid:S1452")

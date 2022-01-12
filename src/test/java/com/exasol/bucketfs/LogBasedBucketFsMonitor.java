@@ -17,6 +17,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
 
     /**
      * Log based bucket fs monitor c'tor.
+     * 
      * @param detectorFactory detectorFactory
      */
     public LogBasedBucketFsMonitor(final LogPatternDetectorFactory detectorFactory) {

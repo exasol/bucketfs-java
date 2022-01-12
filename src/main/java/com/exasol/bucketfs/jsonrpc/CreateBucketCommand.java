@@ -35,7 +35,6 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         return new CreateBucketCommandBuilder(executor, jsonMapper);
     }
 
-
     /**
      * This class represents the create bucket request to the JSON rpc API of the Exasol database.
      * 
@@ -73,6 +72,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
         /**
          * Get BucketFsName.
+         * 
          * @return bucket fs name
          */
         public String getBucketFsName() {
@@ -81,6 +81,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
         /**
          * Get BucketName.
+         * 
          * @return bucket name
          */
         public String getBucketName() {
@@ -89,6 +90,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
         /**
          * Get IsPublic.
+         * 
          * @return public
          */
         public boolean isPublic() {
@@ -97,6 +99,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
         /**
          * Get ReadPassword.
+         * 
          * @return read password
          */
         public String getReadPassword() {
@@ -105,6 +108,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
 
         /**
          * Get WritePassword.
+         * 
          * @return write password
          */
         public String getWritePassword() {

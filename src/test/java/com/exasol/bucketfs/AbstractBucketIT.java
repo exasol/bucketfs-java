@@ -26,6 +26,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the container Ip Address.
+     * 
      * @return String
      */
     protected String getContainerIpAddress() {
@@ -34,6 +35,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the Mapped Default Bucket Fs Port.
+     * 
      * @return Integer
      */
     protected Integer getMappedDefaultBucketFsPort() {
@@ -42,6 +44,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the mapped json rpc port.
+     * 
      * @return mapped json rpc port
      */
     protected Integer getMappedJsonRpcPort() {
@@ -50,6 +53,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the default bucket configuration.
+     * 
      * @return default bucket configuration
      */
     protected BucketConfiguration getDefaultBucketConfiguration() {
@@ -63,6 +67,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the log based bucket fs monitor.
+     * 
      * @return LogBasedBucketFsMonitor
      */
     protected LogBasedBucketFsMonitor createBucketMonitor() {

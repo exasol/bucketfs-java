@@ -22,6 +22,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
 
     /**
      * Sync aware bucket.
+     * 
      * @param builder builder
      */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {

@@ -61,9 +61,10 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     /**
      * Upload with body publisher.
-     * @param uri uri
+     * 
+     * @param uri       uri
      * @param publisher publisher
-     * @param what what
+     * @param what      what
      * @throws BucketAccessException BucketAccessException
      */
     protected void uploadWithBodyPublisher(final URI uri, final BodyPublisher publisher, final String what)
@@ -101,7 +102,8 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     /**
      * Create UploadIoException.
-     * @param uri uri
+     * 
+     * @param uri       uri
      * @param exception exception
      * @return BucketAccessException
      */
@@ -112,6 +114,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     /**
      * Create UploadInterruptedException.
+     * 
      * @param uri uri
      * @return BucketAccessException
      */

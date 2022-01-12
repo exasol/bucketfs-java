@@ -10,10 +10,11 @@ import java.util.Random;
 public final class RandomFileGenerator {
     /**
      * Creates a random file.
-     * @param file file
+     * 
+     * @param file      file
      * @param sizeInKiB size in kb
      * @throws FileNotFoundException FileNotFoundException
-     * @throws IOException IOException
+     * @throws IOException           IOException
      */
     public void createRandomFile(final Path file, final int sizeInKiB) throws FileNotFoundException, IOException {
         try (final BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file.toFile()))) {
@@ -23,7 +24,8 @@ public final class RandomFileGenerator {
 
     /**
      * Writes random bytes to stream.
-     * @param stream stream
+     * 
+     * @param stream    stream
      * @param sizeInKiB size in kb
      * @throws IOException io exception
      */
