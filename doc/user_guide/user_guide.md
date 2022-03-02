@@ -111,7 +111,7 @@ The builder for the `ReadEnalbedBucket` has the following parameter setters:
 If you need to write to a bucket, the analogous builder call looks like this:
 
 ```java
-final UnsychronizedBucket bucket = WriteEnabledBucket.builder()
+final UnsynchronizedBucket bucket = WriteEnabledBucket.builder()
         .useTls(useTls)
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
