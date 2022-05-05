@@ -1,12 +1,6 @@
 # BucketFS Java 2.4.0, released 2022-??-??
 
-Code name:
-
-## Summary
-
-## Features
-
-* ISSUE_NUMBER: description
+Code name: Dependency Updates
 
 ## Dependency Updates
 
