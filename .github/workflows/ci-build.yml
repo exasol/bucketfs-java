@@ -1,23 +1,30 @@
 name: CI Build
 
+
 on:
-  - push
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
     strategy:
       matrix:
-        docker_db_version: [ "6.2.17-d1", "7.0.13", "7.1.1" ]
+        docker_db_version: [ "7.0.18", "7.1.9" ]
     env:
-      DEFAULT_DB_VERSION: "7.1.1"
+      DEFAULT_DB_VERSION: "7.1.9"
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.docker_db_version }}
+      cancel-in-progress: true
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Set up JDK 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 11
@@ -27,14 +34,14 @@ jobs:
           echo 'docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy' > "$HOME"/.testcontainers.properties
           echo 'testcontainers.reuse.enable=true' >> "$HOME"/.testcontainers.properties
       - name: Cache local Maven repository
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Cache SonarQube packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -46,7 +53,7 @@ jobs:
               -Dtest.coverage="true" \
               -Dcom.exasol.dockerdb.image=${{ matrix.docker_db_version }}
       - name: Sonar analysis
-        if: ${{ env.DEFAULT_DB_VERSION == matrix.docker_db_version }}
+        if: ${{ env.SONAR_TOKEN != null && env.DEFAULT_DB_VERSION == matrix.docker_db_version }}
         run: |
           mvn --batch-mode sonar:sonar \
               -Dsonar.organization=exasol -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN

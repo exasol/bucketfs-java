@@ -1,0 +1,10 @@
+sources:
+  - type: maven
+    path: pom.xml
+    modules:
+      - maven_central
+      - integration_tests
+linkReplacements:
+  - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
+excludes:
+  - "E-PK-CORE-18: Outdated content: '.github/workflows/ci-build.yml'"
