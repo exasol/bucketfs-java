@@ -22,13 +22,17 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.exasol.bucketfs.monitor.TimestampRetriever;
+import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
 import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 import com.exasol.containers.exec.ExitCode;
 
 @Tag("slow")
 class SyncAwareBucketIT extends AbstractBucketIT {
+
     private SyncAwareBucket createDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
+        final LogBasedBucketFsMonitor monitor = createBucketMonitor();
         return SyncAwareBucket.builder()//
                 .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
@@ -36,7 +40,8 @@ class SyncAwareBucketIT extends AbstractBucketIT {
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
                 .writePassword(bucketConfiguration.getWritePassword()) //
-                .monitor(createBucketMonitor()) //
+                .monitor(monitor) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 
@@ -201,7 +206,8 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
-        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
+        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient,
+                bucket);
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> bucketSpy.deleteFileNonBlocking(testFile));
         assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-12: Failed to delete"));
@@ -239,7 +245,8 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
-        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
+        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient,
+                bucket);
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
     }
 

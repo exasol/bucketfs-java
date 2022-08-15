@@ -6,6 +6,7 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
 import com.exasol.config.BucketConfiguration;
 import com.exasol.config.BucketFsServiceConfiguration;

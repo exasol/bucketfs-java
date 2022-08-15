@@ -3,6 +3,8 @@ package com.exasol.bucketfs;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.exasol.bucketfs.monitor.BucketFsMonitor;
+import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.config.BucketConfiguration;
 import com.exasol.config.BucketFsServiceConfiguration;
 
@@ -50,7 +52,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
 
     /**
      * Returns bucket from cache.
-     * 
+     *
      * @param cacheKey cache key
      * @return bucket
      */
@@ -65,6 +67,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         this.bucketsCache.computeIfAbsent(cacheKey, bucket -> SyncAwareBucket //
                 .builder() //
                 .monitor(this.monitor) //
+                .stateRetriever(new TimestampRetriever()) //
                 .serviceName(serviceName) //
                 .name(bucketName) //
                 .ipAddress(this.ipAddress) //

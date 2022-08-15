@@ -11,6 +11,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import com.exasol.bucketfs.monitor.BucketFsMonitor;
+import com.exasol.bucketfs.monitor.BucketFsMonitor.State;
+import com.exasol.bucketfs.monitor.BucketFsMonitor.StateRetriever;
+
 /**
  * An abstraction for a bucket inside Exasol's BucketFS.
  */
@@ -19,22 +23,24 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 2 * 60000L;
     private static final long FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS = 200;
     private final BucketFsMonitor monitor;
+    private final StateRetriever stateRetriever;
 
     /**
      * Sync aware bucket.
-     * 
+     *
      * @param builder builder
      */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
         this.monitor = builder.monitor;
+        this.stateRetriever = builder.stateRetriever;
     }
 
     // [impl->dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1]
     @Override
-    public boolean isObjectSynchronized(final String pathInBucket, final Instant afterUTC)
+    public boolean isObjectSynchronized(final String pathInBucket, final BucketFsMonitor.State state)
             throws BucketAccessException {
-        return this.monitor.isObjectSynchronized(this, pathInBucket, afterUTC);
+        return this.monitor.isObjectSynchronized(this, pathInBucket, state);
     }
 
     // [impl->dsn~uploading-to-bucket~1]
@@ -42,10 +48,10 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     public void uploadFile(final Path localPath, final String pathInBucket)
             throws TimeoutException, BucketAccessException, FileNotFoundException {
         delayRepeatedUploadToSamePath(pathInBucket);
-        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        final BucketFsMonitor.State state = this.stateRetriever.getState();
         final UploadResult uploadResult = uploadFileNonBlocking(localPath, pathInBucket);
         if (uploadResult.wasUploadNecessary()) {
-            waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+            waitForFileToBeSynchronized(pathInBucket, state);
             recordUploadInHistory(pathInBucket);
         }
     }
@@ -84,9 +90,9 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     public void uploadStringContent(final String content, final String pathInBucket)
             throws InterruptedException, BucketAccessException, TimeoutException {
         delayRepeatedUploadToSamePath(pathInBucket);
-        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        final BucketFsMonitor.State state = this.stateRetriever.getState();
         uploadStringContentNonBlocking(content, pathInBucket);
-        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+        waitForFileToBeSynchronized(pathInBucket, state);
         recordUploadInHistory(pathInBucket);
     }
 
@@ -95,20 +101,19 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     public void uploadInputStream(final Supplier<InputStream> inputStreamSupplier, final String pathInBucket)
             throws BucketAccessException, TimeoutException {
         delayRepeatedUploadToSamePath(pathInBucket);
-        final var millisSinceEpochBeforeUpload = System.currentTimeMillis();
+        final BucketFsMonitor.State state = this.stateRetriever.getState();
         uploadInputStreamNonBlocking(inputStreamSupplier, pathInBucket);
-        waitForFileToBeSynchronized(pathInBucket, millisSinceEpochBeforeUpload);
+        waitForFileToBeSynchronized(pathInBucket, state);
         recordUploadInHistory(pathInBucket);
     }
 
     // [impl->dsn~waiting-until-archive-extracted~1]
     // [impl->dsn~waiting-until-file-appears-in-target-directory~1]
-    private void waitForFileToBeSynchronized(final String pathInBucket, final long millisSinceEpochBeforeUpload)
+    private void waitForFileToBeSynchronized(final String pathInBucket, final BucketFsMonitor.State state)
             throws TimeoutException, BucketAccessException {
         final var expiry = System.currentTimeMillis() + BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS;
-        final var afterUtc = Instant.ofEpochMilli(millisSinceEpochBeforeUpload);
         while (System.currentTimeMillis() < expiry) {
-            if (this.monitor.isObjectSynchronized(this, pathInBucket, afterUtc)) {
+            if (this.monitor.isObjectSynchronized(this, pathInBucket, state)) {
                 return;
             }
             try {
@@ -120,8 +125,9 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                         .toString());
             }
         }
-        final String message = "Timeout waiting for object '" + pathInBucket + "' to be synchronized in bucket '"
-                + getFullyQualifiedBucketName() + "' after " + afterUtc + ".";
+        final String message = String.format(
+                "Timeout waiting for object '%s' to be synchronized in bucket '%s' after %s.", //
+                pathInBucket, getFullyQualifiedBucketName(), state.getRepresentation());
         LOGGER.severe(() -> message);
         throw new TimeoutException(message);
     }
@@ -143,6 +149,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
      */
     public static class Builder<T extends Builder<T>> extends WriteEnabledBucket.Builder<Builder<T>> {
         private BucketFsMonitor monitor;
+        private StateRetriever stateRetriever;
 
         @SuppressWarnings("unchecked")
         @Override
@@ -153,11 +160,24 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         /**
          * Set monitor for this bucket.
          *
-         * @param monitor synchronization monitor
+         * @param value synchronization monitor
          * @return Builder instance for fluent programming
          */
-        public T monitor(final BucketFsMonitor monitor) {
-            this.monitor = monitor;
+        public T monitor(final BucketFsMonitor value) {
+            this.monitor = value;
+            return self();
+        }
+
+        /**
+         * Set state retriever for this bucket. The bucket uses the state retriever to inquire the current {@link State}
+         * as observed by the monitor. The bucket can pass the state to the monitor to make the monitor accept only
+         * events the happened after the state.
+         *
+         * @param value state retriever
+         * @return Builder instance for fluent programming
+         */
+        public T stateRetriever(final StateRetriever value) {
+            this.stateRetriever = value;
             return self();
         }
 

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
+import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
@@ -153,6 +154,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                 .readPassword(READ_PASSWORD) //
                 .writePassword(WRITE_PASSWORD) //
                 .monitor(createBucketMonitor()) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 

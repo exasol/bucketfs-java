@@ -20,6 +20,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.exasol.bucketfs.*;
+import com.exasol.bucketfs.monitor.TimestampRetriever;
 
 @Tag("slow")
 class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
@@ -48,6 +49,7 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
                 .readPassword(bucketConfiguration.getReadPassword()) //
                 .writePassword(bucketConfiguration.getWritePassword()) //
                 .monitor(createBucketMonitor()) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 

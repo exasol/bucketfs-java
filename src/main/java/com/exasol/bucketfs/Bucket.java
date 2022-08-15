@@ -3,9 +3,10 @@ package com.exasol.bucketfs;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+
+import com.exasol.bucketfs.monitor.BucketFsMonitor.State;
 
 /**
  * Interface for accessing BucketFS buckets.
@@ -18,11 +19,11 @@ public interface Bucket extends UnsynchronizedBucket {
      * </p>
      *
      * @param pathInBucket path to the object inside the bucket
-     * @param afterUTC     point in time after which the synchronization needs to happen.
+     * @param state        state after which the synchronization needs to happen.
      * @return {@code true} if the object is synchronized
      * @throws BucketAccessException if the object at the reference does not exist or is inaccessible
      */
-    boolean isObjectSynchronized(String pathInBucket, Instant afterUTC) throws BucketAccessException;
+    boolean isObjectSynchronized(String pathInBucket, State state) throws BucketAccessException;
 
     /**
      * Upload a file to the bucket.
@@ -48,7 +49,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * Upload the contents of a string to the bucket.
      * <p>
      * This method is intended for writing small objects in BucketFS dynamically like for example configuration files.
-     * For large payload use {@link Bucket#uploadFile(Path, String)} instead.
+     * For large payload use {@link Bucket2#uploadFile(Path, String)} instead.
      * </p>
      * <p>
      * This call blocks until the uploaded file is synchronized in BucketFS or a timeout occurs.
