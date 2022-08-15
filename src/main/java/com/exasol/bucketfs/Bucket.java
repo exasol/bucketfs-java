@@ -49,7 +49,7 @@ public interface Bucket extends UnsynchronizedBucket {
      * Upload the contents of a string to the bucket.
      * <p>
      * This method is intended for writing small objects in BucketFS dynamically like for example configuration files.
-     * For large payload use {@link Bucket2#uploadFile(Path, String)} instead.
+     * For large payload use {@link Bucket#uploadFile(Path, String)} instead.
      * </p>
      * <p>
      * This call blocks until the uploaded file is synchronized in BucketFS or a timeout occurs.
