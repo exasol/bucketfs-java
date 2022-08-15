@@ -15,7 +15,7 @@ import com.exasol.bucketfs.monitor.BucketFsMonitor.State;
 /**
  * Reject other states with earlier time.
  */
-public class TimestampState implements BucketFsMonitor.State { // <Instant> {
+public class TimestampState implements BucketFsMonitor.State {
 
     /**
      * Create a new instance of {@link TimestampState}
