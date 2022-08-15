@@ -17,7 +17,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
 
     /**
      * Log based bucket fs monitor c'tor.
-     * 
+     *
      * @param detectorFactory detectorFactory
      */
     public LogBasedBucketFsMonitor(final LogPatternDetectorFactory detectorFactory) {
@@ -40,17 +40,13 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     }
 
     private LogPatternDetector createBucketLogPatternDetector(final String pathInBucket, final Instant afterUTC) {
-        final var pattern = pathInBucket + ".*" + (isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
         return this.detectorFactory.createLogPatternDetector(EXASOL_CORE_DAEMON_LOGS_PATH,
-                BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern, afterUTC);
+                BUCKETFS_DAEMON_LOG_FILENAME_PATTERN, pattern(pathInBucket), afterUTC);
     }
 
-    private static boolean isSupportedArchiveFormat(final String pathInBucket) {
-        for (final var extension : UnsynchronizedBucket.SUPPORTED_ARCHIVE_EXTENSIONS) {
-            if (pathInBucket.endsWith(extension)) {
-                return true;
-            }
-        }
-        return false;
+    private String pattern(final String pathInBucket) {
+        return "removed sync future for id .*'" //
+                + (pathInBucket.startsWith("/") ? pathInBucket.substring(1) : pathInBucket) //
+                + ".*'";
     }
 }

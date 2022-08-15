@@ -146,7 +146,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     private SyncAwareBucket createBucket(final String bucketName) {
         return SyncAwareBucket.builder() //
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(bucketName) //
