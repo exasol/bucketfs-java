@@ -5,7 +5,29 @@ Code name: State based monitoring
 ## Summary
 
 Enhanced BucketFS to allow filtering entries in BucketFS log file not only by time stamp but also by line number.
-Created a new interface to allow to pass a generic state which can represent the current point in time or the size of the log file in lines before looking for new entries.
+
+Updated interface to allow to pass a generic state which can represent the current point in time or the size of the log file in terms of number of lines before looking for new entries.
+
+Please note that the interface changes should be backwards-compatible for _consumers_ of the interface, while existing implementations of the interface are broken in contrast.
+
+Exasol product integration team assumes that the only existing implementations are inside projects [bucketfs-java](https://github.com/exasol/bucketfs-java) and [exasol-testcontainers](https://github.com/exasol/exasol-testcontainers).
+
+Old:
+```java
+interface com.exasol.bucketfs.Bucket {
+  boolean isObjectSynchronized(String pathInBucket, Instant afterUTC) throws BucketAccessException;
+}
+```
+New:
+```java
+interface com.exasol.bucketfs.Bucket {
+  boolean isObjectSynchronized(String pathInBucket, State state) throws BucketAccessException;
+}
+```
+
+In order to use the new signature of `isObjectSynchronized()` please refer to the following classes:
+* `com.exasol.bucketfs.monitor.TimestampState`
+* `com.exasol.bucketfs.monitor.TimestampRetriever`
 
 ## Features
 

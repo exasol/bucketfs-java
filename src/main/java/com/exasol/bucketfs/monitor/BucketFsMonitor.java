@@ -37,6 +37,9 @@ public interface BucketFsMonitor {
         String getRepresentation();
     }
 
+    /**
+     * Retrieve the initial state before an update operation.
+     */
     public interface StateRetriever {
         /**
          * @return state as currently observed by the monitor
