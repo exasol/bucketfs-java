@@ -6,6 +6,5 @@ sources:
       - integration_tests
 linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
-  - "https://tools.ietf.org/html/rfc5234|https://www.rfc-editor.org/rfc/rfc5234"
 excludes:
   - "E-PK-CORE-18: Outdated content: '.github/workflows/ci-build.yml'"
