@@ -23,11 +23,6 @@ jobs:
           distribution: 'temurin'
           java-version: 11
           cache: 'maven'
-      - name: Configure Testcontainers
-        run: |
-          echo '{}' > "$HOME"/.docker/config.json
-          echo 'docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy' > "$HOME"/.testcontainers.properties
-          echo 'testcontainers.reuse.enable=true' >> "$HOME"/.testcontainers.properties
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
