@@ -1,4 +1,4 @@
-# BucketFS Java 2.4.0, released 2022-??-??
+# BucketFS Java 2.4.0, released 2022-08-17
 
 Code name: State based monitoring
 
