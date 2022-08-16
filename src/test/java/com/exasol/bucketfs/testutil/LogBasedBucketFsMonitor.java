@@ -45,7 +45,7 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
                     exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(messageBuilder("E-BFSJ-29").message( //
+            throw new IllegalStateException(messageBuilder("E-BFSJ-29").message( //
                     "Caught interrupt trying to check if object {{path}} is synchronized in bucket {{bucket filesystem}}/{{bucket name}}.", //
                     pathInBucket, bucket.getBucketFsName(), bucket.getBucketName()) //
                     .toString(), //

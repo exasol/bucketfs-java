@@ -1,16 +1,5 @@
-community-tags:
-  - BucketFS
-  - Java Library
-  - Open Source
-  - Library
-  - API
-community-project-name: BucketFS Java (library and API)
-community-project-description: |
-  Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm) is a distributed file
-  system that automatically synchronizes files uploaded on one cluster node to all other nodes. It is intended for
-  providing shared configuration, scripts and libraries used in
-  [User Defined Functions](https://docs.exasol.com/database_concepts/udf_scripts.htm) (UDF) mainly.
-
-  This project provides a library that abstracts access to Exasol's
-  [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm).
-  That allows using BucketFS features programmatically without having to deal with the underlying protocol.
+release-platforms:
+  - GitHub
+  - Maven
+  - Jira
+language: Java
