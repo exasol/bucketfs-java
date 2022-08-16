@@ -1,3 +1,8 @@
+release-platforms:
+  - GitHub
+  - Maven
+  - Jira
+language: Java
 community-tags:
   - BucketFS
   - Java Library
