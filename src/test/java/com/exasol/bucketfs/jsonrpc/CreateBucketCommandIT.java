@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
+import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.containers.ExasolDockerImageReference;
 
 @Tag("slow")
@@ -146,13 +147,14 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     private SyncAwareBucket createBucket(final String bucketName) {
         return SyncAwareBucket.builder() //
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(bucketName) //
                 .readPassword(READ_PASSWORD) //
                 .writePassword(WRITE_PASSWORD) //
                 .monitor(createBucketMonitor()) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 

@@ -6,7 +6,7 @@ This project provides a library that abstracts access to Exasol's [BucketFS](htt
 
 ## Notation Used in This Document
 
-Syntax definitions in this document are written in [Augmented Backus-Naur Form (ABNF)](https://tools.ietf.org/html/rfc5234).
+Syntax definitions in this document are written in [Augmented Backus-Naur Form (ABNF)](https://www.rfc-editor.org/rfc/rfc5234).
 
 ## Getting BucketFS Java Into Your Project
 

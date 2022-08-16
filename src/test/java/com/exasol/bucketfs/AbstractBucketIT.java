@@ -6,6 +6,7 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
 import com.exasol.config.BucketConfiguration;
 import com.exasol.config.BucketFsServiceConfiguration;
@@ -26,16 +27,16 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the container Ip Address.
-     * 
+     *
      * @return String
      */
-    protected String getContainerIpAddress() {
-        return EXASOL.getContainerIpAddress();
+    protected String getHost() {
+        return EXASOL.getHost();
     }
 
     /**
      * Get the Mapped Default Bucket Fs Port.
-     * 
+     *
      * @return Integer
      */
     protected Integer getMappedDefaultBucketFsPort() {
@@ -44,7 +45,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the mapped json rpc port.
-     * 
+     *
      * @return mapped json rpc port
      */
     protected Integer getMappedJsonRpcPort() {
@@ -53,7 +54,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the default bucket configuration.
-     * 
+     *
      * @return default bucket configuration
      */
     protected BucketConfiguration getDefaultBucketConfiguration() {
@@ -67,10 +68,10 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the log based bucket fs monitor.
-     * 
+     *
      * @return LogBasedBucketFsMonitor
      */
     protected LogBasedBucketFsMonitor createBucketMonitor() {
-        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL));
+        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL), EXASOL.getDockerImageReference());
     }
 }

@@ -25,7 +25,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         return ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
                 .useTls(false) //
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
@@ -79,7 +79,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
                 .useTls(false) //
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //

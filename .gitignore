@@ -33,3 +33,5 @@ venv/
 *.old
 *.md.html
 *.flattened-pom.xml
+/.apt_generated/
+/.apt_generated_tests/

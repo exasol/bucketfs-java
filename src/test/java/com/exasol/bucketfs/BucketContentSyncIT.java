@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -16,6 +15,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import com.exasol.bucketfs.monitor.TimestampRetriever;
+
 @Tag("slow")
 class BucketContentSyncIT extends AbstractBucketIT {
     private static RandomFileGenerator GENERATOR = new RandomFileGenerator();
@@ -23,13 +24,14 @@ class BucketContentSyncIT extends AbstractBucketIT {
     private Bucket getDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         return SyncAwareBucket.builder()//
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
                 .writePassword(bucketConfiguration.getWritePassword()) //
                 .monitor(createBucketMonitor()) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 
@@ -46,7 +48,7 @@ class BucketContentSyncIT extends AbstractBucketIT {
 
     private void assertObjectSynchronized(final Path tempFile, final Bucket bucket, final String pathInBucket)
             throws BucketAccessException, InterruptedException, TimeoutException, FileNotFoundException {
-        final var now = Instant.now();
+        final var now = new TimestampRetriever().getState();
         assertThat(bucket.isObjectSynchronized(pathInBucket, now), equalTo(false));
         bucket.uploadFile(tempFile, pathInBucket);
         assertThat(bucket.isObjectSynchronized(pathInBucket, now), equalTo(true));

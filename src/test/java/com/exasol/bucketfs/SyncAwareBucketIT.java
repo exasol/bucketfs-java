@@ -22,21 +22,26 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.exasol.bucketfs.monitor.TimestampRetriever;
+import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
 import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 import com.exasol.containers.exec.ExitCode;
 
 @Tag("slow")
 class SyncAwareBucketIT extends AbstractBucketIT {
+
     private SyncAwareBucket createDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
+        final LogBasedBucketFsMonitor monitor = createBucketMonitor();
         return SyncAwareBucket.builder()//
-                .ipAddress(getContainerIpAddress()) //
+                .ipAddress(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
                 .writePassword(bucketConfiguration.getWritePassword()) //
-                .monitor(createBucketMonitor()) //
+                .monitor(monitor) //
+                .stateRetriever(new TimestampRetriever()) //
                 .build();
     }
 
