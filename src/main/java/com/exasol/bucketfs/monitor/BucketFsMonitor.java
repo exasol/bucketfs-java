@@ -22,7 +22,7 @@ public interface BucketFsMonitor {
 
     /**
      * A {@link State} allows to detect events more precisely. For instance the state could define a point in time and
-     * reject events that happened before .
+     * reject events that happened before.
      */
     public interface State {
         /**
@@ -30,15 +30,10 @@ public interface BucketFsMonitor {
          * @return true if current {@link State} accepts {@link State} {@code other}.
          */
         boolean accepts(State other);
-
-        /**
-         * @return string representation of the current state for log messages
-         */
-        String getRepresentation();
     }
 
     /**
-     * Retrieve the initial state before an update operation.
+     * Retrieves the initial state before an update operation.
      */
     public interface StateRetriever {
         /**

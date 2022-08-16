@@ -20,7 +20,7 @@ class TimestampStateTest {
     @Test
     void lowResolution() {
         assertThat(TESTEE.getTime(), equalTo(INSTANT));
-        assertThat(TESTEE.getRepresentation(), equalTo("time " + STRING));
+        assertThat(TESTEE.toString(), equalTo("time " + STRING));
     }
 
     @Test

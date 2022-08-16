@@ -127,7 +127,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         }
         final String message = String.format(
                 "Timeout waiting for object '%s' to be synchronized in bucket '%s' after %s.", //
-                pathInBucket, getFullyQualifiedBucketName(), state.getRepresentation());
+                pathInBucket, getFullyQualifiedBucketName(), state.toString());
         LOGGER.severe(() -> message);
         throw new TimeoutException(message);
     }
@@ -171,7 +171,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         /**
          * Set state retriever for this bucket. The bucket uses the state retriever to inquire the current {@link State}
          * as observed by the monitor. The bucket can pass the state to the monitor to make the monitor accept only
-         * events the happened after the state.
+         * events that happened after the state.
          *
          * @param value state retriever
          * @return Builder instance for fluent programming

@@ -206,8 +206,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
-        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient,
-                bucket);
+        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> bucketSpy.deleteFileNonBlocking(testFile));
         assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-12: Failed to delete"));
@@ -245,8 +244,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var bucket = createDefaultBucket();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
-        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient,
-                bucket);
+        final SyncAwareBucket bucketSpy = getBucketWithExceptionThrowingHttpClient(exceptionThrownByHttpClient, bucket);
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
     }
 

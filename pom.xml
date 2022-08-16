@@ -8,14 +8,8 @@
     <description>Java library for automating tasks on Exasol's BucketFS.</description>
     <url>https://github.com/exasol/bucketfs-java/</url>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
         <junit.version>5.8.2</junit.version>
-        <maven.surefire-and-failsafe.version>3.0.0-M3</maven.surefire-and-failsafe.version>
         <testcontainers.version>1.15.2</testcontainers.version>
-        <gpg.skip>true</gpg.skip>
-        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <distributionManagement>
         <snapshotRepository>

@@ -72,6 +72,6 @@ public abstract class AbstractBucketIT {
      * @return LogBasedBucketFsMonitor
      */
     protected LogBasedBucketFsMonitor createBucketMonitor() {
-        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL));
+        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL), EXASOL.getDockerImageReference());
     }
 }

@@ -7,13 +7,8 @@ import java.util.TimeZone;
 
 import com.exasol.bucketfs.monitor.BucketFsMonitor.State;
 
-/*
- * COPY from project exasol-testcontainers.
- * SHOULD be replaced by test dependency.
- */
-
 /**
- * Reject other states with earlier time.
+ * Rejects other states with earlier time.
  */
 public class TimestampState implements BucketFsMonitor.State {
 
@@ -56,7 +51,7 @@ public class TimestampState implements BucketFsMonitor.State {
     }
 
     @Override
-    public String getRepresentation() {
+    public String toString() {
         return "time " + this.time.toString();
     }
 

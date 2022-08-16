@@ -2,36 +2,34 @@ package com.exasol.bucketfs.testutil;
 
 import static com.exasol.containers.ExasolContainerConstants.BUCKETFS_DAEMON_LOG_FILENAME_PATTERN;
 import static com.exasol.containers.ExasolContainerConstants.EXASOL_CORE_DAEMON_LOGS_PATH;
+import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
 
-import com.exasol.bucketfs.BucketAccessException;
-import com.exasol.bucketfs.ReadOnlyBucket;
+import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.monitor.BucketFsMonitor;
 import com.exasol.bucketfs.monitor.TimestampState;
 import com.exasol.clusterlogs.LogPatternDetector;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
+import com.exasol.containers.ExasolDockerImageReference;
 
 /**
- * This class is basically a copy of the same class in project "exasol-testcontainers".
- *
- * <p>
- * As soon as project "exasol-testcontainers" has been migrated to bucketfs-java 2.3.0 and has released a newer version
- * v2, this class can be replaced by upgrading dependency exasol-testcontainers to a version v2 and using the class
- * LogBasedBucketFsMonitor from exasol-testcontainers.
- * </p>
+ * This {@link BucketFsMonitor} detects if a file was successfully uploaded from the Exasol log files.
  */
 public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     private final LogPatternDetectorFactory detectorFactory;
+    private final ExasolDockerImageReference dockerImageReference;
 
     /**
      * Log based bucket fs monitor c'tor.
      *
      * @param detectorFactory detectorFactory
      */
-    public LogBasedBucketFsMonitor(final LogPatternDetectorFactory detectorFactory) {
+    public LogBasedBucketFsMonitor(final LogPatternDetectorFactory detectorFactory,
+            final ExasolDockerImageReference dockerImageReference) {
         this.detectorFactory = detectorFactory;
+        this.dockerImageReference = dockerImageReference;
     }
 
     @Override
@@ -40,15 +38,17 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
         try {
             return createBucketLogPatternDetector(pathInBucket, ((TimestampState) state).getTime()).isPatternPresent();
         } catch (final IOException exception) {
-            throw new BucketAccessException(
-                    "Unable to check if object \"" + pathInBucket + "\" is synchronized in bucket \""
-                            + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "\".",
+            throw new BucketAccessException(messageBuilder("E-BFSJ-28").message( //
+                    "Unable to check if object {{path}} is synchronized in bucket {{bucket filesystem}}/{{bucket name}}.", //
+                    pathInBucket, bucket.getBucketFsName(), bucket.getBucketName()) //
+                    .toString(), //
                     exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(
-                    "Caught interrupt trying to check if object \"" + pathInBucket + "\" is synchronized in bucket \""
-                            + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "\".",
+            throw new RuntimeException(messageBuilder("E-BFSJ-29").message( //
+                    "Caught interrupt trying to check if object {{path}} is synchronized in bucket {{bucket filesystem}}/{{bucket name}}.", //
+                    pathInBucket, bucket.getBucketFsName(), bucket.getBucketName()) //
+                    .toString(), //
                     exception);
         }
     }
@@ -59,8 +59,26 @@ public class LogBasedBucketFsMonitor implements BucketFsMonitor {
     }
 
     private String pattern(final String pathInBucket) {
-        return "removed sync future for id .*'" //
-                + (pathInBucket.startsWith("/") ? pathInBucket.substring(1) : pathInBucket) //
-                + ".*'";
+        if (isOldVersion()) {
+            return pathInBucket + ".*" + (isSupportedArchiveFormat(pathInBucket) ? "extracted" : "linked");
+        } else {
+            return "rsync for .*'" //
+                    + (pathInBucket.startsWith("/") ? pathInBucket.substring(1) : pathInBucket) //
+                    + ".*'.* is done";
+        }
     }
+
+    private boolean isOldVersion() {
+        return (this.dockerImageReference.hasMajor() && (this.dockerImageReference.getMajor() < 8));
+    }
+
+    private static boolean isSupportedArchiveFormat(final String pathInBucket) {
+        for (final String extension : UnsynchronizedBucket.SUPPORTED_ARCHIVE_EXTENSIONS) {
+            if (pathInBucket.endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
