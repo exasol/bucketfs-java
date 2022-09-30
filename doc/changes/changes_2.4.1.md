@@ -4,7 +4,7 @@ Code name: Replace redundant classes
 
 ## Summary
 
-Due to dependencies and concurrent implementation temporarily some classes needed be created redundantly in in the current repository as well as in exasol-testcontainers.
+Due to dependencies and concurrent implementation temporarily some classes needed be created redundantly in the current repository as well as in exasol-testcontainers.
 
 The current release replaces the redundant implementations by the default implementations from exasol-testcontainers.
 

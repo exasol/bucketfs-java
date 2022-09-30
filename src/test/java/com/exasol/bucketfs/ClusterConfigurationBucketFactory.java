@@ -10,8 +10,6 @@ import com.exasol.config.BucketFsServiceConfiguration;
 
 /**
  * Factory for objects abstracting buckets in Exasol's BucketFS.
- *
- * @param <LineCountRetriever>
  */
 public final class ClusterConfigurationBucketFactory implements BucketFactory {
     private final Map<String, Bucket> bucketsCache = new HashMap<>();
