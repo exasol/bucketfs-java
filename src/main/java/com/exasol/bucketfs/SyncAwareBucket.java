@@ -32,6 +32,12 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
      */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
+        if (builder.monitor == null) {
+            throw new NullPointerException("builder.monitor must be not null");
+        }
+        if (builder.stateRetriever == null) {
+            throw new NullPointerException("builder.stateRetriever must be not null");
+        }
         this.monitor = builder.monitor;
         this.stateRetriever = builder.stateRetriever;
     }
