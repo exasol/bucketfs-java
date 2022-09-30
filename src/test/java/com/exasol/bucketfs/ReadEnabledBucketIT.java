@@ -70,7 +70,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile), //
                 matchesPattern(
-                        "E-BFSJ-2: File or directory not found trying to download http://.*/" + pathInBucket + "."));
+                        "E-BFSJ-2: File or directory not found trying to download 'http://.*/" + pathInBucket + "'."));
     }
 
     @Test

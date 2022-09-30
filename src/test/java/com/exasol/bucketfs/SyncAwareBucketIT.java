@@ -23,7 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.exasol.bucketfs.monitor.TimestampRetriever;
-import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
+import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor;
 import com.exasol.bucketfs.uploadnecessity.UploadNecessityCheckStrategy;
 import com.exasol.containers.exec.ExitCode;
 

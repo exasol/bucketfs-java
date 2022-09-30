@@ -28,7 +28,7 @@ class ReadEnabledBucketTest {
 
     private static final String BUCKET_NAME = "bucket";
     private static final String BUCKET_FS_NAME = "service";
-    private static final String IP_ADDRESS = "192.168.1.1";
+    private static final String IP_ADDRESS = "101.102.103.104";
     private static final int PORT = 1234;
 
     @Mock
@@ -89,14 +89,13 @@ class ReadEnabledBucketTest {
     }
 
     @CsvSource({ //
-            "404, 'E-BFSJ-2: File or directory not found trying to list http://192.168.1.1:1234/bucket/.'",
-            "403, 'E-BFSJ-3: Access denied trying to list http://192.168.1.1:1234/bucket/.'",
-            "500, 'E-BFSJ-1: Unable to perform list http://192.168.1.1:1234/bucket/. HTTP status 500.'" })
+            "404, E-BFSJ-2: File or directory not found trying to list 'http://101.102.103.104:1234/bucket/'.",
+            "403, E-BFSJ-3: Access denied trying to list 'http://101.102.103.104:1234/bucket/'.",
+            "500, E-BFSJ-1: Unable to perform list 'http://101.102.103.104:1234/bucket/'. HTTP status 500." })
     @ParameterizedTest
     void testRequestListingThrowsException(final int responseStatus, final String expectedExceptionMessage)
             throws BucketAccessException, IOException, InterruptedException {
         simulateResponse(null, responseStatus);
-
         final ReadOnlyBucket bucket = createBucket();
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 expectedExceptionMessage);
@@ -109,7 +108,7 @@ class ReadEnabledBucketTest {
 
         final ReadOnlyBucket bucket = createBucket();
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
-                "E-BFSJ-5: I/O error trying to list http://192.168.1.1:1234/bucket/");
+                "E-BFSJ-5: I/O error trying to list 'http://101.102.103.104:1234/bucket/'");
     }
 
     @Test
@@ -120,7 +119,7 @@ class ReadEnabledBucketTest {
 
         final ReadOnlyBucket bucket = createBucket();
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
-                "E-BFSJ-4: Interrupted trying to list http://192.168.1.1:1234/bucket/.");
+                "E-BFSJ-4: Interrupted trying to list 'http://101.102.103.104:1234/bucket/'.");
     }
 
     @CsvSource({ //
