@@ -6,7 +6,8 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.exasol.bucketfs.testutil.LogBasedBucketFsMonitor;
+import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor;
+import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor.FilterStrategy;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
 import com.exasol.config.BucketConfiguration;
 import com.exasol.config.BucketFsServiceConfiguration;
@@ -72,6 +73,6 @@ public abstract class AbstractBucketIT {
      * @return LogBasedBucketFsMonitor
      */
     protected LogBasedBucketFsMonitor createBucketMonitor() {
-        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL), EXASOL.getDockerImageReference());
+        return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL), FilterStrategy.TIME_STAMP);
     }
 }

@@ -14,12 +14,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.exasol.bucketfs.monitor.BucketFsMonitor;
 import com.exasol.config.BucketConfiguration;
 import com.exasol.config.BucketFsServiceConfiguration;
 
 @Tag("fast")
 @ExtendWith(MockitoExtension.class)
 class ClusterConfigurationBucketFactoryTest {
+
+    @Mock
+    BucketFsMonitor monitor;
+
     @Test
     void testGetBucketInjectsAccessCredentials(
             @Mock final BucketFsSerivceConfigurationProvider serviceConfigurationProviderMock) {
@@ -35,7 +40,7 @@ class ClusterConfigurationBucketFactoryTest {
         final BucketFsServiceConfiguration serviceConfiguration = BucketFsServiceConfiguration.builder()
                 .name(serviceName).httpPort(port).addBucketConfiguration(bucketConfiguration).build();
         when(serviceConfigurationProviderMock.getBucketFsServiceConfiguration(any())).thenReturn(serviceConfiguration);
-        final BucketFactory factory = new ClusterConfigurationBucketFactory(null, ipAddress,
+        final BucketFactory factory = new ClusterConfigurationBucketFactory(this.monitor, ipAddress,
                 serviceConfigurationProviderMock, portMappings);
         final Bucket bucket = factory.getBucket(serviceName, bucketName);
         assertAll(() -> assertThat(bucket.getReadPassword(), equalTo(readPassword)),

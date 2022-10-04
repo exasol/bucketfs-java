@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -32,6 +33,8 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
      */
     protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
+        Objects.requireNonNull(builder.monitor);
+        Objects.requireNonNull(builder.stateRetriever);
         this.monitor = builder.monitor;
         this.stateRetriever = builder.stateRetriever;
     }
