@@ -23,12 +23,13 @@ The current release replaces the redundant implementations by the default implem
 
 ### Test Dependency Updates
 
-* Updated `com.exasol:exasol-testcontainers:6.1.2` to `6.2.0`
+* Updated `com.exasol:exasol-testcontainers:6.1.2` to `6.3.0`
 * Updated `org.junit.jupiter:junit-jupiter-engine:5.8.2` to `5.9.1`
 * Updated `org.junit.jupiter:junit-jupiter-params:5.8.2` to `5.9.1`
-* Updated `org.mockito:mockito-junit-jupiter:4.5.1` to `4.8.0`
-* Updated `org.testcontainers:junit-jupiter:1.17.1` to `1.17.4`
+* Updated `org.mockito:mockito-junit-jupiter:4.5.1` to `4.8.1`
+* Updated `org.testcontainers:junit-jupiter:1.17.1` to `1.17.5`
 
 ### Plugin Dependency Updates
 
 * Updated `com.exasol:project-keeper-maven-plugin:2.6.2` to `2.8.0`
+* Updated `org.itsallcode:openfasttrace-maven-plugin:1.0.0` to `1.5.0`
