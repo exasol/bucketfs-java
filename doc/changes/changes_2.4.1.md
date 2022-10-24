@@ -1,4 +1,4 @@
-# BucketFS Java 2.4.1, released 2022-??-??
+# BucketFS Java 2.4.1, released 2022-10-24
 
 Code name: Replace redundant classes
 
