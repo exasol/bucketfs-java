@@ -87,7 +87,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
-    // [impl->dsn~bucket-lists-its-contents~1]
+    // [impl->dsn~bucket-lists-its-contents~2]
     public List<String> listContents() throws BucketAccessException {
         return listContents(BUCKET_ROOT);
     }

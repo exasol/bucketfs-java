@@ -69,7 +69,7 @@ Covers:
 Needs: impl, itest
 
 ### List of `Bucket` Contents
-`dsn~bucket-lists-its-contents~1`
+`dsn~bucket-lists-its-contents~2`
 
 The `Bucket` lists its contents as a sorted list of object names.
 

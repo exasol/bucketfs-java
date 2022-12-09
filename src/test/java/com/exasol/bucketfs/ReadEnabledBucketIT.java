@@ -40,13 +40,13 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 () -> assertThat(defaultBucket.getBucketName(), equalTo(DEFAULT_BUCKET)));
     }
 
-    // [itest->dsn~bucket-lists-its-contents~1]
+    // [itest->dsn~bucket-lists-its-contents~2]
     @Test
     void testListBucketContentsWithRootPath() throws BucketAccessException {
         assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
     }
 
-    // [itest->dsn~bucket-lists-its-contents~1]
+    // [itest->dsn~bucket-lists-its-contents~2]
     @ValueSource(strings = { "EXAClusterOS/", "/EXAClusterOS/" })
     @ParameterizedTest
     void testListBucketContents(final String pathInBucket) throws BucketAccessException {
