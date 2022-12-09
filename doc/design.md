@@ -20,6 +20,10 @@ For more details on what this means and how we deal with this constraint see the
 
 Needs: dsn
 
+## Format of Entries in a `Bucket`
+
+A `Bucket` can hold entries with common prefix and a slash `/` as separator. When interpreting this as a hierarchy similar to a file system then we need to consider that `Bucket` also enables to have a file with the same name as a folder. For example `name/child.txt` and `name` can exist at the same time.
+
 # Solution Strategy
 
 BucketFS offers a web API that is not compatible with established standards like [Web DAV](http://www.webdav.org/). While in some parts similar, the differences are big enough that standard client libraries can't be used. This library abstracts the underlying HTTP requests and responses to a level that lets users instead deal with buckets and their contents directly.
@@ -65,16 +69,47 @@ Covers:
 Needs: impl, itest
 
 ### List of `Bucket` Contents
-
 `dsn~bucket-lists-its-contents~1`
 
-The `Bucket` lists its contents as a set of object names.
+The `Bucket` lists its contents as a sorted list of object names.
 
 Covers:
-
 * `req~bucket-content-listing~1`
 
 Needs: impl, itest
+
+### List of `Bucket` Contents with common prefix
+`dsn~bucket-lists-files-with-common-prefix~1`
+
+The list of contents of a path in the bucket contains files as well as subfolders with this path as prefix.
+
+Covers:
+* `req~bucket-content-listing~1`
+
+Needs: impl, utest
+
+### List Files and Folders with Identical Name
+`dsn~bucket-lists-file-and-folder-with-identical-name~1`
+
+If `Bucket` contains two entries sharing the same prefix and only one of these entries having a path separator after the prefix then list of contents of the bucket will contain two entries.
+
+Covers:
+* `req~bucket-content-listing~1`
+
+Needs: impl, utest
+
+### Append Suffix to Folders
+`dsn~bucket-lists-folders-with-suffix~1`
+
+The list of contents of the bucket contains folders with a slash `/` as suffix.
+
+Rationale:
+* This enables to distinct folders from files potentially having the same name.
+
+Covers:
+* `req~bucket-content-listing~1`
+
+Needs: impl, utest
 
 ### Uploading to `Bucket`
 
@@ -215,6 +250,37 @@ Needs: impl, itest
 # Cross-cutting Concerns
 
 # Design Decisions
+
+## How to interpret entries in `Bucket`?
+
+See the constraint [format of entries in a `Bucket`](#format-of-entries-in-a-bucket).
+
+### Alternatives considered
+
+The list of contents of a `Bucket` could either be represented as a hierarchy or as a flat list potentially with
+* multiply entries sharing a common prefix
+* prefix containing one or multiple slash `/` separators
+
+### Decisions
+
+#### Hierarchies of Entries
+
+The design decides to interpret `Bucket` to contain a hierarchy of entries. Each entry may either be a *file* or a *folder*. An entry is a *folder* if it has children, otherwise the entry is a *file*. An entry has children when its name contains the BucketFS separator `/`.
+
+Examples:
+* `a.txt` is a *file*
+* `a/b.txt` is interpreted as *folder* `a` containing file `b.txt`
+
+This affects especially the list of `Bucket` contents.
+
+Rationale:
+* A hierarchical representation of files and folders provides additional benefits:
+  * Hierarchies are a convenient and familiar concept to users.
+  * Hierarchies enable operations on multiple entries in a common scope, e.g. list, copy, or delete.
+
+To support the coexistence of files and folders with the same name, folders should be represented with a slash `/` as suffix. The list of contents of a folder may then contain the same entry twice:
+* one time as file (without suffix)
+* one time as folder (with suffix)
 
 ## How do we Validate That Objects on BucketFS are Ready to Use?
 
