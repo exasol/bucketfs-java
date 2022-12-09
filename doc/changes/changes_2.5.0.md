@@ -4,7 +4,9 @@ Code name: List Files and Folders Hierarchically
 
 ## Summary
 
-When BucketFS contains multiple files in a common folder the list returned by `ReadEnabledBucket.parseContentListResponseBody()` contained the common folder multiple times. Additionally this release compensates for files and folders sharing the same name by appending a suffix to folders.
+When BucketFS contains multiple files in a common folder the list returned by `ReadEnabledBucket.parseContentListResponseBody()` contained the common folder multiple times. This has been fixed by listing only distinct entries.
+
+Additionally this release compensates for files and folders sharing the same name by appending a suffix to folders.
 
 ## Bugfixes
 
