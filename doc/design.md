@@ -280,7 +280,7 @@ Rationale:
 
 To support the coexistence of files and directories with the same name, directories should be represented with a slash `/` as suffix. The list of contents of a directory may then contain the same entry twice:
 * once as file (without suffix)
-* one time as directory (with suffix)
+* a second time as directory (with suffix)
 
 ## How do we Validate That Objects on BucketFS are Ready to Use?
 
