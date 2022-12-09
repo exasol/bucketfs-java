@@ -76,23 +76,23 @@ class ReadEnabledBucketTest {
     @Test
     // [utest->dsn~bucket-lists-files-with-common-prefix~1]
     void listRoot() throws Exception {
-        simulateResponse(lines("folder/b1.txt", "b.txt", "folder/a1.txt", "a.txt"), 200);
+        simulateResponse(lines("dir/b1.txt", "b.txt", "dir/a1.txt", "a.txt"), 200);
         final List<String> actual = createBucket().listContents();
-        assertThat(actual, equalTo(List.of("a.txt", "b.txt", "folder/")));
+        assertThat(actual, equalTo(List.of("a.txt", "b.txt", "dir/")));
     }
 
     @Test
     // [utest->dsn~bucket-lists-files-with-common-prefix~1]
-    void listSubFolder() throws Exception {
-        simulateResponse(lines("folder/b1.txt", "b.txt", "folder/a1.txt", "a.txt"), 200);
-        final List<String> actual = createBucket().listContents("folder/");
+    void listSubDirectory() throws Exception {
+        simulateResponse(lines("dir/b1.txt", "b.txt", "dir/a1.txt", "a.txt"), 200);
+        final List<String> actual = createBucket().listContents("dir/");
         assertThat(actual, equalTo(List.of("a1.txt", "b1.txt")));
     }
 
     @Test
-    // [utest->dsn~bucket-lists-file-and-folder-with-identical-name~1]
-    // [utest->dsn~bucket-lists-folders-with-suffix~1]
-    void listFileAndFolderWithIdenticalName() throws Exception {
+    // [utest->dsn~bucket-lists-file-and-directory-with-identical-name~1]
+    // [utest->dsn~bucket-lists-directories-with-suffix~1]
+    void listFileAndDirectoryWithIdenticalName() throws Exception {
         simulateResponse(lines("name", "name/child.txt"), 200);
         final List<String> actual = createBucket().listContents();
         assertThat(actual, equalTo(List.of("name", "name/")));

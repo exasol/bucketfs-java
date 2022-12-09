@@ -89,7 +89,7 @@ Covers:
 Needs: impl, utest
 
 ### List Files and Folders with Identical Name
-`dsn~bucket-lists-file-and-folder-with-identical-name~1`
+`dsn~bucket-lists-file-and-directory-with-identical-name~1`
 
 If `Bucket` contains two entries sharing the same prefix and only one of these entries having a path separator after the prefix then list of contents of the bucket will contain two entries.
 
@@ -98,13 +98,13 @@ Covers:
 
 Needs: impl, utest
 
-### Append Suffix to Folders
-`dsn~bucket-lists-folders-with-suffix~1`
+### Append Suffix to Directories
+`dsn~bucket-lists-directories-with-suffix~1`
 
-The list of contents of the bucket contains folders with a slash `/` as suffix.
+The list of contents of the bucket contains directories with a slash `/` as suffix.
 
 Rationale:
-* This enables to distinct folders from files potentially having the same name.
+* This enables to distinct directories from files potentially having the same name.
 
 Covers:
 * `req~bucket-content-listing~1`
@@ -265,22 +265,22 @@ The list of contents of a `Bucket` could either be represented as a hierarchy or
 
 #### Hierarchies of Entries
 
-The design decides to interpret `Bucket` to contain a hierarchy of entries. Each entry may either be a *file* or a *folder*. An entry is a *folder* if it has children, otherwise the entry is a *file*. An entry has children when its name contains the BucketFS separator `/`.
+The design decides to interpret `Bucket` to contain a hierarchy of entries. Each entry may either be a *file* or a *directory*. An entry is a *directory* if it has children, otherwise the entry is a *file*. An entry has children when its name contains the BucketFS separator `/`.
 
 Examples:
 * `a.txt` is a *file*
-* `a/b.txt` is interpreted as *folder* `a` containing file `b.txt`
+* `a/b.txt` is interpreted as *directory* `a` containing file `b.txt`
 
 This affects especially the list of `Bucket` contents.
 
 Rationale:
-* A hierarchical representation of files and folders provides additional benefits:
+* A hierarchical representation of files and directories provides additional benefits:
   * Hierarchies are a convenient and familiar concept to users.
   * Hierarchies enable operations on multiple entries in a common scope, e.g. list, copy, or delete.
 
-To support the coexistence of files and folders with the same name, folders should be represented with a slash `/` as suffix. The list of contents of a folder may then contain the same entry twice:
+To support the coexistence of files and directories with the same name, directories should be represented with a slash `/` as suffix. The list of contents of a directory may then contain the same entry twice:
 * one time as file (without suffix)
-* one time as folder (with suffix)
+* one time as directory (with suffix)
 
 ## How do we Validate That Objects on BucketFS are Ready to Use?
 

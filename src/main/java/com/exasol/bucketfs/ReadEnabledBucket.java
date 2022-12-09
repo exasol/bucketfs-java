@@ -139,8 +139,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     // [impl->dsn~bucket-lists-files-with-common-prefix~1]
-    // [impl->dsn~bucket-lists-file-and-folder-with-identical-name~1]
-    // [impl->dsn~bucket-lists-folders-with-suffix~1]
+    // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
+    // [impl->dsn~bucket-lists-directories-with-suffix~1]
     private List<String> parseContentListResponseBody(final HttpResponse<String> response, final String path) {
         return Arrays.stream(response.body().split("\\s+")) //
                 .map(this::removeLeadingSlash) //
