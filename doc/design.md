@@ -22,7 +22,7 @@ Needs: dsn
 
 ## Format of Entries in a `Bucket`
 
-A `Bucket` can hold entries with common prefix and a slash `/` as separator. When interpreting this as a hierarchy similar to a file system then we need to consider that `Bucket` also enables to have a file with the same name as a folder. For example `name/child.txt` and `name` can exist at the same time.
+A `Bucket` can hold entries with common prefix and a slash `/` as separator. When interpreting this as a hierarchy similar to a file system, we need to consider that `Bucket` also allows having a file with the same name as a directory. For example `name/child.txt` and `name` can exist at the same time.
 
 # Solution Strategy
 
@@ -78,20 +78,20 @@ Covers:
 
 Needs: impl, itest
 
-### List of `Bucket` Contents with common prefix
+### List of `Bucket` Contents With Common Prefix
 `dsn~bucket-lists-files-with-common-prefix~1`
 
-The list of contents of a path in the bucket contains files as well as subfolders with this path as prefix.
+The list of contents of a path in the bucket contains files as well as sub-directories with this path as prefix.
 
 Covers:
 * `req~bucket-content-listing~1`
 
 Needs: impl, utest
 
-### List Files and Folders with Identical Name
+### List Files and Folders With Identical Name
 `dsn~bucket-lists-file-and-directory-with-identical-name~1`
 
-If `Bucket` contains two entries sharing the same prefix and only one of these entries having a path separator after the prefix then list of contents of the bucket will contain two entries.
+If `Bucket` contains two entries sharing the same prefix and only one of these entries has a path separator after the prefix, then list of contents of the bucket contains two entries.
 
 Covers:
 * `req~bucket-content-listing~1`
@@ -251,11 +251,11 @@ Needs: impl, itest
 
 # Design Decisions
 
-## How to interpret entries in `Bucket`?
+## How to Interpret Entries in `Bucket`?
 
 See the constraint [format of entries in a `Bucket`](#format-of-entries-in-a-bucket).
 
-### Alternatives considered
+### Alternatives Considered
 
 The list of contents of a `Bucket` could either be represented as a hierarchy or as a flat list potentially with
 * multiply entries sharing a common prefix
@@ -271,7 +271,7 @@ Examples:
 * `a.txt` is a *file*
 * `a/b.txt` is interpreted as *directory* `a` containing file `b.txt`
 
-This affects especially the list of `Bucket` contents.
+This in particular affects the list of `Bucket` contents.
 
 Rationale:
 * A hierarchical representation of files and directories provides additional benefits:
@@ -279,7 +279,7 @@ Rationale:
   * Hierarchies enable operations on multiple entries in a common scope, e.g. list, copy, or delete.
 
 To support the coexistence of files and directories with the same name, directories should be represented with a slash `/` as suffix. The list of contents of a directory may then contain the same entry twice:
-* one time as file (without suffix)
+* once as file (without suffix)
 * one time as directory (with suffix)
 
 ## How do we Validate That Objects on BucketFS are Ready to Use?
