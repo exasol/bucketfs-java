@@ -35,8 +35,8 @@
 | [SonarQube Scanner for Maven][21]                       | [GNU LGPL 3][22]                               |
 | [Apache Maven Compiler Plugin][23]                      | [Apache License, Version 2.0][10]              |
 | [Apache Maven Enforcer Plugin][24]                      | [Apache License, Version 2.0][10]              |
-| [Maven Flatten Plugin][25]                              | [Apache Software Licenese][26]                 |
-| [org.sonatype.ossindex.maven:ossindex-maven-plugin][27] | [ASL2][26]                                     |
+| [Maven Flatten Plugin][25]                              | [Apache Software Licenese][10]                 |
+| [org.sonatype.ossindex.maven:ossindex-maven-plugin][26] | [ASL2][27]                                     |
 | [Maven Surefire Plugin][28]                             | [Apache License, Version 2.0][10]              |
 | [Versions Maven Plugin][29]                             | [Apache License, Version 2.0][10]              |
 | [Apache Maven Deploy Plugin][30]                        | [Apache License, Version 2.0][10]              |
@@ -49,12 +49,12 @@
 | [Maven Failsafe Plugin][40]                             | [Apache License, Version 2.0][10]              |
 | [JaCoCo :: Maven Plugin][41]                            | [Eclipse Public License 2.0][42]               |
 | [error-code-crawler-maven-plugin][43]                   | [MIT License][44]                              |
-| [Reproducible Build Maven Plugin][45]                   | [Apache 2.0][26]                               |
-| [Maven Clean Plugin][46]                                | [The Apache Software License, Version 2.0][26] |
-| [Maven Resources Plugin][47]                            | [The Apache Software License, Version 2.0][26] |
-| [Maven JAR Plugin][48]                                  | [The Apache Software License, Version 2.0][26] |
-| [Maven Install Plugin][49]                              | [The Apache Software License, Version 2.0][26] |
-| [Maven Site Plugin 3][50]                               | [The Apache Software License, Version 2.0][26] |
+| [Reproducible Build Maven Plugin][45]                   | [Apache 2.0][27]                               |
+| [Maven Clean Plugin][46]                                | [The Apache Software License, Version 2.0][27] |
+| [Maven Resources Plugin][47]                            | [The Apache Software License, Version 2.0][27] |
+| [Maven JAR Plugin][48]                                  | [The Apache Software License, Version 2.0][27] |
+| [Maven Install Plugin][49]                              | [The Apache Software License, Version 2.0][27] |
+| [Maven Site Plugin 3][50]                               | [The Apache Software License, Version 2.0][27] |
 
 [0]: https://github.com/exasol/error-reporting-java/
 [1]: https://github.com/exasol/error-reporting-java/blob/main/LICENSE
@@ -82,10 +82,10 @@
 [23]: https://maven.apache.org/plugins/maven-compiler-plugin/
 [24]: https://maven.apache.org/enforcer/maven-enforcer-plugin/
 [25]: https://www.mojohaus.org/flatten-maven-plugin/
-[26]: http://www.apache.org/licenses/LICENSE-2.0.txt
-[27]: https://sonatype.github.io/ossindex-maven/maven-plugin/
+[26]: https://sonatype.github.io/ossindex-maven/maven-plugin/
+[27]: http://www.apache.org/licenses/LICENSE-2.0.txt
 [28]: https://maven.apache.org/surefire/maven-surefire-plugin/
-[29]: http://www.mojohaus.org/versions-maven-plugin/
+[29]: https://www.mojohaus.org/versions-maven-plugin/
 [30]: https://maven.apache.org/plugins/maven-deploy-plugin/
 [31]: https://maven.apache.org/plugins/maven-gpg-plugin/
 [32]: https://maven.apache.org/plugins/maven-source-plugin/
