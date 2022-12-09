@@ -1,7 +1,6 @@
 package com.exasol.bucketfs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -9,6 +8,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.http.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,10 +74,32 @@ class ReadEnabledBucketTest {
     }
 
     @Test
-    void testRequestListingSucceeds() throws BucketAccessException, IOException, InterruptedException {
-        simulateResponse("file", 200);
+    // [utest->dsn~bucket-lists-files-with-common-prefix~1]
+    void listRoot() throws Exception {
+        simulateResponse(lines("dir/b1.txt", "b.txt", "dir/a1.txt", "a.txt"), 200);
+        final List<String> actual = createBucket().listContents();
+        assertThat(actual, equalTo(List.of("a.txt", "b.txt", "dir/")));
+    }
 
-        assertThat(createBucket().listContents(), contains("file"));
+    @Test
+    // [utest->dsn~bucket-lists-files-with-common-prefix~1]
+    void listSubDirectory() throws Exception {
+        simulateResponse(lines("dir/b1.txt", "b.txt", "dir/a1.txt", "a.txt"), 200);
+        final List<String> actual = createBucket().listContents("dir/");
+        assertThat(actual, equalTo(List.of("a1.txt", "b1.txt")));
+    }
+
+    @Test
+    // [utest->dsn~bucket-lists-file-and-directory-with-identical-name~1]
+    // [utest->dsn~bucket-lists-directories-with-suffix~1]
+    void listFileAndDirectoryWithIdenticalName() throws Exception {
+        simulateResponse(lines("name", "name/child.txt"), 200);
+        final List<String> actual = createBucket().listContents();
+        assertThat(actual, equalTo(List.of("name", "name/")));
+    }
+
+    private String lines(final String... lines) {
+        return Arrays.stream(lines).collect(Collectors.joining("\n"));
     }
 
     private void simulateResponse(final String responseBody, final int responseStatus)

@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
@@ -86,7 +87,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
-    // [impl->dsn~bucket-lists-its-contents~1]
+    // [impl->dsn~bucket-lists-its-contents~2]
     public List<String> listContents() throws BucketAccessException {
         return listContents(BUCKET_ROOT);
     }
@@ -137,21 +138,23 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                 + removeLeadingSlash(pathInBucket));
     }
 
+    // [impl->dsn~bucket-lists-files-with-common-prefix~1]
+    // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
+    // [impl->dsn~bucket-lists-directories-with-suffix~1]
     private List<String> parseContentListResponseBody(final HttpResponse<String> response, final String path) {
-        final var items = response.body().split("\\s+");
-        final var contents = new ArrayList<String>(items.length);
-        for (final var item : items) {
-            final var relativeItem = removeLeadingSlash(item);
-            if (relativeItem.startsWith(path)) {
-                contents.add(extractFirstPathComponent(relativeItem.substring(path.length(), relativeItem.length())));
-            }
-        }
-        return contents;
+        return Arrays.stream(response.body().split("\\s+")) //
+                .map(this::removeLeadingSlash) //
+                .filter(e -> e.startsWith(path)) // keep only entries with path as prefix
+                .map(e -> e.substring(path.length())) // cut of path prefix
+                .map(this::extractFirstPathComponent) //
+                .distinct() // ensure only unique entries
+                .sorted() //
+                .collect(Collectors.toList());
     }
 
     private String extractFirstPathComponent(final String path) {
         if (path.contains(BucketConstants.PATH_SEPARATOR)) {
-            return path.substring(0, path.indexOf(BucketConstants.PATH_SEPARATOR));
+            return path.substring(0, path.indexOf(BucketConstants.PATH_SEPARATOR) + 1);
         } else {
             return path;
         }
@@ -159,7 +162,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Extends path in bucket down to filename.
-     * 
+     *
      * @param localPath    localPath
      * @param pathInBucket pathInBucket
      * @return String
@@ -233,7 +236,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Evaluates the request status.
-     * 
+     *
      * @param uri        uri
      * @param operation  operation
      * @param statusCode statusCode
@@ -279,7 +282,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     /**
      * Returns a builder.
-     * 
+     *
      * @return builder
      */
     @SuppressWarnings("squid:S1452")
@@ -313,7 +316,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-* Get self.
+         * Get self.
+         *
          * @return self
          */
         @SuppressWarnings("unchecked")
