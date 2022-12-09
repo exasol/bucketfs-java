@@ -101,10 +101,10 @@ Needs: impl, utest
 ### Append Suffix to Directories
 `dsn~bucket-lists-directories-with-suffix~1`
 
-The list of contents of the bucket contains directories with a slash `/` as suffix.
+Directories in the list of bucket contents end with a slash `/` .
 
 Rationale:
-* This enables to distinct directories from files potentially having the same name.
+* This makes it easier for users to distinguish files from directories in a bucket listing. Especially if they have the same name.
 
 Covers:
 * `req~bucket-content-listing~1`
