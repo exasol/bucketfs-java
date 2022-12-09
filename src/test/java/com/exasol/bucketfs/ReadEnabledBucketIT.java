@@ -43,7 +43,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     // [itest->dsn~bucket-lists-its-contents~1]
     @Test
     void testListBucketContentsWithRootPath() throws BucketAccessException {
-        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS"));
+        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
     }
 
     // [itest->dsn~bucket-lists-its-contents~1]
@@ -85,6 +85,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .name(DEFAULT_BUCKET) //
                 .readPassword(getDefaultBucketConfiguration().getReadPassword()) //
                 .build();
-        assertThat(bucket.listContents(), hasItem("EXAClusterOS"));
+        assertThat(bucket.listContents(), hasItem("EXAClusterOS/"));
     }
 }

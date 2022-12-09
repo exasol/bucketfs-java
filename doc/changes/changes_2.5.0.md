@@ -1,10 +1,10 @@
-# BucketFS Java 2.5.0, released 2022-??-??
+# BucketFS Java 2.5.0, released 2022-12-09
 
-Code name: List only unique entries
+Code name: List Files and Folders Hierarchically
 
 ## Summary
 
-When BucketFS contains multiple files in a common folder the list returned by `ReadEnabledBucket.parseContentListResponseBody()` contained the common folder multiple times.
+When BucketFS contains multiple files in a common folder the list returned by `ReadEnabledBucket.parseContentListResponseBody()` contained the common folder multiple times. Additionally this release compensates for files and folders sharing the same name by appending a suffix to folders.
 
 ## Bugfixes
 
