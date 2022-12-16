@@ -3,7 +3,6 @@ package com.exasol.bucketfs;
 import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
 import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
 import static com.exasol.bucketfs.ListingProvider.removeLeadingSeparator;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -150,10 +149,10 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             final var response = this.client.send(request, BodyHandlers.ofFile(localPath));
             HttpRequestStatus.evaluate(uri, DOWNLOAD, response.statusCode());
         } catch (final IOException exception) {
-            throw createDownloadIoException(uri, DOWNLOAD, exception);
+            throw BucketAccessException.downloadIoException(uri, DOWNLOAD, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, DOWNLOAD);
+            throw BucketAccessException.downloadInterruptedException(uri, DOWNLOAD);
         }
     }
 
@@ -162,17 +161,6 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                 .GET() //
                 .header("Authorization", encodeBasicAuthForReading()) //
                 .build();
-    }
-
-    private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
-            final IOException exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-5")
-                .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
-    }
-
-    private BucketAccessException createDownloadInterruptedException(final URI uri, final BucketOperation operation) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-4")
-                .message("Interrupted trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
     }
 
     // [impl->dsn~downloading-a-file-from-a-bucket-as-string~1]
@@ -190,10 +178,10 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             final var request = createGetRequest(uri);
             return this.client.send(request, BodyHandlers.ofString());
         } catch (final IOException exception) {
-            throw createDownloadIoException(uri, DOWNLOAD, exception);
+            throw BucketAccessException.downloadIoException(uri, DOWNLOAD, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, DOWNLOAD);
+            throw BucketAccessException.downloadInterruptedException(uri, DOWNLOAD);
         }
     }
 

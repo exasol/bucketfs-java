@@ -64,10 +64,10 @@ public class ListingProvider {
             HttpRequestStatus.evaluate(uri, LIST, response.statusCode());
             return response.body();
         } catch (final IOException exception) {
-            throw createDownloadIoException(uri, LIST, exception);
+            throw BucketAccessException.downloadIoException(uri, LIST, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, LIST);
+            throw BucketAccessException.downloadInterruptedException(uri, LIST);
         }
     }
 
@@ -84,17 +84,6 @@ public class ListingProvider {
                 .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", path,
                         this.host + ":" + this.port + "/" + this.bucketName)
                 .toString());
-    }
-
-    private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
-            final IOException exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-5")
-                .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
-    }
-
-    private BucketAccessException createDownloadInterruptedException(final URI uri, final BucketOperation operation) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-4")
-                .message("Interrupted trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
     }
 
     public static Builder builder() {

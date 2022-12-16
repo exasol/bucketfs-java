@@ -1,5 +1,8 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.errorreporting.ExaError.messageBuilder;
+
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -8,6 +11,18 @@ import java.net.URI;
  * @serial exclude
  */
 public class BucketAccessException extends Exception {
+
+    static BucketAccessException downloadInterruptedException(final URI uri, final BucketOperation operation) {
+        return new BucketAccessException(messageBuilder("E-BFSJ-4")
+                .message("Interrupted trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
+    }
+
+    static BucketAccessException downloadIoException(final URI uri, final BucketOperation operation,
+            final IOException exception) {
+        return new BucketAccessException(messageBuilder("E-BFSJ-5")
+                .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
+    }
+
     private static final long serialVersionUID = -1002852289020779835L;
     private final URI uri;
     private final int statusCode;
