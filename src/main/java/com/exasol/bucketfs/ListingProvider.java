@@ -82,7 +82,7 @@ public class ListingProvider {
     private BucketAccessException createPathToBeListedNotFoundException(final String path) {
         return new BucketAccessException(messageBuilder("E-BFSJ-11")
                 .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", path,
-                        this)
+                        this.host + ":" + this.port + "/" + this.bucketName)
                 .toString());
     }
 

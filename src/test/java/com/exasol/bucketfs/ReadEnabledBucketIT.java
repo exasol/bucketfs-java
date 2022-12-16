@@ -56,10 +56,12 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     @Test
     void testListBucketContentsOfIllegalPathThrowsException() {
         final var nonExistentPath = "illegal%path";
+        final String expected = String.format("E-BFSJ-11: Unable to list contents" //
+                + " of '%s' in bucket '%s:%s/%s': No such file or directory.", //
+                nonExistentPath, getHost(), getMappedDefaultBucketFsPort(), "default");
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
                 () -> getDefaultBucket().listContents(nonExistentPath), //
-                "E-BFSJ-11: Unable to list contents of '" + nonExistentPath
-                        + "' in bucket bfsdefault/default: No such file or directory.");
+                expected);
     }
 
     @Test
