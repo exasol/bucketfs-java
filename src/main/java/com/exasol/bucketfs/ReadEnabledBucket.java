@@ -121,7 +121,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     private String extractFirstPathComponent(final String path) {
         final int i = path.indexOf(PATH_SEPARATOR);
-        return i < 0 ? path : path.substring(0, i);
+        return i < 0 ? path : path.substring(0, i + 1);
     }
 
     /**
