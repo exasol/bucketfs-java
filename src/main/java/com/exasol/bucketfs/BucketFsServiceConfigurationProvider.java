@@ -5,7 +5,7 @@ import com.exasol.config.BucketFsServiceConfiguration;
 /**
  * Interface for objects that can provide the configuration of a BucketFS service.
  */
-public interface BucketFsSerivceConfigurationProvider {
+public interface BucketFsServiceConfigurationProvider {
     /**
      * Get the BucketFS service configuration for a given service name.
      *

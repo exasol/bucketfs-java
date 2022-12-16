@@ -76,7 +76,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
 
     private URI createWriteUri(final String pathInBucket) throws BucketAccessException {
         try {
-            return new URI("http", null, this.ipAddress, this.port, "/" + this.bucketName + "/" + pathInBucket, null,
+            return new URI("http", null, this.host, this.port, "/" + this.bucketName + "/" + pathInBucket, null,
                     null).normalize();
         } catch (final URISyntaxException exception) {
             throw new BucketAccessException("Unable to create write URI.", exception);

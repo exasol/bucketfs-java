@@ -34,7 +34,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         final LogBasedBucketFsMonitor monitor = createBucketMonitor();
         return SyncAwareBucket.builder()//
-                .ipAddress(getHost()) //
+                .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //

@@ -25,7 +25,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         return ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
                 .useTls(false) //
-                .ipAddress(getHost()) //
+                .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
@@ -47,7 +47,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     }
 
     // [itest->dsn~bucket-lists-its-contents~2]
-    @ValueSource(strings = { "EXAClusterOS/", "/EXAClusterOS/" })
+    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/" })
     @ParameterizedTest
     void testListBucketContents(final String pathInBucket) throws BucketAccessException {
         assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
@@ -79,7 +79,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
                 .useTls(false) //
-                .ipAddress(getHost()) //
+                .host(getHost()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
