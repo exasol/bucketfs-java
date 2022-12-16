@@ -153,8 +153,7 @@ public class ListingProvider {
         }
 
         /**
-         * Set the port the BucketFS service listens on. Make sure to also call {@link #useTls(boolean)} with argument
-         * {@code false} if this is an HTTP port or {@code true} if this is an HTTPS port.
+         * Set the port the BucketFS service listens on.
          *
          * @param port HTTP or HTTPS port the BucketFS service listens on
          * @return Builder instance for fluent programming

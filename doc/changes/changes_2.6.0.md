@@ -9,3 +9,8 @@ Besides listing contents of a bucket BFSJ now additionally supports to also list
 ## Features
 
 * #51: Enabled BFSJ to list bucket on root level
+## Dependency Updates
+
+### Test Dependency Updates
+
+* Updated `org.mockito:mockito-junit-jupiter:4.9.0` to `4.10.0`
