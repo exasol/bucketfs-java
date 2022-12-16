@@ -1,9 +1,8 @@
 package com.exasol.bucketfs;
 
-import java.net.http.HttpClient;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.monitor.BucketFsMonitor;
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.config.BucketConfiguration;
@@ -23,7 +22,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
      * Create a new instance of a {@link ClusterConfigurationBucketFactory}.
      *
      * @param monitor                      BucketFS synchronization monitor
-     * @param host                    IP address of the the BucketFS service
+     * @param host                         IP address of the the BucketFS service
      * @param serviceConfigurationProvider provider for the configuration of BucketFS services
      * @param portMappings                 mapping of container internal to exposed port numbers
      */
@@ -45,23 +44,6 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
         final String cacheKey = getFullyQualifiedBucketName(serviceName, bucketName);
         updateBucketCache(serviceName, bucketName, cacheKey);
         return getBucketFromCache(cacheKey);
-    }
-
-    public List<String> listBuckets(final String serviceName) throws BucketAccessException {
-        final BucketFsServiceConfiguration serviceConfiguration = this.serviceConfigurationProvider
-                .getBucketFsServiceConfiguration(serviceName);
-        final HttpClient client = new HttpClientBuilder() //
-                // .certificate(...)
-                // .raiseTlsErrors(...)
-                .build();
-        return ListingProvider.builder() //
-                // .serviceName(serviceName) //
-                .httpClient(client) //
-                .protocol("http") // could as well be "https"
-                .host(this.host) //
-                .port(serviceConfiguration.getHttpPort()) //
-                .build() //
-                .listContents();
     }
 
     private String getFullyQualifiedBucketName(final String serviceName, final String bucketName) {

@@ -91,7 +91,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                     .build();
             final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
-            HttpRequestStatus.evaluate(uri, UPLOAD, statusCode);
+            HttpResponseEvaluator.evaluate(uri, UPLOAD, statusCode);
         } catch (final IOException exception) {
             throw createUploadIoException(uri, exception);
         } catch (final InterruptedException exception) {
@@ -182,7 +182,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
                     .build();
             final var response = getClient().send(request, BodyHandlers.ofString());
             final var statusCode = response.statusCode();
-            HttpRequestStatus.evaluate(uri, DELETE, statusCode);
+            HttpResponseEvaluator.evaluate(uri, DELETE, statusCode);
         } catch (final IOException exception) {
             throw getDeleteFailedException(filenameInBucket, exception);
         } catch (final InterruptedException exception) {

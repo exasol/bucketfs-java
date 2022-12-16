@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
+import com.exasol.bucketfs.list.BucketContentListing;
 import com.exasol.bucketfs.testutil.BucketCreator;
 
 @Tag("slow")
@@ -49,13 +50,8 @@ class ListingProviderIT extends AbstractBucketIT {
     }
 
     private List<String> listContents(final String bucketName, final String path) throws BucketAccessException {
-        return ListingProvider.builder() //
-                .httpClient(HTTP_CLIENT) //
-                .bucketName(bucketName) //
-                .host(getHost()) //
-                .port(getMappedDefaultBucketFsPort()) //
-                .build() //
-                .listContents(path);
+        return new BucketContentListing(HTTP_CLIENT, "http:", getHost(), getMappedDefaultBucketFsPort(), bucketName)
+                .retrieve(path);
     }
 
     private BucketCreator bucketCreator() {

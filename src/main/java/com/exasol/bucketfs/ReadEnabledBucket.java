@@ -2,7 +2,7 @@ package com.exasol.bucketfs;
 
 import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
 import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
-import static com.exasol.bucketfs.ListingProvider.removeLeadingSeparator;
+import static com.exasol.bucketfs.list.ListingProvider.removeLeadingSeparator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
+import com.exasol.bucketfs.list.BucketContentListing;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -97,14 +98,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
     public List<String> listContents(final String path) throws BucketAccessException {
         final String prefix = removeLeadingSeparator(path);
-        return ListingProvider.builder() //
-                .httpClient(this.client) //
-                .protocol(this.protocol) //
-                .host(this.host) //
-                .port(this.port) //
-                .bucketName(this.bucketName) //
-                .build() //
-                .listContents(prefix) //
+        return new BucketContentListing(this.client, this.protocol, this.host, this.port, this.bucketName) //
+                .retrieve(prefix) //
                 .stream() //
                 .map(e -> e.substring(prefix.length())) // cut of path prefix
                 .map(this::extractFirstPathComponent) //
@@ -147,7 +142,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         try {
             final var request = createGetRequest(uri);
             final var response = this.client.send(request, BodyHandlers.ofFile(localPath));
-            HttpRequestStatus.evaluate(uri, DOWNLOAD, response.statusCode());
+            HttpResponseEvaluator.evaluate(uri, DOWNLOAD, response.statusCode());
         } catch (final IOException exception) {
             throw BucketAccessException.downloadIoException(uri, DOWNLOAD, exception);
         } catch (final InterruptedException exception) {
@@ -169,7 +164,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         final var uri = createPublicReadURI(pathInBucket);
         LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "'");
         final var response = requestFileOnBucketAsString(uri);
-        HttpRequestStatus.evaluate(uri, DOWNLOAD, response.statusCode());
+        HttpResponseEvaluator.evaluate(uri, DOWNLOAD, response.statusCode());
         return response.body();
     }
 

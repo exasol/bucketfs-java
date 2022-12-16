@@ -5,15 +5,18 @@ import static java.net.HttpURLConnection.*;
 
 import java.net.URI;
 
-public class HttpRequestStatus {
+/**
+ * THis class provides a central place for evaluation of HTTP response and throws appropriate exceptions.
+ */
+public class HttpResponseEvaluator {
 
     /**
-     * Evaluates the request status.
+     * Evaluates the response
      *
-     * @param uri        uri
-     * @param operation  operation
-     * @param statusCode statusCode
-     * @throws BucketAccessException BucketAccessException
+     * @param uri        URI of the request
+     * @param operation  operation {@link BucketOperation} initially requested
+     * @param statusCode statusCode status code returned
+     * @throws BucketAccessException BucketAccessException in case statusCode indicates a failure
      */
     public static void evaluate(final URI uri, final BucketOperation operation, final int statusCode)
             throws BucketAccessException {
