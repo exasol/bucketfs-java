@@ -24,24 +24,22 @@ class ListingProviderIT extends AbstractBucketIT {
     @Test
     void testListBuckets() throws Exception {
         final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
-
         bucketCreator.waitUntilBucketExists();
         final List<String> actual = listBuckets();
         assertThat(actual, hasItems(bucketCreator.getBucketName(), "default"));
     }
 
     private List<String> listBuckets() throws BucketAccessException {
-        return new BucketService(uri(), CONTENT_LISTER).retrieve();
+        return new BucketService(uri(""), CONTENT_LISTER).retrieve();
     }
 
-    private URI uri() {
-        return URI.create("http" + "://" + getHost() + ":" + getMappedDefaultBucketFsPort() + "/");
+    private URI uri(final String suffix) {
+        return URI.create("http" + "://" + getHost() + ":" + getMappedDefaultBucketFsPort() + "/" + suffix);
     }
 
     @Test
     void testListBucketContentsWithoutReadPassword() throws Exception {
         final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
-
         final SyncAwareBucket bucket = bucketCreator.waitUntilBucketExists();
         bucket.uploadStringContent("file content", "folder/file.txt");
         final List<String> listing = listContents(bucket.getBucketName(), "folder");
@@ -49,7 +47,7 @@ class ListingProviderIT extends AbstractBucketIT {
     }
 
     private List<String> listContents(final String bucketName, final String path) throws BucketAccessException {
-        return new BucketContentLister(uri(), CONTENT_LISTER, "").retrieve(path, false);
+        return new BucketContentLister(uri(bucketName), CONTENT_LISTER, "").retrieve(path, false);
     }
 
     private BucketCreator bucketCreator() {
