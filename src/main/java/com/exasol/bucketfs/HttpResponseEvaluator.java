@@ -6,7 +6,7 @@ import static java.net.HttpURLConnection.*;
 import java.net.URI;
 
 /**
- * THis class provides a central place for evaluation of HTTP response and throws appropriate exceptions.
+ * This class provides a central place for evaluation of HTTP response and throws appropriate exceptions.
  */
 public class HttpResponseEvaluator {
 

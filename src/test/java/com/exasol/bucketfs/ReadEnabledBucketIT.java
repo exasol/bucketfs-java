@@ -61,7 +61,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void listBucketContentsOfIllegalPath_ThrowsException() {
+    void testListingBucketContentsOfIllegalPathThrowsException() {
         final var nonExistentPath = "illegal%path";
         final String expected = String.format("E-BFSJ-11: Unable to list contents" //
                 + " of '%s' in bucket 'http://%s:%s/%s/': No such file or directory.", //

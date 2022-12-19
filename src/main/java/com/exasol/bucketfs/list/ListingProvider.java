@@ -17,7 +17,7 @@ import com.exasol.bucketfs.*;
 /**
  * This class enables to request list of buckets or of objects inside a bucket.
  */
-public abstract class ListingProvider {
+public abstract class AbstractListingProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ListingProvider.class.getName());
     private final HttpClient httpClient;

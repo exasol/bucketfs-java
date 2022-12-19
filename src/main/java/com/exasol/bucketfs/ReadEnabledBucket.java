@@ -34,7 +34,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String bucketName;
     private final String protocol;
     /**
-     * ip address
+     *Host or IP address
      */
     protected final String host;
     /**
@@ -52,7 +52,9 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private final HttpClient client;
 
     /**
-     * @param builder builder
+     * Create a new instance of a bucket that support reading.
+     *
+     * @param builder builder from which the bucket should be constructed
      */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
         this.serviceName = builder.serviceName;

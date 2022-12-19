@@ -37,6 +37,7 @@ public class BucketContentListing extends ListingProvider {
     }
 
     /**
+     * Retrieve the listing.
      * @param path      path to list the contents of
      * @param recursive {@code true} if result should include entries in subdirectories of the specified path, too
      * @return list of files and subdirectories
