@@ -9,6 +9,7 @@ Besides listing contents of a bucket BFSJ now additionally supports to also list
 ## Features
 
 * #51: Enabled BFSJ to list buckets on root level
+
 ## Dependency Updates
 
 ### Test Dependency Updates

@@ -97,8 +97,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         assertThat(bucket.listContents(), hasItem("EXAClusterOS/"));
     }
 
-    // ------------------------------------------------------
-
     private ReadOnlyBucket getDefaultBucket() {
         return getDefaultBucket(getDefaultBucketConfiguration().getReadPassword());
     }
