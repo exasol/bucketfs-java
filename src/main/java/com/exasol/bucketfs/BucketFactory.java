@@ -11,5 +11,5 @@ public interface BucketFactory {
      * @param bucketName  name of the bucket
      * @return bucket
      */
-    Bucket getBucket(final String serviceName, final String bucketName);
+    public Bucket getBucket(final String serviceName, final String bucketName);
 }

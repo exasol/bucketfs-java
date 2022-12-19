@@ -1,4 +1,4 @@
-# BucketFS Java 2.6.0, released 2022-12-19
+# BucketFS Java 2.6.0, released 2022-12-20
 
 Code name: List buckets
 

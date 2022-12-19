@@ -29,74 +29,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 () -> assertThat(defaultBucket.getBucketName(), equalTo(DEFAULT_BUCKET)));
     }
 
-    // [itest->dsn~bucket-lists-its-contents~2]
-    @Test
-    void listBucketContentsWithRootPath() throws BucketAccessException {
-        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
-    }
-
-    // [itest->dsn~bucket-lists-its-contents~2]
-    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/" })
-    @ParameterizedTest
-    void listContents(final String pathInBucket) throws BucketAccessException {
-        assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
-    }
-
-    @Test
-    void listContentsWithWrongReadPassword_Fails() throws Exception {
-        final String bucketName = createBucket("dir/file.txt", "protected content");
-        final ReadOnlyBucket bucket = getBucket(bucketName, "wrong read password");
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, () -> bucket.listContents("dir/"), //
-                startsWith("E-BFSJ-3: Access denied trying to list "));
-    }
-
-    @Test
-    void downloadWithWrongReadPassword_Fails() throws Exception {
-        final String pathInBucket = "dir/file.txt";
-        final String bucketName = createBucket(pathInBucket, "protected content");
-        final ReadOnlyBucket bucket = getBucket(bucketName, "wrong read password");
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
-                () -> bucket.downloadFileAsString(pathInBucket), //
-                startsWith("E-BFSJ-3: Access denied trying to download "));
-    }
-
-    @Test
-    void testListingBucketContentsOfIllegalPathThrowsException() {
-        final var nonExistentPath = "illegal%path";
-        final String expected = String.format("E-BFSJ-11: Unable to list contents" //
-                + " of '%s' in bucket 'http://%s:%s/%s/': No such file or directory.", //
-                nonExistentPath, getHost(), getMappedDefaultBucketFsPort(), "default");
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
-                () -> getDefaultBucket().listContents(nonExistentPath), //
-                expected);
-    }
-
-    @Test
-    void downloadFromIllegalPath_ThrowsException(@TempDir final Path tempDir) {
-        final var pathToFile = tempDir.resolve("irrelevant");
-        final var pathInBucket = "this/path/does/not/exist";
-        final var bucket = getDefaultBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
-                () -> bucket.downloadFile(pathInBucket, pathToFile), //
-                matchesPattern(
-                        "E-BFSJ-2: File or directory not found trying to download 'http://.*/" + pathInBucket + "'."));
-    }
-
-    @Test
-    void deprecatedHttpPortBuilderMethod_Works() throws BucketAccessException {
-        @SuppressWarnings("deprecation")
-        final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
-                .raiseTlsErrors(true) //
-                .useTls(false) //
-                .host(getHost()) //
-                .httpPort(getMappedDefaultBucketFsPort()) //
-                .serviceName(DEFAULT_BUCKETFS) //
-                .name(DEFAULT_BUCKET) //
-                .readPassword(getDefaultBucketConfiguration().getReadPassword()) //
-                .build();
-        assertThat(bucket.listContents(), hasItem("EXAClusterOS/"));
-    }
-
     private ReadOnlyBucket getDefaultBucket() {
         return getDefaultBucket(getDefaultBucketConfiguration().getReadPassword());
     }
@@ -117,6 +49,27 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .build();
     }
 
+    // [itest->dsn~bucket-lists-its-contents~2]
+    @Test
+    void testListBucketContentsWithRootPath() throws BucketAccessException {
+        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
+    }
+
+    // [itest->dsn~bucket-lists-its-contents~2]
+    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/" })
+    @ParameterizedTest
+    void testListContents(final String pathInBucket) throws BucketAccessException {
+        assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
+    }
+
+    @Test
+    void testListContentsWithWrongReadPasswordFails() throws Exception {
+        final String bucketName = createBucket("dir/file.txt", "protected content");
+        final ReadOnlyBucket bucket = getBucket(bucketName, "wrong read password");
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, () -> bucket.listContents("dir/"), //
+                startsWith("E-BFSJ-3: Access denied trying to list "));
+    }
+
     private String createBucket(final String pathInBucket, final String content)
             throws InterruptedException, BucketAccessException, TimeoutException {
         final BucketCreator bucketCreator = new BucketCreator(ReadEnabledBucketIT.class, EXASOL) //
@@ -126,5 +79,52 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final SyncAwareBucket bucket = bucketCreator.waitUntilBucketExists();
         bucket.uploadStringContent("protected content", "dir/file.txt");
         return bucketCreator.getBucketName();
+    }
+
+    @Test
+    void testDownloadWithWrongReadPasswordFails() throws Exception {
+        final String pathInBucket = "dir/file.txt";
+        final String bucketName = createBucket(pathInBucket, "protected content");
+        final ReadOnlyBucket bucket = getBucket(bucketName, "wrong read password");
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
+                () -> bucket.downloadFileAsString(pathInBucket), //
+                startsWith("E-BFSJ-3: Access denied trying to download "));
+    }
+
+    @Test
+    void testListingBucketContentsOfIllegalPathThrowsException() {
+        final var nonExistentPath = "illegal%path";
+        final String expected = String.format("E-BFSJ-11: Unable to list contents" //
+                + " of '%s' in bucket 'http://%s:%s/%s/': No such file or directory.", //
+                nonExistentPath, getHost(), getMappedDefaultBucketFsPort(), "default");
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
+                () -> getDefaultBucket().listContents(nonExistentPath), //
+                expected);
+    }
+
+    @Test
+    void testDownloadFromIllegalPathThrowsException(@TempDir final Path tempDir) {
+        final var pathToFile = tempDir.resolve("irrelevant");
+        final var pathInBucket = "this/path/does/not/exist";
+        final var bucket = getDefaultBucket();
+        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
+                () -> bucket.downloadFile(pathInBucket, pathToFile), //
+                matchesPattern(
+                        "E-BFSJ-2: File or directory not found trying to download 'http://.*/" + pathInBucket + "'."));
+    }
+
+    @Test
+    void testDeprecatedHttpPortBuilderMethodWorks() throws BucketAccessException {
+        @SuppressWarnings("deprecation")
+        final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
+                .raiseTlsErrors(true) //
+                .useTls(false) //
+                .host(getHost()) //
+                .httpPort(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(DEFAULT_BUCKET) //
+                .readPassword(getDefaultBucketConfiguration().getReadPassword()) //
+                .build();
+        assertThat(bucket.listContents(), hasItem("EXAClusterOS/"));
     }
 }

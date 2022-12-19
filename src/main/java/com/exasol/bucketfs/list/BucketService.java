@@ -3,7 +3,6 @@ package com.exasol.bucketfs.list;
 import static com.exasol.errorreporting.ExaError.messageBuilder;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,18 +11,20 @@ import com.exasol.bucketfs.BucketAccessException;
 /**
  * This class enables to retrieve a list of buckets.
  */
-public class BucketListing extends ListingProvider {
+public class BucketService {
+
+    private final ListingRetriever listingRetriever;
+    private final URI bucketServiceUri;
 
     /**
-     * Create a new instance
+     * Create a new instance of {@link BucketService}.
      *
-     * @param httpClient HTTP client to use
-     * @param protocol   protocol to use: either "http:" or "https:"
-     * @param host       host name or IP address
-     * @param port       port of BucketFS service
+     * @param bucketServiceUri URI to access the bucket service
+     * @param listingRetriever used to retrieve the raw listing
      */
-    public BucketListing(final HttpClient httpClient, final String protocol, final String host, final int port) {
-        super(httpClient, protocol, host, port);
+    public BucketService(final URI bucketServiceUri, final ListingRetriever listingRetriever) {
+        this.bucketServiceUri = bucketServiceUri;
+        this.listingRetriever = listingRetriever;
     }
 
     /**
@@ -31,7 +32,9 @@ public class BucketListing extends ListingProvider {
      * @throws BucketAccessException in case of failure
      */
     public List<String> retrieve() throws BucketAccessException {
-        final List<String> list = listingStream(createPublicReadURI(), "").collect(Collectors.toList());
+        final List<String> list = this.listingRetriever //
+                .retrieve(this.bucketServiceUri, "") //
+                .collect(Collectors.toList());
         if (list.isEmpty()) {
             throw pathToBeListedNotFoundException();
         } else {
@@ -39,13 +42,9 @@ public class BucketListing extends ListingProvider {
         }
     }
 
-    private URI createPublicReadURI() {
-        return super.createPublicReadURI("");
-    }
-
     private BucketAccessException pathToBeListedNotFoundException() {
         return new BucketAccessException(messageBuilder("E-BFSJ-30") //
-                .message("Unable to list buckets of {{bucket}}: No such file or directory.", createPublicReadURI()) //
+                .message("Unable to list buckets of {{bucket}}: No such file or directory.", this.bucketServiceUri) //
                 .toString());
     }
 }

@@ -1,7 +1,7 @@
 package com.exasol.bucketfs;
 
 import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
-import static com.exasol.bucketfs.list.ListingProvider.removeLeadingSeparator;
+import static com.exasol.bucketfs.list.ListingRetriever.removeLeadingSeparator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +15,8 @@ import java.util.logging.Logger;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
-import com.exasol.bucketfs.list.BucketContentListing;
+import com.exasol.bucketfs.list.BucketContentLister;
+import com.exasol.bucketfs.list.ListingRetriever;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -34,7 +35,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String bucketName;
     private final String protocol;
     /**
-     *Host or IP address
+     * Host or IP address
      */
     protected final String host;
     /**
@@ -97,14 +98,15 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
     public List<String> listContents(final String path) throws BucketAccessException {
-        final String prefix = removeLeadingSeparator(path);
-        return new BucketContentListing(this.client, this.protocol, this.host, this.port, this.bucketName,
-                this.readPassword).retrieve(prefix, false);
+        final URI uri = createPublicReadURI("");
+        final ListingRetriever contentLister = new ListingRetriever(this.client);
+        return new BucketContentLister(uri, contentLister, this.readPassword) //
+                .retrieve(removeLeadingSeparator(path), false);
     }
 
     private URI createPublicReadURI(final String pathInBucket) {
-        return URI.create(this.protocol + "://" + this.host + ":" + this.port + "/" + this.bucketName + "/"
-                + removeLeadingSeparator(pathInBucket));
+        final String suffix = this.bucketName + "/" + removeLeadingSeparator(pathInBucket);
+        return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, this.bucketName + "/" + suffix);
     }
 
     /**

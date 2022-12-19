@@ -15,29 +15,12 @@ import java.util.stream.Stream;
 import com.exasol.bucketfs.*;
 
 /**
- * This class enables to request list of buckets or of objects inside a bucket.
+ * This class retrieves the list of buckets or of objects inside a bucket.
  */
-public abstract class AbstractListingProvider {
+public class ListingRetriever {
 
-    private static final Logger LOGGER = Logger.getLogger(ListingProvider.class.getName());
-    private final HttpClient httpClient;
-    private final String protocol;
-    private final String host;
-    private final int port;
-
-    /**
-     * Create a new instance
-     *
-     * @param httpClient HTTP client to use
-     * @param protocol   protocol to use: either "http" or "https"
-     * @param host       host name or IP address
-     * @param port       port of BucketFS service
-     */
-    protected ListingProvider(final HttpClient httpClient, final String protocol, final String host, final int port) {
-        this.httpClient = httpClient;
-        this.protocol = protocol;
-        this.host = host;
-        this.port = port;
+    public static URI publicReadUri(final String protocol, final String host, final int port, final String suffix) {
+        return URI.create(protocol + "://" + host + ":" + port + "/" + suffix);
     }
 
     /**
@@ -48,6 +31,18 @@ public abstract class AbstractListingProvider {
         return path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
     }
 
+    private static final Logger LOGGER = Logger.getLogger(ListingRetriever.class.getName());
+    private final HttpClient httpClient;
+
+    /**
+     * Create a new instance of {@link ListingRetriever}.
+     *
+     * @param httpClient HTTP client to access the BucketFS service
+     */
+    public ListingRetriever(final HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
     /**
      * Retrieve the content for the given URI as stream.
      *
@@ -56,7 +51,7 @@ public abstract class AbstractListingProvider {
      * @return stream of strings
      * @throws BucketAccessException in case of failure
      */
-    protected Stream<String> listingStream(final URI uri, final String readPassword) throws BucketAccessException {
+    public Stream<String> retrieve(final URI uri, final String readPassword) throws BucketAccessException {
         return Arrays.stream(requestListing(uri, readPassword).split("\\s+")).sorted();
     }
 
@@ -79,13 +74,5 @@ public abstract class AbstractListingProvider {
 
     private String encodeBasicAuth(final String readPassword) {
         return "Basic " + Base64.getEncoder().encodeToString(("r:" + readPassword).getBytes());
-    }
-
-    /**
-     * @param suffix suffix to add to the URI
-     * @return URI based on the fields of the current instance: protocol, host, port
-     */
-    protected URI createPublicReadURI(final String suffix) {
-        return URI.create(this.protocol + "://" + this.host + ":" + this.port + "/" + suffix);
     }
 }

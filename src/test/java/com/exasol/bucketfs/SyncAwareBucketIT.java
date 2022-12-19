@@ -27,7 +27,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
 
     // [itest->dsn~uploading-to-bucket~1]
     @Test
-    void uploadFile(@TempDir final Path tempDir) throws Exception {
+    void testUploadFile(@TempDir final Path tempDir) throws Exception {
         final var fileName = "test-uploaded.txt";
         final var testFile = createTestFile(tempDir, fileName, 10000);
         final var bucket = getDefaultBucketForWriting();
@@ -35,10 +35,17 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         assertThat(bucket.listContents(), hasItem(fileName));
     }
 
+    private Path createTestFile(final Path tempDir, final String fileName, final int sizeInKiB) throws IOException {
+        final var generator = new RandomFileGenerator();
+        final var path = tempDir.resolve(Path.of(fileName));
+        generator.createRandomFile(path, sizeInKiB);
+        return path;
+    }
+
     // [itest->dsn~uploading-to-bucket~1]
     @ParameterizedTest
     @ValueSource(strings = { "dir1/", "dir2/sub2/", "dir3/sub3/subsub3/", "/dir4/", "/dir5/sub5/" })
-    void uploadToDirectoryInBucket(final String pathInBucket, @TempDir final Path tempDir) throws Exception {
+    void testUploadToDirectoryInBucket(final String pathInBucket, @TempDir final Path tempDir) throws Exception {
         final var fileName = "file.txt";
         final var file = createTestFile(tempDir, fileName, 1);
         final var bucket = getDefaultBucketForWriting();
@@ -48,17 +55,29 @@ class SyncAwareBucketIT extends AbstractBucketIT {
 
     // [itest->dsn~uploading-strings-to-bucket~1]
     @Test
-    void uploadStringContent() throws Exception {
+    void testUploadStringContent() throws Exception {
         verifyUploadStringContent(getUniqueFileName(), getDefaultBucketConfiguration().getReadPassword());
     }
 
+    private String getUniqueFileName() {
+        return "myFile-" + System.currentTimeMillis() + ".txt";
+    }
+
+    private void verifyUploadStringContent(final String pathInBucket, final String readPassword)
+            throws IOException, BucketAccessException, InterruptedException, TimeoutException {
+        final var content = "Hello BucketFS!";
+        final var bucket = getDefaultBucketForWriting(readPassword, getDefaultBucketConfiguration().getWritePassword());
+        bucket.uploadStringContent(content, pathInBucket);
+        assertThat(bucket.listContents(), hasItem(pathInBucket.toString()));
+    }
+
     @Test
-    void uploadStringContentWrongReadPassword_Succeeds() throws Exception {
+    void testUploadStringContentWrongReadPasswordSucceeds() throws Exception {
         verifyUploadStringContent(getUniqueFileName(), "wrong read password");
     }
 
     @Test
-    void uploadStringContentWrongWritePassword_Fails() throws Exception {
+    void testUploadStringContentWrongWritePasswordFails() throws Exception {
         final String readPassword = getDefaultBucketConfiguration().getReadPassword();
         final var bucket = getDefaultBucketForWriting(readPassword, "wrong write password");
         assertThrows(BucketAccessException.class, () -> bucket.uploadStringContent("any content", "any-filename.txt"));
@@ -66,7 +85,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
 
     // [itest->dsn~uploading-input-stream-to-bucket~1]
     @Test
-    void uploadInputStreamContent() throws Exception {
+    void testUploadInputStreamContent() throws Exception {
         final var content = "Hello BucketFS!";
         final var pathInBucket = "string-uploaded.txt";
         final var bucket = getDefaultBucketForWriting();
@@ -88,7 +107,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testUploadContentToIllegalUrl_ThrowsException() {
+    void testUploadContentToIllegalUrlThrowsException() {
         assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
                 .uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
     }
@@ -117,7 +136,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testDownloadFileToIllegalLocalPath_ThrowsException(@TempDir final Path tempDir) throws Exception {
+    void testDownloadFileToIllegalLocalPathThrowsException(@TempDir final Path tempDir) throws Exception {
         final var pathToFile = tempDir.resolve("/this/path/does/not/exist");
         final var pathInBucket = "foo.txt";
         final var bucket = getDefaultBucketForWriting();
@@ -130,7 +149,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     // [itest->dsn~waiting-until-file-appears-in-target-directory~1]
     // [itest->dsn~bucketfs-object-overwrite-throttle~1]
     @Test
-    void replaceFile(@TempDir final Path tempDir) throws Exception {
+    void testReplaceFile(@TempDir final Path tempDir) throws Exception {
         final var scaleContentSizeBy = 10000000;
         final var fileName = "replace_me.txt";
         final var absolutePathInContainer = "/exa/data/bucketfs/bfsdefault/.dest/default/" + fileName;
@@ -156,7 +175,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
 
     // [itest->dsn~delete-a-file-from-a-bucket~1]
     @Test
-    void deleteFile() throws Exception {
+    void testDeleteFile() throws Exception {
         final var bucket = getDefaultBucketForWriting();
         final String testFile = getUniqueFileName();
         bucket.uploadStringContent("test", testFile);
@@ -165,61 +184,9 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void interruptedDuringDeleteFile() throws Exception {
+    void testInterruptedDuringDeleteFile() throws Exception {
         assertDeleteThrowsExceptionWhenClientThrows(new InterruptedException());
         assertTrue(Thread.currentThread().isInterrupted());
-    }
-
-    @Test
-    void ioExceptionDuringDeleteFile() throws Exception {
-        assertDeleteThrowsExceptionWhenClientThrows(new IOException());
-    }
-
-    @Test
-    void interruptedDuringUploadFile() throws Exception {
-        final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new InterruptedException());
-        assertAll(//
-                () -> assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-6: Interrupted trying to upload")),
-                () -> assertTrue(Thread.currentThread().isInterrupted())//
-        );
-    }
-
-    @Test
-    void ioExceptionDuringUploadFile() throws Exception {
-        final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new IOException());
-        assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-7: I/O error trying to upload"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void uploadNecessityCheckStrategy(final boolean uploadNecessary, @TempDir final Path tempDir) throws Exception {
-        final SyncAwareBucket bucket = getDefaultBucketForWriting();
-        final String fileName = getUniqueFileName();
-        final Path testFile = tempDir.resolve(fileName);
-        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = createUploadNeverStrategyMock(bucket,
-                fileName, testFile, uploadNecessary);
-        Files.writeString(testFile, "some content");
-        bucket.setUploadNecessityCheckStrategy(uploadNecessityCheckStrategy);
-        bucket.uploadFile(testFile, fileName);
-        assertThat(bucket.listContents().contains(fileName), equalTo(uploadNecessary));
-        verify(uploadNecessityCheckStrategy).isUploadNecessary(testFile, fileName, bucket);
-    }
-
-    // ----------------------------------------
-
-    private Path createTestFile(final Path tempDir, final String fileName, final int sizeInKiB) throws IOException {
-        final var generator = new RandomFileGenerator();
-        final var path = tempDir.resolve(Path.of(fileName));
-        generator.createRandomFile(path, sizeInKiB);
-        return path;
-    }
-
-    private void verifyUploadStringContent(final String pathInBucket, final String readPassword)
-            throws IOException, BucketAccessException, InterruptedException, TimeoutException {
-        final var content = "Hello BucketFS!";
-        final var bucket = getDefaultBucketForWriting(readPassword, getDefaultBucketConfiguration().getWritePassword());
-        bucket.uploadStringContent(content, pathInBucket);
-        assertThat(bucket.listContents(), hasItem(pathInBucket.toString()));
     }
 
     private void assertDeleteThrowsExceptionWhenClientThrows(final Exception exceptionThrownByHttpClient)
@@ -242,6 +209,20 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         return bucketSpy;
     }
 
+    @Test
+    void testIoExceptionDuringDeleteFile() throws Exception {
+        assertDeleteThrowsExceptionWhenClientThrows(new IOException());
+    }
+
+    @Test
+    void testInterruptedDuringUploadFile() throws Exception {
+        final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new InterruptedException());
+        assertAll(//
+                () -> assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-6: Interrupted trying to upload")),
+                () -> assertTrue(Thread.currentThread().isInterrupted())//
+        );
+    }
+
     private BucketAccessException assertUploadThrowsExceptionWhenClientThrows(
             final Exception exceptionThrownByHttpClient)
             throws InterruptedException, BucketAccessException, TimeoutException, IOException {
@@ -252,14 +233,31 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         return assertThrows(BucketAccessException.class, () -> bucketSpy.uploadStringContent("test", testFile));
     }
 
+    @Test
+    void testIoExceptionDuringUploadFile() throws Exception {
+        final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new IOException());
+        assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-7: I/O error trying to upload"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void testUploadNecessityCheckStrategy(final boolean uploadNecessary, @TempDir final Path tempDir) throws Exception {
+        final SyncAwareBucket bucket = getDefaultBucketForWriting();
+        final String fileName = getUniqueFileName();
+        final Path testFile = tempDir.resolve(fileName);
+        final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = createUploadNeverStrategyMock(bucket,
+                fileName, testFile, uploadNecessary);
+        Files.writeString(testFile, "some content");
+        bucket.setUploadNecessityCheckStrategy(uploadNecessityCheckStrategy);
+        bucket.uploadFile(testFile, fileName);
+        assertThat(bucket.listContents().contains(fileName), equalTo(uploadNecessary));
+        verify(uploadNecessityCheckStrategy).isUploadNecessary(testFile, fileName, bucket);
+    }
+
     private UploadNecessityCheckStrategy createUploadNeverStrategyMock(final SyncAwareBucket bucket,
             final String fileName, final Path testFile, final boolean uploadNecessary) throws BucketAccessException {
         final UploadNecessityCheckStrategy uploadNecessityCheckStrategy = mock(UploadNecessityCheckStrategy.class);
         when(uploadNecessityCheckStrategy.isUploadNecessary(testFile, fileName, bucket)).thenReturn(uploadNecessary);
         return uploadNecessityCheckStrategy;
-    }
-
-    private String getUniqueFileName() {
-        return "myFile-" + System.currentTimeMillis() + ".txt";
     }
 }
