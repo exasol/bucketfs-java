@@ -25,6 +25,14 @@ public abstract class ListingProvider {
     private final String host;
     private final int port;
 
+    /**
+     * Create a new instance
+     *
+     * @param httpClient HTTP client to use
+     * @param protocol   protocol to use: either "http" or "https"
+     * @param host       host name or IP address
+     * @param port       port of BucketFS service
+     */
     protected ListingProvider(final HttpClient httpClient, final String protocol, final String host, final int port) {
         this.httpClient = httpClient;
         this.protocol = protocol;
@@ -65,6 +73,10 @@ public abstract class ListingProvider {
         return "Basic " + Base64.getEncoder().encodeToString(("r:" + readPassword).getBytes());
     }
 
+    /**
+     * @param suffix suffix to add to the URI
+     * @return URI based on the fields of the current instance: protocol, host, port
+     */
     protected URI createPublicReadURI(final String suffix) {
         return URI.create(this.protocol + "://" + this.host + ":" + this.port + "/" + suffix);
     }

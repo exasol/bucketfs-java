@@ -26,6 +26,10 @@ public class BucketListing extends ListingProvider {
         super(httpClient, protocol, host, port);
     }
 
+    /**
+     * @return list of children of the current bucket
+     * @throws BucketAccessException in case of failure
+     */
     public List<String> retrieve() throws BucketAccessException {
         final List<String> list = listingStream(createPublicReadURI(), "").collect(Collectors.toList());
         if (list.isEmpty()) {

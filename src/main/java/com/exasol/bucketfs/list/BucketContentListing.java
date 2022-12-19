@@ -23,7 +23,7 @@ public class BucketContentListing extends ListingProvider {
      * Create a new instance
      *
      * @param httpClient   HTTP client to use
-     * @param protocol     protocol to use: either "http:" or "https:"
+     * @param protocol     protocol to use: either "http" or "https"
      * @param host         host name or IP address
      * @param port         port of BucketFS service
      * @param bucketName   name of the bucket to list the contents for
