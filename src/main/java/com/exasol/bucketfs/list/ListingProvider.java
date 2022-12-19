@@ -48,6 +48,14 @@ public abstract class ListingProvider {
         return path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
     }
 
+    /**
+     * Retrieve the content for the given URI as stream.
+     *
+     * @param uri          URI to retrieve listing for
+     * @param readPassword read password, only relevant for non-public buckets
+     * @return stream of strings
+     * @throws BucketAccessException in case of failure
+     */
     protected Stream<String> listingStream(final URI uri, final String readPassword) throws BucketAccessException {
         return Arrays.stream(requestListing(uri, readPassword).split("\\s+")).sorted();
     }
