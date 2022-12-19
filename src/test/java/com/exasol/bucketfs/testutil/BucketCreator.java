@@ -30,8 +30,17 @@ public class BucketCreator {
         this.container = container;
     }
 
-    public final CreateBucketCommandBuilder command() {
-        return command(createCommandFactory());
+    public BucketCreator createBucket() {
+        return createBucket(true, createCommandFactory());
+    }
+
+    public BucketCreator createBucket(final boolean isPublic, final CommandFactory factory) {
+        commandWithDefaultValues(factory) //
+                .isPublic(isPublic) //
+                .readPassword(READ_PASSWORD) //
+                .writePassword(WRITE_PASSWORD) //
+                .execute();
+        return this;
     }
 
     public BucketCreator assumeJsonRpcAvailable() {
@@ -39,13 +48,6 @@ public class BucketCreator {
         assumeTrue(version.getMajor() >= 7,
                 "JSON RPC only available with Exasol version 7 or later, " + version + " is not supported.");
         return this;
-    }
-
-    public final CreateBucketCommandBuilder command(final CommandFactory factory) {
-        return commandWithDefaultValues(factory) //
-                .isPublic(true) //
-                .readPassword(READ_PASSWORD) //
-                .writePassword(WRITE_PASSWORD);
     }
 
     public final CreateBucketCommandBuilder commandWithDefaultValues() {
@@ -88,7 +90,7 @@ public class BucketCreator {
 
     @SuppressWarnings("java:S2925") // Sleep required for waiting until bucket is available
     private void delayNextCheck() throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(300);
     }
 
     private boolean bucketExists(final SyncAwareBucket bucket) {

@@ -1,6 +1,5 @@
 package com.exasol.bucketfs;
 
-import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
 import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
 import static com.exasol.bucketfs.list.ListingProvider.removeLeadingSeparator;
 
@@ -13,7 +12,6 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
@@ -98,23 +96,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
     public List<String> listContents(final String path) throws BucketAccessException {
         final String prefix = removeLeadingSeparator(path);
-        return new BucketContentListing(this.client, this.protocol, this.host, this.port, this.bucketName) //
-                .retrieve(prefix) //
-                .stream() //
-                .map(e -> e.substring(prefix.length())) // cut of path prefix
-                .map(this::extractFirstPathComponent) //
-                .distinct() // ensure only unique entries
-                .collect(Collectors.toList());
+        return new BucketContentListing(this.client, this.protocol, this.host, this.port, this.bucketName,
+                this.readPassword).retrieve(prefix, false);
     }
 
     private URI createPublicReadURI(final String pathInBucket) {
         return URI.create(this.protocol + "://" + this.host + ":" + this.port + "/" + this.bucketName + "/"
                 + removeLeadingSeparator(pathInBucket));
-    }
-
-    private String extractFirstPathComponent(final String path) {
-        final int i = path.indexOf(PATH_SEPARATOR);
-        return i < 0 ? path : path.substring(0, i + 1);
     }
 
     /**

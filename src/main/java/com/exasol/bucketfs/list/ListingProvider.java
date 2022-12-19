@@ -5,14 +5,12 @@ import static com.exasol.bucketfs.BucketOperation.LIST;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
+import java.net.http.*;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.Base64;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.exasol.bucketfs.*;
 
@@ -42,18 +40,17 @@ public abstract class ListingProvider {
         return path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
     }
 
-    protected List<String> requestListing(final URI uri, final Predicate<String> filter) throws BucketAccessException {
-        return Arrays.stream(requestListing(uri).split("\\s+")) //
-                .sorted() //
-                .filter(filter) //
-                .collect(Collectors.toList());
+    protected Stream<String> listingStream(final URI uri, final String readPassword) throws BucketAccessException {
+        return Arrays.stream(requestListing(uri, readPassword).split("\\s+")).sorted();
     }
 
-    private String requestListing(final URI uri) throws BucketAccessException {
+    private String requestListing(final URI uri, final String readPassword) throws BucketAccessException {
         LOGGER.fine(() -> "Listing contents of URI '" + uri + "'");
         try {
-            final var request = HttpRequest.newBuilder(uri).build();
-            final var response = this.httpClient.send(request, BodyHandlers.ofString());
+            final HttpRequest request = HttpRequest.newBuilder(uri) //
+                    .header("Authorization", encodeBasicAuth(readPassword)) //
+                    .build();
+            final HttpResponse<String> response = this.httpClient.send(request, BodyHandlers.ofString());
             HttpResponseEvaluator.evaluate(uri, LIST, response.statusCode());
             return response.body();
         } catch (final IOException exception) {
@@ -62,6 +59,10 @@ public abstract class ListingProvider {
             Thread.currentThread().interrupt();
             throw BucketAccessException.downloadInterruptedException(uri, LIST);
         }
+    }
+
+    private String encodeBasicAuth(final String readPassword) {
+        return "Basic " + Base64.getEncoder().encodeToString(("r:" + readPassword).getBytes());
     }
 
     protected URI createPublicReadURI(final String suffix) {

@@ -22,7 +22,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
      * Create a new instance of a {@link ClusterConfigurationBucketFactory}.
      *
      * @param monitor                      BucketFS synchronization monitor
-     * @param host                         IP address of the the BucketFS service
+     * @param host                         host name or IP address of the the BucketFS service
      * @param serviceConfigurationProvider provider for the configuration of BucketFS services
      * @param portMappings                 mapping of container internal to exposed port numbers
      */

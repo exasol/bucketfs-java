@@ -12,46 +12,40 @@ import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.list.BucketContentListing;
+import com.exasol.bucketfs.list.BucketListing;
 import com.exasol.bucketfs.testutil.BucketCreator;
 
 @Tag("slow")
 class ListingProviderIT extends AbstractBucketIT {
-    private static HttpClient HTTP_CLIENT = new HttpClientBuilder() //
-            // .certificate(null)
-            // .raiseTlsErrors(false)
-            .build();
+
+    private static HttpClient HTTP_CLIENT = new HttpClientBuilder().build();
 
     @Test
     void testListBuckets() throws Exception {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable();
-        bucketCreator.command().execute();
+        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
 
         bucketCreator.waitUntilBucketExists();
-
         final List<String> actual = listBuckets();
         assertThat(actual, hasItems(bucketCreator.getBucketName(), "default"));
     }
 
     @Test
     void listBucketContentsWithoutReadPassword() throws Exception {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable();
-        bucketCreator.command().execute();
+        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
 
         final SyncAwareBucket bucket = bucketCreator.waitUntilBucketExists();
-
-        final var path = "folder/file.txt";
-        bucket.uploadStringContent("file content", path);
+        bucket.uploadStringContent("file content", "folder/file.txt");
         final List<String> listing = listContents(bucket.getBucketName(), "folder");
-        assertThat(listing, hasItem(path));
+        assertThat(listing, hasItem("file.txt"));
     }
 
     private List<String> listBuckets() throws BucketAccessException {
-        return listContents(null, "");
+        return new BucketListing(HTTP_CLIENT, "http", getHost(), getMappedDefaultBucketFsPort()).retrieve();
     }
 
     private List<String> listContents(final String bucketName, final String path) throws BucketAccessException {
-        return new BucketContentListing(HTTP_CLIENT, "http:", getHost(), getMappedDefaultBucketFsPort(), bucketName)
-                .retrieve(path);
+        return new BucketContentListing(HTTP_CLIENT, "http", getHost(), getMappedDefaultBucketFsPort(), bucketName, "")
+                .retrieve(path, false);
     }
 
     private BucketCreator bucketCreator() {

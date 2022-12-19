@@ -5,6 +5,7 @@ import static com.exasol.errorreporting.ExaError.messageBuilder;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.BucketAccessException;
 
@@ -26,7 +27,7 @@ public class BucketListing extends ListingProvider {
     }
 
     public List<String> retrieve() throws BucketAccessException {
-        final List<String> list = requestListing(createPublicReadURI(), s -> true);
+        final List<String> list = listingStream(createPublicReadURI(), "").collect(Collectors.toList());
         if (list.isEmpty()) {
             throw pathToBeListedNotFoundException();
         } else {
@@ -39,7 +40,7 @@ public class BucketListing extends ListingProvider {
     }
 
     private BucketAccessException pathToBeListedNotFoundException() {
-        return new BucketAccessException(messageBuilder("E-BFSJ-11") //
+        return new BucketAccessException(messageBuilder("E-BFSJ-30") //
                 .message("Unable to list buckets of {{bucket}}: No such file or directory.", createPublicReadURI()) //
                 .toString());
     }
