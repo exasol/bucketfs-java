@@ -16,7 +16,7 @@ import com.exasol.bucketfs.list.*;
 import com.exasol.bucketfs.testutil.BucketCreator;
 
 @Tag("slow")
-class ListingProviderIT extends AbstractBucketIT {
+class ListingRetrieverIT extends AbstractBucketIT {
 
     private static HttpClient HTTP_CLIENT = new HttpClientBuilder().build();
     private static ListingRetriever CONTENT_LISTER = new ListingRetriever(HTTP_CLIENT);
@@ -34,7 +34,7 @@ class ListingProviderIT extends AbstractBucketIT {
     }
 
     private URI uri(final String suffix) {
-        return URI.create("http" + "://" + getHost() + ":" + getMappedDefaultBucketFsPort() + "/" + suffix);
+        return ListingRetriever.publicReadUri("http", getHost(), getMappedDefaultBucketFsPort(), suffix);
     }
 
     @Test
@@ -51,6 +51,6 @@ class ListingProviderIT extends AbstractBucketIT {
     }
 
     private BucketCreator bucketCreator() {
-        return new BucketCreator(ListingProviderIT.class, EXASOL);
+        return new BucketCreator(ListingRetrieverIT.class, EXASOL);
     }
 }

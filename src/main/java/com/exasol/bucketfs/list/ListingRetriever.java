@@ -19,6 +19,13 @@ import com.exasol.bucketfs.*;
  */
 public class ListingRetriever {
 
+    /**
+     * @param protocol protocol
+     * @param host     host name or IP address for the URI
+     * @param port     port
+     * @param suffix   e.g. name of the bucket
+     * @return {@link URI} made up from the specified elements
+     */
     public static URI publicReadUri(final String protocol, final String host, final int port, final String suffix) {
         return URI.create(protocol + "://" + host + ":" + port + "/" + suffix);
     }
