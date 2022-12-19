@@ -106,7 +106,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     private URI createPublicReadURI(final String pathInBucket) {
         final String suffix = this.bucketName + "/" + removeLeadingSeparator(pathInBucket);
-        return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, this.bucketName + "/" + suffix);
+        return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, suffix);
     }
 
     /**
