@@ -10,6 +10,10 @@ import java.net.URI;
  */
 public class HttpResponseEvaluator {
 
+    private HttpResponseEvaluator() {
+        // only static usage
+    }
+
     /**
      * Evaluates the response
      *
