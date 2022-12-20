@@ -12,7 +12,6 @@ import com.exasol.bucketfs.BucketAccessException;
  * This class enables to retrieve a list of buckets.
  */
 public class BucketService {
-
     private final ListingRetriever listingRetriever;
     private final URI bucketServiceUri;
 

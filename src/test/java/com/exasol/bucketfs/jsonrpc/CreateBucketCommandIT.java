@@ -73,8 +73,6 @@ class CreateBucketCommandIT extends AbstractBucketIT {
         assertDoesNotThrow(() -> bucketCreator.commandWithDefaultValues().execute());
     }
 
-    // -----------------------------------------------------
-
     private BucketCreator bucketCreator() {
         return new BucketCreator(CreateBucketCommandIT.class, EXASOL);
     }

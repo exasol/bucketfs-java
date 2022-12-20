@@ -15,7 +15,6 @@ import com.exasol.bucketfs.BucketAccessException;
  * This class enables to list the contents of a directory in a bucket.
  */
 public class BucketContentLister {
-
     private final URI bucketUri;
     private final ListingRetriever listingRetriever;
     private final String readPassword;
