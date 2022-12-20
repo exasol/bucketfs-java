@@ -18,7 +18,6 @@ import com.exasol.bucketfs.*;
  * This class retrieves the list of buckets or of objects inside a bucket.
  */
 public class ListingRetriever {
-
     /**
      * @param protocol protocol
      * @param host     host name or IP address for the URI
