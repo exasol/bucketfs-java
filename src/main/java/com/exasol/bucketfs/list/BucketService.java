@@ -36,15 +36,11 @@ public class BucketService {
                 .retrieve(this.bucketServiceUri, "") //
                 .collect(Collectors.toList());
         if (list.isEmpty()) {
-            throw pathToBeListedNotFoundException();
+            throw new BucketAccessException(messageBuilder("E-BFSJ-30") //
+                    .message("Unable to list buckets of {{bucket}}: No such file or directory.", this.bucketServiceUri) //
+                    .toString());
         } else {
             return list;
         }
-    }
-
-    private BucketAccessException pathToBeListedNotFoundException() {
-        return new BucketAccessException(messageBuilder("E-BFSJ-30") //
-                .message("Unable to list buckets of {{bucket}}: No such file or directory.", this.bucketServiceUri) //
-                .toString());
     }
 }

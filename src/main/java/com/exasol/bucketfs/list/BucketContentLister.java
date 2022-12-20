@@ -51,7 +51,10 @@ public class BucketContentLister {
                 .distinct() //
                 .collect(Collectors.toList());
         if (list.isEmpty()) {
-            throw pathToBeListedNotFoundException(path);
+            throw new BucketAccessException(messageBuilder("E-BFSJ-11")
+                    .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", //
+                            path, this.bucketUri)
+                    .toString());
         } else {
             return list;
         }
@@ -60,12 +63,5 @@ public class BucketContentLister {
     private String extractFirstPathComponent(final String path) {
         final int i = path.indexOf(PATH_SEPARATOR);
         return i < 0 ? path : path.substring(0, i + 1);
-    }
-
-    private BucketAccessException pathToBeListedNotFoundException(final String path) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-11")
-                .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", //
-                        path, this.bucketUri)
-                .toString());
     }
 }
