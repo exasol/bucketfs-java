@@ -27,12 +27,12 @@ class ClusterConfigurationBucketFactoryTest {
 
     @Test
     void testGetBucketInjectsAccessCredentials(
-            @Mock final BucketFsSerivceConfigurationProvider serviceConfigurationProviderMock) {
+            @Mock final BucketFsServiceConfigurationProvider serviceConfigurationProviderMock) {
         final String readPassword = "foo";
         final String writePassword = "bar";
         final String serviceName = "the_service";
         final String bucketName = "the_bucket";
-        final String ipAddress = "192.168.1.1";
+        final String host = "192.168.1.1";
         final int port = 2850;
         final Map<Integer, Integer> portMappings = Map.of(port, port);
         final BucketConfiguration bucketConfiguration = BucketConfiguration.builder().name(bucketName)
@@ -40,7 +40,7 @@ class ClusterConfigurationBucketFactoryTest {
         final BucketFsServiceConfiguration serviceConfiguration = BucketFsServiceConfiguration.builder()
                 .name(serviceName).httpPort(port).addBucketConfiguration(bucketConfiguration).build();
         when(serviceConfigurationProviderMock.getBucketFsServiceConfiguration(any())).thenReturn(serviceConfiguration);
-        final BucketFactory factory = new ClusterConfigurationBucketFactory(this.monitor, ipAddress,
+        final BucketFactory factory = new ClusterConfigurationBucketFactory(this.monitor, host,
                 serviceConfigurationProviderMock, portMappings);
         final Bucket bucket = factory.getBucket(serviceName, bucketName);
         assertAll(() -> assertThat(bucket.getReadPassword(), equalTo(readPassword)),

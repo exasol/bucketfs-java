@@ -47,7 +47,7 @@ class ReadEnabledBucketTest {
     @ParameterizedTest
     void toString(final int port, final String serviceName, final String bucketName, final String expectedOutput) {
         final var bucket = bucketBuilder() //
-                .ipAddress(IP_ADDRESS) //
+                .host(IP_ADDRESS) //
                 .port(port) //
                 .serviceName(serviceName) //
                 .name(bucketName).build();
@@ -66,7 +66,7 @@ class ReadEnabledBucketTest {
     }
 
     private ReadOnlyBucket createBucket() {
-        return bucketBuilder().ipAddress(IP_ADDRESS) //
+        return bucketBuilder().host(IP_ADDRESS) //
                 .port(PORT) //
                 .serviceName(BUCKET_FS_NAME) //
                 .name(BUCKET_NAME) //
@@ -156,7 +156,7 @@ class ReadEnabledBucketTest {
         simulateResponse("", 200);
 
         bucketBuilder().useTls(useTls) //
-                .ipAddress(IP_ADDRESS) //
+                .host(IP_ADDRESS) //
                 .port(PORT) //
                 .serviceName(BUCKET_FS_NAME) //
                 .name(BUCKET_NAME) //

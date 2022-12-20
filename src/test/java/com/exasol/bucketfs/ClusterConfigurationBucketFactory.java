@@ -13,8 +13,8 @@ import com.exasol.config.BucketFsServiceConfiguration;
  */
 public final class ClusterConfigurationBucketFactory implements BucketFactory {
     private final Map<String, Bucket> bucketsCache = new HashMap<>();
-    private final String ipAddress;
-    private final BucketFsSerivceConfigurationProvider serviceConfigurationProvider;
+    private final String host;
+    private final BucketFsServiceConfigurationProvider serviceConfigurationProvider;
     private final Map<Integer, Integer> portMappings;
     private final BucketFsMonitor monitor;
 
@@ -22,14 +22,14 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
      * Create a new instance of a {@link ClusterConfigurationBucketFactory}.
      *
      * @param monitor                      BucketFS synchronization monitor
-     * @param ipAddress                    IP address of the the BucketFS service
+     * @param host                         host name or IP address of the the BucketFS service
      * @param serviceConfigurationProvider provider for the configuration of BucketFS services
      * @param portMappings                 mapping of container internal to exposed port numbers
      */
-    public ClusterConfigurationBucketFactory(final BucketFsMonitor monitor, final String ipAddress,
-            final BucketFsSerivceConfigurationProvider serviceConfigurationProvider,
+    public ClusterConfigurationBucketFactory(final BucketFsMonitor monitor, final String host,
+            final BucketFsServiceConfigurationProvider serviceConfigurationProvider,
             final Map<Integer, Integer> portMappings) {
-        this.ipAddress = ipAddress;
+        this.host = host;
         this.serviceConfigurationProvider = serviceConfigurationProvider;
         this.portMappings = portMappings;
         this.monitor = monitor;
@@ -70,7 +70,7 @@ public final class ClusterConfigurationBucketFactory implements BucketFactory {
                 .stateRetriever(new TimestampRetriever()) //
                 .serviceName(serviceName) //
                 .name(bucketName) //
-                .ipAddress(this.ipAddress) //
+                .host(this.host) //
                 .port(mapPort(serviceConfiguration.getHttpPort())) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
                 .writePassword(bucketConfiguration.getWritePassword()) //

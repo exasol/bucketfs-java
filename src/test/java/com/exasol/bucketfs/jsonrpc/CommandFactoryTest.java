@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 class CommandFactoryTest {
     @Test
     void testCreatingCommandFactoryWithoutAuthenticatorFails() {
-        asserBuildingFails(CommandFactory.builder(), NullPointerException.class, "authenticator");
+        assertBuildingFails(CommandFactory.builder(), NullPointerException.class, "authenticator");
     }
 
     @Test
     void testCreatingCommandFactoryWithoutUriFails() {
-        asserBuildingFails(CommandFactory.builder().bearerTokenAuthentication("token"), NullPointerException.class,
+        assertBuildingFails(CommandFactory.builder().bearerTokenAuthentication("token"), NullPointerException.class,
                 "serviceUri");
     }
 
@@ -27,7 +27,7 @@ class CommandFactoryTest {
                 equalTo("E-BFSJ-19: Error parsing server URL 'invalid url'. Use a valid format for the URL."));
     }
 
-    private void asserBuildingFails(final CommandFactory.Builder builder,
+    private void assertBuildingFails(final CommandFactory.Builder builder,
             final Class<? extends Throwable> expectedException, final String expectedMessage) {
         final Throwable exception = assertThrows(expectedException, builder::build);
         assertThat(exception.getMessage(), equalTo(expectedMessage));

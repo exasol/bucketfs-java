@@ -1,9 +1,7 @@
 package com.exasol.bucketfs;
 
 import static com.exasol.bucketfs.BucketOperation.DOWNLOAD;
-import static com.exasol.bucketfs.BucketOperation.LIST;
-import static com.exasol.errorreporting.ExaError.messageBuilder;
-import static java.net.HttpURLConnection.*;
+import static com.exasol.bucketfs.list.ListingRetriever.removeLeadingSeparator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,10 +12,11 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
+import com.exasol.bucketfs.list.BucketContentLister;
+import com.exasol.bucketfs.list.ListingRetriever;
 
 /**
  * Bucket that support read access like listing contents and downloading files.
@@ -29,16 +28,16 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     /**
      * bucketFs name
      */
-    protected final String bucketFsName;
+    protected final String serviceName;
     /**
      * bucket name
      */
     protected final String bucketName;
     private final String protocol;
     /**
-     * ip address
+     * Host or IP address
      */
-    protected final String ipAddress;
+    protected final String host;
     /**
      * port
      */
@@ -54,13 +53,15 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private final HttpClient client;
 
     /**
-     * @param builder builder
+     * Create a new instance of a bucket that support reading.
+     *
+     * @param builder builder from which the bucket should be constructed
      */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
-        this.bucketFsName = builder.bucketFsName;
+        this.serviceName = builder.serviceName;
         this.bucketName = builder.bucketName;
         this.protocol = builder.protocol;
-        this.ipAddress = builder.ipAddress;
+        this.host = builder.host;
         this.port = builder.port;
         this.readPassword = builder.readPassword;
         this.client = builder.httpClientBuilder.build();
@@ -68,7 +69,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     @Override
     public String getBucketFsName() {
-        return this.bucketFsName;
+        return this.serviceName;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     @Override
     public String getFullyQualifiedBucketName() {
-        return this.bucketFsName + BucketConstants.PATH_SEPARATOR + this.bucketName;
+        return this.serviceName + BucketConstants.PATH_SEPARATOR + this.bucketName;
     }
 
     @Override
@@ -93,71 +94,19 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
-    public List<String> listContents(final String path) throws BucketAccessException {
-        final var uri = createPublicReadURI(BUCKET_ROOT);
-        LOGGER.fine(() -> "Listing contents of bucket under URI '" + uri + "'");
-        return requestListing(path, uri);
-    }
-
-    private List<String> requestListing(final String path, final URI uri) throws BucketAccessException {
-        try {
-            final var request = HttpRequest.newBuilder(uri).build();
-            final var response = this.client.send(request, BodyHandlers.ofString());
-            evaluateRequestStatus(uri, LIST, response.statusCode());
-            final var list = parseContentListResponseBody(response, removeLeadingSlash(path));
-            if (list.isEmpty()) {
-                throw createPathToBeListedNotFoundException(path);
-            } else {
-                return list;
-            }
-        } catch (final IOException exception) {
-            throw createDownloadIoException(uri, LIST, exception);
-        } catch (final InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, LIST);
-        }
-    }
-
-    private BucketAccessException createPathToBeListedNotFoundException(final String path) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-11")
-                .message("Unable to list contents of {{path}} in bucket {{bucket}}: No such file or directory.", path,
-                        this)
-                .toString());
-    }
-
-    private String removeLeadingSlash(final String path) {
-        if (path.startsWith(BucketConstants.PATH_SEPARATOR)) {
-            return path.substring(1);
-        } else {
-            return path;
-        }
-    }
-
-    private URI createPublicReadURI(final String pathInBucket) {
-        return URI.create(this.protocol + "://" + this.ipAddress + ":" + this.port + "/" + this.bucketName + "/"
-                + removeLeadingSlash(pathInBucket));
-    }
-
     // [impl->dsn~bucket-lists-files-with-common-prefix~1]
     // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
-    private List<String> parseContentListResponseBody(final HttpResponse<String> response, final String path) {
-        return Arrays.stream(response.body().split("\\s+")) //
-                .map(this::removeLeadingSlash) //
-                .filter(e -> e.startsWith(path)) // keep only entries with path as prefix
-                .map(e -> e.substring(path.length())) // cut of path prefix
-                .map(this::extractFirstPathComponent) //
-                .distinct() // ensure only unique entries
-                .sorted() //
-                .collect(Collectors.toList());
+    public List<String> listContents(final String path) throws BucketAccessException {
+        final URI uri = createPublicReadURI("");
+        final ListingRetriever contentLister = new ListingRetriever(this.client);
+        return new BucketContentLister(uri, contentLister, this.readPassword) //
+                .retrieve(removeLeadingSeparator(path), false);
     }
 
-    private String extractFirstPathComponent(final String path) {
-        if (path.contains(BucketConstants.PATH_SEPARATOR)) {
-            return path.substring(0, path.indexOf(BucketConstants.PATH_SEPARATOR) + 1);
-        } else {
-            return path;
-        }
+    private URI createPublicReadURI(final String pathInBucket) {
+        final String suffix = this.bucketName + "/" + removeLeadingSeparator(pathInBucket);
+        return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, suffix);
     }
 
     /**
@@ -185,12 +134,12 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         try {
             final var request = createGetRequest(uri);
             final var response = this.client.send(request, BodyHandlers.ofFile(localPath));
-            evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
+            HttpResponseEvaluator.evaluate(uri, DOWNLOAD, response.statusCode());
         } catch (final IOException exception) {
-            throw createDownloadIoException(uri, DOWNLOAD, exception);
+            throw BucketAccessException.downloadIoException(uri, DOWNLOAD, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, DOWNLOAD);
+            throw BucketAccessException.downloadInterruptedException(uri, DOWNLOAD);
         }
     }
 
@@ -201,24 +150,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                 .build();
     }
 
-    private BucketAccessException createDownloadIoException(final URI uri, final BucketOperation operation,
-            final IOException exception) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-5")
-                .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
-    }
-
-    private BucketAccessException createDownloadInterruptedException(final URI uri, final BucketOperation operation) {
-        return new BucketAccessException(messageBuilder("E-BFSJ-4")
-                .message("Interrupted trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
-    }
-
     // [impl->dsn~downloading-a-file-from-a-bucket-as-string~1]
     @Override
     public String downloadFileAsString(final String pathInBucket) throws BucketAccessException {
         final var uri = createPublicReadURI(pathInBucket);
         LOGGER.fine(() -> "Downloading  file from bucket '" + this + "' at '" + uri + "'");
         final var response = requestFileOnBucketAsString(uri);
-        evaluateRequestStatus(uri, DOWNLOAD, response.statusCode());
+        HttpResponseEvaluator.evaluate(uri, DOWNLOAD, response.statusCode());
         return response.body();
     }
 
@@ -227,38 +165,10 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
             final var request = createGetRequest(uri);
             return this.client.send(request, BodyHandlers.ofString());
         } catch (final IOException exception) {
-            throw createDownloadIoException(uri, DOWNLOAD, exception);
+            throw BucketAccessException.downloadIoException(uri, DOWNLOAD, exception);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw createDownloadInterruptedException(uri, DOWNLOAD);
-        }
-    }
-
-    /**
-     * Evaluates the request status.
-     *
-     * @param uri        uri
-     * @param operation  operation
-     * @param statusCode statusCode
-     * @throws BucketAccessException BucketAccessException
-     */
-    protected void evaluateRequestStatus(final URI uri, final BucketOperation operation, final int statusCode)
-            throws BucketAccessException {
-        switch (statusCode) {
-        case HTTP_OK:
-            return;
-        case HTTP_NOT_FOUND:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-2")
-                    .message("File or directory not found trying to {{operation|uq}} {{URI}}.", operation, uri)
-                    .toString());
-        case HTTP_FORBIDDEN:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-3")
-                    .message("Access denied trying to {{operation|uq}} {{URI}}.", operation, uri).toString());
-        default:
-            throw new BucketAccessException(messageBuilder("E-BFSJ-1")
-                    .message("Unable to perform {{operation|uq}} {{URI}}. HTTP status {{status}}.", operation, uri,
-                            statusCode)
-                    .toString());
+            throw BucketAccessException.downloadInterruptedException(uri, DOWNLOAD);
         }
     }
 
@@ -277,7 +187,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     @Override
     public String toString() {
-        return (this.bucketFsName == null ? (this.port + ":") : (this.bucketFsName + "/")) + this.bucketName;
+        return (this.serviceName == null ? (this.port + ":") : (this.serviceName + "/")) + this.bucketName;
     }
 
     /**
@@ -297,9 +207,9 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      */
     public static class Builder<T extends Builder<T>> {
         private String protocol = "http";
-        private String bucketFsName;
+        private String serviceName;
         private String bucketName;
-        private String ipAddress;
+        private String host;
         private int port;
         private String readPassword;
         private final HttpClientBuilder httpClientBuilder;
@@ -326,13 +236,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-         * Set the filesystem name.
+         * Set the service name.
          *
-         * @param bucketFsName name of the BucketFS filesystem
+         * @param serviceName name of the BucketFS service
          * @return Builder instance for fluent programming
          */
-        public T serviceName(final String bucketFsName) {
-            this.bucketFsName = bucketFsName;
+        public T serviceName(final String serviceName) {
+            this.serviceName = serviceName;
             return self();
         }
 
@@ -359,13 +269,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-         * Set the IP address of the BucketFS service.
+         * Set the host of the BucketFS service.
          *
-         * @param ipAddress IP Address of the BucketFS service
+         * @param host host of the BucketFS service
          * @return Builder instance for fluent programming
          */
-        public T ipAddress(final String ipAddress) {
-            this.ipAddress = ipAddress;
+        public T host(final String host) {
+            this.host = host;
             return self();
         }
 

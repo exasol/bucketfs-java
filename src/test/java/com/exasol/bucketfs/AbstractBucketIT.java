@@ -6,6 +6,7 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor;
 import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor.FilterStrategy;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
@@ -74,5 +75,24 @@ public abstract class AbstractBucketIT {
      */
     protected LogBasedBucketFsMonitor createBucketMonitor() {
         return new LogBasedBucketFsMonitor(new LogPatternDetectorFactory(EXASOL), FilterStrategy.TIME_STAMP);
+    }
+
+    protected SyncAwareBucket getDefaultBucketForWriting() {
+        final BucketConfiguration config = getDefaultBucketConfiguration();
+        return getDefaultBucketForWriting(config.getReadPassword(), config.getWritePassword());
+    }
+
+    protected SyncAwareBucket getDefaultBucketForWriting(final String readPassword, final String writePassword) {
+        final LogBasedBucketFsMonitor monitor = createBucketMonitor();
+        return SyncAwareBucket.builder()//
+                .host(getHost()) //
+                .port(getMappedDefaultBucketFsPort()) //
+                .serviceName(DEFAULT_BUCKETFS) //
+                .name(DEFAULT_BUCKET) //
+                .readPassword(readPassword) //
+                .writePassword(writePassword) //
+                .monitor(monitor) //
+                .stateRetriever(new TimestampRetriever()) //
+                .build();
     }
 }
