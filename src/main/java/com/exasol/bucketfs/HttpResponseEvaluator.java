@@ -15,7 +15,10 @@ public class HttpResponseEvaluator {
     }
 
     /**
-     * Evaluates the response
+     * Evaluates the HTTP response code.
+     * <p>
+     * In case of success does nothing, otherwise throws appropriate exception.
+     * </p>
      *
      * @param uri        URI of the request
      * @param operation  operation {@link BucketOperation} initially requested
