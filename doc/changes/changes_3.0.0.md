@@ -11,7 +11,7 @@ Those are the breaking changes compared to the 2.x.x line:
 | 2.x.x                                                                      | 3.0.0                                  |
 |----------------------------------------------------------------------------|----------------------------------------|
 | `BucketFsSerivceConfigurationProvider`                                     | `BucketFsServiceConfigurationProvider` |
-| `ReadEnabledBucket.Builder.ipAddress()` `ReadEnabledBucket.Builder.host()` |
+| `ReadEnabledBucket.Builder.ipAddress()` | `ReadEnabledBucket.Builder.host()` |
 
 We also updated test dependencies and plugins. Functionally 3.0.0 is identical to the deprecated 2.6.0.
 
