@@ -4,7 +4,7 @@ Code name: Removed duplicate classes from dependencies
 
 ## Summary
 
-This release removes duplicate classes from dependencies
+This release removes duplicate classes from dependencies and switched from Jakarta JSON implementation to [Eclipse Parsson](https://projects.eclipse.org/projects/ee4j.parsson) and [Yasson](https://projects.eclipse.org/projects/ee4j.yasson).
 
 ## Features
 
