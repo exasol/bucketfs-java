@@ -1,4 +1,4 @@
-# BucketFS Java 3.0.1, released 2023-04-??
+# BucketFS Java 3.0.1, released 2023-04-11
 
 Code name: Removed duplicate classes from dependencies
 
