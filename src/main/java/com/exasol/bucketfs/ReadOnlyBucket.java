@@ -40,6 +40,14 @@ public interface ReadOnlyBucket {
     List<String> listContents() throws BucketAccessException;
 
     /**
+     * Recursively list the contents of a bucket.
+     *
+     * @return bucket contents
+     * @throws BucketAccessException if the contents are not accessible or the path is invalid
+     */
+    List<String> listContentsRecursively() throws BucketAccessException;
+
+    /**
      * List the contents of a path inside a bucket.
      *
      * @param path relative path from the bucket root
@@ -47,6 +55,15 @@ public interface ReadOnlyBucket {
      * @throws BucketAccessException if the contents are not accessible or the path is invalid
      */
     List<String> listContents(String path) throws BucketAccessException;
+
+    /**
+     * Recursively list the contents of a path inside a bucket.
+     *
+     * @param path relative path from the bucket root
+     * @return list of file system entries
+     * @throws BucketAccessException if the contents are not accessible or the path is invalid
+     */
+    List<String> listContentsRecursively(String path) throws BucketAccessException;
 
     /**
      * Download a file from a bucket to a local filesystem.

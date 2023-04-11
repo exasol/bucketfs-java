@@ -1,12 +1,16 @@
-# BucketFS Java 3.0.1, released 2023-04-11
+# BucketFS Java 3.1.0, released 2023-04-11
 
 Code name: Removed duplicate classes from dependencies
 
 ## Summary
 
-This release removes duplicate classes from dependencies and switched from Jakarta JSON implementation to [Eclipse Parsson](https://projects.eclipse.org/projects/ee4j.parsson) and [Yasson](https://projects.eclipse.org/projects/ee4j.yasson).
+This release adds a method for recursively listing the content of a bucket. It also removes duplicate classes from dependencies and switched from Jakarta JSON implementation to [Eclipse Parsson](https://projects.eclipse.org/projects/ee4j.parsson) and [Yasson](https://projects.eclipse.org/projects/ee4j.yasson).
 
 ## Features
+
+* #57: Supported recursive listing of bucket contents
+
+## Bugfixes
 
 * #59: Removed duplicate classes from dependencies
 

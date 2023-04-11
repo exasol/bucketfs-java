@@ -78,6 +78,16 @@ Covers:
 
 Needs: impl, itest
 
+### Recursive Listing
+`dsn~bucket-lists-its-contents-recursively~1`
+
+The `Bucket` lists its contents recursively.
+
+Covers:
+* `req~bucket-content-listing-recursive~1`
+
+Needs: impl, itest
+
 ### List of `Bucket` Contents With Common Prefix
 `dsn~bucket-lists-files-with-common-prefix~1`
 
