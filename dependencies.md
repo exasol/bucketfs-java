@@ -75,7 +75,7 @@
 [15]: http://opensource.org/licenses/MIT
 [16]: http://www.slf4j.org
 [17]: http://www.opensource.org/licenses/mit-license.php
-[18]: https://github.com/eclipse-ee4j/parsson/parsson
+[18]: https://github.com/eclipse-ee4j/parsson
 [19]: https://projects.eclipse.org/projects/ee4j.yasson
 [20]: http://www.eclipse.org/legal/epl-v20.html
 [21]: http://www.eclipse.org/org/documents/edl-v10.php
