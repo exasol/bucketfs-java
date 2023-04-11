@@ -37,7 +37,7 @@ class JsonRpcClient {
         final HttpResponse<String> response = sendRequest(request);
         verifySuccessResponse(request, response);
         final String responseBody = response.body();
-        LOGGER.fine(() -> "Received response " + response + " for request " + request + " with body '" + responseBody
+        LOGGER.finest(() -> "Received response " + response + " for request " + request + " with body '" + responseBody
                 + "' after " + Duration.between(start, Instant.now()));
         return responseBody;
     }
@@ -48,7 +48,7 @@ class JsonRpcClient {
                 .POST(BodyPublishers.ofString(requestBody));
         this.authenticator.authenticate(requestBuilder);
         final var request = requestBuilder.build();
-        LOGGER.fine(() -> "Sending request " + request + " with body '" + requestBody + "'");
+        LOGGER.finest(() -> "Sending request " + request + " with body '" + requestBody + "'");
         return request;
     }
 

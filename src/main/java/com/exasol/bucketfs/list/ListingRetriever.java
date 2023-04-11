@@ -62,7 +62,7 @@ public class ListingRetriever {
     }
 
     private String requestListing(final URI uri, final String readPassword) throws BucketAccessException {
-        LOGGER.fine(() -> "Listing contents of URI '" + uri + "'");
+        LOGGER.finest(() -> "Listing contents of URI '" + uri + "'");
         try {
             final HttpRequest request = HttpRequest.newBuilder(uri) //
                     .header("Authorization", encodeBasicAuth(readPassword)) //
