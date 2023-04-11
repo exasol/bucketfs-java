@@ -1,7 +1,7 @@
 # bucketfs-java
 
 [![Build Status](https://github.com/exasol/bucketfs-java/actions/workflows/ci-build.yml/badge.svg)](https://github.com/exasol/bucketfs-java/actions/workflows/ci-build.yml)
-[![Maven Central – BucketFS Java](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
+[![Maven Central &ndash; BucketFS Java](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Abucketfs-java&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.exasol%3Abucketfs-java)
 
