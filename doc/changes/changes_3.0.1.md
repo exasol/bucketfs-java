@@ -16,7 +16,13 @@ This release removes duplicate classes from dependencies
 
 * Updated `com.exasol:error-reporting-java:1.0.0` to `1.0.1`
 * Removed `org.apache.commons:commons-compress:1.22`
-* Updated `org.eclipse:yasson:3.0.2` to `3.0.3`
+* Removed `org.eclipse:yasson:3.0.2`
+
+### Runtime Dependency Updates
+
+* Added `org.eclipse.parsson:parsson:1.1.1`
+* Added `org.eclipse:yasson:3.0.3`
+* Removed `org.glassfish:jakarta.json:2.0.1`
 
 ### Test Dependency Updates
 
@@ -33,4 +39,5 @@ This release removes duplicate classes from dependencies
 * Updated `org.apache.maven.plugins:maven-enforcer-plugin:3.1.0` to `3.2.1`
 * Updated `org.apache.maven.plugins:maven-failsafe-plugin:3.0.0-M6` to `3.0.0-M8`
 * Updated `org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M7` to `3.0.0-M8`
+* Added `org.basepom.maven:duplicate-finder-maven-plugin:1.3.0`
 * Updated `org.codehaus.mojo:versions-maven-plugin:2.13.0` to `2.14.2`
