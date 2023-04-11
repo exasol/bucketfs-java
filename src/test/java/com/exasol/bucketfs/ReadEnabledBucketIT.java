@@ -55,11 +55,26 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
     }
 
+    // [itest->dsn~bucket-lists-its-contents-recursively~1]
+    @Test
+    void testListBucketContentsRecursivelyWithRootPath() throws BucketAccessException {
+        assertThat(getDefaultBucket().listContentsRecursively(), hasItem(startsWith("EXAClusterOS/ScriptLanguages")));
+    }
+
     // [itest->dsn~bucket-lists-its-contents~2]
-    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/" })
+    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/", "EXAClusterOS" })
     @ParameterizedTest
     void testListContents(final String pathInBucket) throws BucketAccessException {
         assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
+    }
+
+    // [itest->dsn~bucket-lists-its-contents-recursively~1]
+    @ValueSource(strings = { "/recursive-dir1/", "recursive-dir1/", "recursive-dir1" })
+    @ParameterizedTest
+    void testListContentsRecursively(final String pathInBucket)
+            throws BucketAccessException, InterruptedException, TimeoutException {
+        getDefaultBucketForWriting().uploadStringContent("dummy-content", "recursive-dir1/dir2/file.txt");
+        assertThat(getDefaultBucket().listContentsRecursively(pathInBucket), contains("dir2/file.txt"));
     }
 
     @Test

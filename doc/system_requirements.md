@@ -83,6 +83,22 @@ Covers:
 
 Needs: dsn
 
+#### Recursive Bucket Content Listing
+
+`req~bucket-content-listing-recursive~1`
+
+BFSJ lists the contents of a bucket in BucketFS recursively.
+
+Rationale:
+
+Allows listing all files in a directory hierarchy.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
 #### Uploading a File to BucketFS
 
 `req~uploading-a-file-to-bucketfs~1`

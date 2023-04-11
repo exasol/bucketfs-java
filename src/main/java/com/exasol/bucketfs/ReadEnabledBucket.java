@@ -90,7 +90,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     // [impl->dsn~bucket-lists-its-contents~2]
     public List<String> listContents() throws BucketAccessException {
-        return listContents(BUCKET_ROOT);
+        return listContents(BUCKET_ROOT, false);
+    }
+
+    @Override
+    // [impl->dsn~bucket-lists-its-contents-recursively~1]
+    public List<String> listContentsRecursively() throws BucketAccessException {
+        return listContents(BUCKET_ROOT, true);
     }
 
     @Override
@@ -98,10 +104,20 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
     public List<String> listContents(final String path) throws BucketAccessException {
+        return listContents(path, false);
+    }
+
+    @Override
+    // [impl->dsn~bucket-lists-its-contents-recursively~1]
+    public List<String> listContentsRecursively(final String path) throws BucketAccessException {
+        return listContents(path, true);
+    }
+
+    private List<String> listContents(final String path, final boolean recursive) throws BucketAccessException {
         final URI uri = createPublicReadURI("");
         final ListingRetriever contentLister = new ListingRetriever(this.client);
         return new BucketContentLister(uri, contentLister, this.readPassword) //
-                .retrieve(removeLeadingSeparator(path), false);
+                .retrieve(removeLeadingSeparator(path), recursive);
     }
 
     private URI createPublicReadURI(final String pathInBucket) {
