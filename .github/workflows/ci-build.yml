@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        docker_db_version: ["7.1.23", "8.22.0"]
+        docker_db_version: ["7.1.23"] # "8.22.0" does not support UDFs yet
     env:
       DEFAULT_DB_VERSION: "7.1.23"
     runs-on: ubuntu-20.04 # UDFs fail with "VM error: Internal error: VM crashed" on ubuntu-latest
