@@ -1,4 +1,4 @@
-# BucketFS Java 3.1.2, released 2024-??-??
+# BucketFS Java 3.1.2, released 2024-02-29
 
 Code name: Fix CVE-2024-25710 and CVE-2024-26308 in test dependency `org.apache.commons:commons-compress`
 
@@ -41,5 +41,6 @@ This release fixes vulnerabilities CVE-2024-25710 and CVE-2024-26308 in test dep
 * Added `org.apache.maven.plugins:maven-toolchains-plugin:3.1.0`
 * Updated `org.codehaus.mojo:flatten-maven-plugin:1.5.0` to `1.6.0`
 * Updated `org.codehaus.mojo:versions-maven-plugin:2.16.0` to `2.16.2`
+* Updated `org.itsallcode:openfasttrace-maven-plugin:1.6.1` to `1.8.0`
 * Updated `org.jacoco:jacoco-maven-plugin:0.8.10` to `0.8.11`
 * Updated `org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184` to `3.10.0.2594`
