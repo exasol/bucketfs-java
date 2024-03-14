@@ -34,7 +34,7 @@ As always, check for the latest version of the dependencies.
 
 ## Services, Buckets, Objects and Paths
 
-A "bucket" in BucketFS terms is a storage container that can contain multiple objects. Buckets are hosted by BucketFS services. They allowing access to a bucket via a network protocol.
+A "bucket" in BucketFS terms is a storage container that can contain multiple objects. Buckets are hosted by BucketFS services. They allow access to a bucket via a network protocol.
 
 To work with BucketFS you need at least one service that hosts one bucket.
 
