@@ -34,7 +34,7 @@ As always, check for the latest version of the dependencies.
 
 ## Services, Buckets, Objects and Paths
 
-A "bucket" in BucketFS terms is a storage container that can contain multiple objects. Buckets are hosted by BucketFS services. They allowing access to a bucket via a network protocol.
+A "bucket" in BucketFS terms is a storage container that can contain multiple objects. Buckets are hosted by BucketFS services. They allow access to a bucket via a network protocol.
 
 To work with BucketFS you need at least one service that hosts one bucket.
 
@@ -96,7 +96,7 @@ As mentioned before, `ReadOnlyBucket` is an interface. `ReadEnabledBucket` is an
 
 Each bucket implementation comes with a builder that you create by calling the static method calling `builder()` on the implementation class.
 
-The builder for the `ReadEnalbedBucket` has the following parameter setters:
+The builder for the `ReadEnabledBucket` has the following parameter setters:
 
 * Configure TLS behavior. See [below](#configuring-tls) for details.
     * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
@@ -174,7 +174,7 @@ EXAClusterOS/
 
 ### Listing Bucket Contents
 
-The following code lists the contents of a buckets root:
+The following code lists the contents of a bucket's root:
 
 ```java
 final List<String> bucketContents = bucket.listContents();
