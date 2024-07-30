@@ -33,7 +33,7 @@
 | Dependency                                              | License                               |
 | ------------------------------------------------------- | ------------------------------------- |
 | [SonarQube Scanner for Maven][22]                       | [GNU LGPL 3][23]                      |
-| [Apache Maven Toolchains Plugin][24]                    | [Apache License, Version 2.0][25]     |
+| [Apache Maven Toolchains Plugin][24]                    | [Apache-2.0][25]                      |
 | [OpenFastTrace Maven Plugin][26]                        | [GNU General Public License v3.0][27] |
 | [Project Keeper Maven plugin][28]                       | [The MIT License][29]                 |
 | [Apache Maven Compiler Plugin][30]                      | [Apache-2.0][25]                      |
@@ -49,7 +49,7 @@
 | [Apache Maven Javadoc Plugin][42]                       | [Apache-2.0][25]                      |
 | [Nexus Staging Maven Plugin][43]                        | [Eclipse Public License][44]          |
 | [Maven Failsafe Plugin][45]                             | [Apache-2.0][25]                      |
-| [JaCoCo :: Maven Plugin][46]                            | [Eclipse Public License 2.0][47]      |
+| [JaCoCo :: Maven Plugin][46]                            | [EPL-2.0][47]                         |
 | [error-code-crawler-maven-plugin][48]                   | [MIT License][49]                     |
 | [Reproducible Build Maven Plugin][50]                   | [Apache 2.0][34]                      |
 
@@ -58,7 +58,7 @@
 [2]: https://github.com/eclipse-ee4j/jsonp
 [3]: https://projects.eclipse.org/license/epl-2.0
 [4]: https://projects.eclipse.org/license/secondary-gpl-2.0-cp
-[5]: https://github.com/eclipse-ee4j/jsonb-api
+[5]: https://jakartaee.github.io/jsonb-api
 [6]: https://junit.org/junit5/
 [7]: https://www.eclipse.org/legal/epl-v20.html
 [8]: http://hamcrest.org/JavaHamcrest/
