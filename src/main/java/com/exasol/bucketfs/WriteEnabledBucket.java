@@ -134,7 +134,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
      */
     protected void recordUploadInHistory(final String pathInBucket) {
         final var now = Instant.now();
-        LOGGER.fine(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
+        LOGGER.finest(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
         this.uploadHistory.put(pathInBucket, now);
     }
 

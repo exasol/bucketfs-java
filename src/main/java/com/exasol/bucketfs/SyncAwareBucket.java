@@ -68,7 +68,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                     .with(ChronoField.NANO_OF_SECOND, 0);
             final Instant now = Instant.now();
             if (now.isAfter(lastUploadAt.plusSeconds(1))) {
-                LOGGER.fine(() -> "Last upload to '" + extendedPathInBucket + "' was at " + lastUploadAt
+                LOGGER.finest(() -> "Last upload to '" + extendedPathInBucket + "' was at " + lastUploadAt
                         + ". No need to add extra delay.");
             } else {
                 final long delayInMillis = 1000L - (now.getNano() / 1000000L);
@@ -83,7 +83,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
                 }
             }
         } else {
-            LOGGER.fine(() -> "No previous uploads to '" + extendedPathInBucket
+            LOGGER.finest(() -> "No previous uploads to '" + extendedPathInBucket
                     + "' recorded in upload history. No upload delay required.");
         }
     }
