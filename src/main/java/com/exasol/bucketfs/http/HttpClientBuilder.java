@@ -115,30 +115,36 @@ public class HttpClientBuilder {
                     .message("Setting raiseTlsErrors to false and using a certificate is mutually exclusive.")
                     .mitigation("Either set raiseTlsErrors to true or remove the certificate.").toString());
         }
+        if (this.certificate == null && !this.altNames.isEmpty()) {
+            throw new IllegalStateException(messageBuilder("E-BFSJ-31")
+                    .message("Using alternative subject names requires configuring a certificate.")
+                    .mitigation("Either specify a certificate or remove the alternative subject names.").toString());
+        }
         if (!this.raiseTlsErrors) {
             return Optional.of(createDummyTrustManagers());
         } else if (this.certificate != null) {
-            return Optional.of(createTrustManagerForCertificate()).map(this::allowAlternativeNames);
+            return Optional.of(createTrustManagerForCertificate(this.certificate)).map(this::allowAlternativeNames);
         } else {
             return Optional.empty();
         }
     }
 
-    private TrustManager[] createDummyTrustManagers() {
+    private static TrustManager[] createDummyTrustManagers() {
         return new TrustManager[] { new DummyTrustManager() };
     }
 
-    private TrustManager[] createTrustManagerForCertificate() {
+    // [impl->dsn~custom-tls-certificate~1]
+    private static TrustManager[] createTrustManagerForCertificate(final X509Certificate certificate) {
         try {
             final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null);
-            keyStore.setCertificateEntry("caCert", this.certificate);
+            keyStore.setCertificateEntry("caCert", certificate);
             final TrustManagerFactory trustManagerFactory = TrustManagerFactory
                     .getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(keyStore);
             final TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
             LOGGER.finest(() -> "Created " + trustManagers.length + " trust managers for certificate with subject '"
-                    + this.certificate.getSubjectX500Principal() + "': " + Arrays.toString(trustManagers));
+                    + certificate.getSubjectX500Principal() + "': " + Arrays.toString(trustManagers));
             return trustManagers;
         } catch (final KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException exception) {
             throw new IllegalStateException(messageBuilder("E-BFSJ-25")
@@ -155,7 +161,7 @@ public class HttpClientBuilder {
         return SubjectAltNameTrustManager.wrap(trustManager, altNames);
     }
 
-    private SSLContext createSslContext() {
+    private static SSLContext createSslContext() {
         try {
             return SSLContext.getInstance("TLS");
         } catch (final NoSuchAlgorithmException exception) {

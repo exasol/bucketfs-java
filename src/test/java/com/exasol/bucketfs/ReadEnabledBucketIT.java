@@ -50,7 +50,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     private ReadOnlyBucket getBucket(final String bucketName, final String readPassword) {
         return ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
-                .useTls(false) //
                 .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
                 .useTls(dbUsesTls()) //
@@ -149,7 +148,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         @SuppressWarnings("deprecation")
         final ReadOnlyBucket bucket = ReadEnabledBucket.builder() //
                 .raiseTlsErrors(true) //
-                .useTls(false) //
                 .host(getHost()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
                 .useTls(dbUsesTls()) //

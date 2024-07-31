@@ -59,10 +59,10 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @param builder builder from which the bucket should be constructed
      */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
-        this.serviceName = builder.serviceName;
-        this.bucketName = builder.bucketName;
-        this.protocol = builder.protocol;
-        this.host = builder.host;
+        this.serviceName = Objects.requireNonNull(builder.serviceName, "serviceName");
+        this.bucketName = Objects.requireNonNull(builder.bucketName, "bucketName");
+        this.protocol = Objects.requireNonNull(builder.protocol, "protocol");
+        this.host = Objects.requireNonNull(builder.host, "host");
         this.port = builder.port;
         this.readPassword = builder.readPassword;
         this.client = builder.httpClientBuilder.build();
@@ -121,6 +121,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
                 .retrieve(removeLeadingSeparator(path), recursive);
     }
 
+    // [impl->dsn~tls-configuration~1]
     private URI createPublicReadURI(final String pathInBucket) {
         final String suffix = this.bucketName + "/" + removeLeadingSeparator(pathInBucket);
         return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, suffix);
@@ -280,6 +281,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          * @param useTls {@code true} to use the TLS/HTTPS protocol, {@code false} to use plain text HTTP (default)
          * @return Builder instance for fluent programming
          */
+        // [impl->dsn~tls-configuration~1]
         public T useTls(final boolean useTls) {
             this.protocol = useTls ? "https" : "http";
             return self();
@@ -359,6 +361,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          * @param certificate certificate to use
          * @return Builder instance for fluent programming
          */
+        // [impl->dsn~custom-tls-certificate~1]
         public T certificate(final X509Certificate certificate) {
             this.httpClientBuilder.certificate(certificate);
             return self();
