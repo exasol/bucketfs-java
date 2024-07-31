@@ -20,7 +20,7 @@ Code name:
 
 ### Test Dependency Updates
 
-* Updated `com.exasol:exasol-testcontainers:7.0.1` to `7.1.1`
+* Updated `com.exasol:exasol-testcontainers:7.0.1` to `7.1.0`
 * Updated `org.junit.jupiter:junit-jupiter-engine:5.10.2` to `5.10.3`
 * Updated `org.junit.jupiter:junit-jupiter-params:5.10.2` to `5.10.3`
 * Updated `org.mockito:mockito-junit-jupiter:5.10.0` to `5.12.0`
