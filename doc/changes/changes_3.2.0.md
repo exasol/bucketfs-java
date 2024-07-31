@@ -1,12 +1,14 @@
-# BucketFS Java 3.2.0, released 2024-??-??
+# BucketFS Java 3.2.0, released 2024-07-31
 
-Code name:
+Code name: Specify additional Subject Alternative Names (SAN) for certificate
 
 ## Summary
 
+This release supports establishing TLS connections to Exasol Docker DB version 8.29.1 and later by allowing users to specify additional Subject Alternative Names (SAN) for the TLS certificate. See the [user guide](../user_guide/user_guide.md#additional-host-names) for details.
+
 ## Features
 
-* ISSUE_NUMBER: description
+* #69: Allowed specifying Subject Alternative Names (SAN) for certificate
 
 ## Dependency Updates
 

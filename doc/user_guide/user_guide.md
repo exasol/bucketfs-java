@@ -102,8 +102,9 @@ The builder for the `ReadEnabledBucket` has the following parameter setters:
     * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
-    * `allowAlternativeHostName`: if the certificate does not contain the correct host name, you can allow additional host names for connecting, e.g. `localhost`.
-    * `allowAlternativeIpAddress`: if the certificate does not contain the correct host name, you can allow additional host names for connecting, e.g. `127.0.0.1`.
+    * If the certificate does not contain the correct host name, you can allow additional host names or IP addresses as Subject Alternative Names (SAN) for connecting, e.g. `localhost` or `127.0.0.1` using the following methods:
+      * `allowAlternativeHostName()`
+      * `allowAlternativeIpAddress()`
 * `host`: Host name or IP address of the cluster node to which you want to connect
 * `port`: number of the port the BucketFS service listens on
 * `serviceName`: name of the service that hosts the bucket
@@ -334,3 +335,11 @@ There are two methods in the `CommandFactory.Builder` and the `ReadEnabledBucket
 * With `raiseTlsErrors(true)` the HTTP client will throw an exception for any TLS errors (e.g. unknown certificate or invalid hostname). Use this when the database has an CA-signed certificate. This is the default.
 * With `raiseTlsErrors(true).certificate(<certificate>)` you can specify a custom `X509Certificate`. This is useful when the database has a self-signed certificate with correct hostname.
 * With `raiseTlsErrors(false)` the HTTP client will ignore any TLS errors. Use this when the database has a self-signed certificate with an invalid hostname. This is usually the case with the Exasol docker container that generates a self-signed certificate that is not valid when connecting to hostname `localhost`.
+
+##### Additional Host Names
+
+If a self-signed certificate specified via `certificate(<certificate>)` does not contain the correct host name, you can allow additional host names or IP addresses as Subject Alternative Names (SAN) for connecting, e.g. `localhost` or `127.0.0.1` using the following methods:
+* `allowAlternativeHostName(<hostname>)`
+* `allowAlternativeIpAddress(<ip-address>)`
+
+Please note that this only works when you specify a custom certificate with `certificate()`.
