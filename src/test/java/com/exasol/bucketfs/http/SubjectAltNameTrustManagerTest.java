@@ -132,8 +132,7 @@ class SubjectAltNameTrustManagerTest {
     }
 
     @Test
-    void getAcceptedIssuers(@Mock final X509Certificate cert1Mock, @Mock final SSLEngine engine)
-            throws CertificateException {
+    void getAcceptedIssuers(@Mock final X509Certificate cert1Mock, @Mock final SSLEngine engine) {
         final X509Certificate[] issuers = new X509Certificate[0];
         when(delegateMock.getAcceptedIssuers()).thenReturn(issuers);
         assertThat(testee().getAcceptedIssuers(), sameInstance(issuers));
