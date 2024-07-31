@@ -56,7 +56,7 @@ class SubjectAltNameTrustManager extends X509ExtendedTrustManager {
     }
 
     private X509Certificate[] addAlternativeNames(final X509Certificate[] chain) {
-        if (chain.length < 1) {
+        if (chain == null || chain.length < 1) {
             return chain;
         }
         LOGGER.finest(() -> "Modify Subject Alternative Name of first certificate to use " + alternativeNames);

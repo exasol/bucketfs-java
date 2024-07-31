@@ -170,14 +170,15 @@ class FixedSANCertificate extends X509Certificate {
         return delegate.toString();
     }
 
-    // Methods equal() and hashCode() must be defined like this, else it won't work.
     @Override
     public boolean equals(final Object other) {
+        // This violates the equals() contract but must be defined like this, else it won't work.
         return delegate.equals(other);
     }
 
     @Override
     public int hashCode() {
+        // This violates the hashCode() contract but must be defined like this, else it won't work.
         return delegate.hashCode();
     }
 }

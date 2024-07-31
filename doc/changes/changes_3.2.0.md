@@ -1,4 +1,4 @@
-# BucketFS Java 3.2.0, released 2024-07-31
+# BucketFS Java 3.2.0, released 2024-08-01
 
 Code name: Specify additional Subject Alternative Names (SAN) for certificate
 
