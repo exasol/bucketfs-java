@@ -222,3 +222,37 @@ Covers:
 * [feat~bucketfs-access~1](#bucketfs-access)
 
 Needs: dsn
+
+#### TLS Support
+
+`req~tls-support~1`
+
+BFSJ allows users to access a bucket via an connection encrypted with TLS.
+
+Rationale:
+
+* Unencrypted connections are insecure.
+* Exasol Docker DB versions 8.29.1 and later only support TLS encrypted connections.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
+##### Custom TLS Certificates
+
+`req~tls-support.custom-certificate~1`
+
+BFSJ allows users to connect to a database that uses a certificate that is not included in the runtime's keystore.
+
+Rationale:
+
+* Exasol databases (e.g. Docker DB) use a self signed certificate by default.
+* Ignoring the certificate completely is not acceptable for security reasons.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn

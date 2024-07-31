@@ -50,6 +50,10 @@ The `CommandFactory` building block allows executing RPC commands like creating 
 
 The `Bucket` building block controls interaction with a bucket in BucketFS.
 
+## `HttpClientBuilder`
+
+The `HttpClientBuilder` building block creates and configures HTTP clients, including TLS configuration.
+
 # Runtime
 
 This section describes the runtime behavior of the software.
@@ -259,6 +263,34 @@ Needs: impl, itest
 
 # Cross-cutting Concerns
 
+## Enabling TLS Encryption
+
+`dsn~tls-configuration~1`
+
+The `Bucket` allows the user enable TLS encryption using builder method `useTls(boolean)`.
+
+Covers:
+
+* [`req~tls-support~1`](system_requirements.md#tls-support)
+
+Needs: impl, utest, itest
+
+## Specifying Custom TLS Certificate
+
+`dsn~custom-tls-certificate~1`
+
+If the user has specified a certificate, the [HttpClientBuilder](#httpclientbuilder) creates and uses a custom `TrustManager` that trusts the given certificate.
+
+Rationale:
+
+This allows connecting to a database that uses a self-signed certificate while still validating the certificate.
+
+Covers:
+
+* [`req~tls-support.custom-certificate~1`](system_requirements.md#custom-tls-certificates)
+
+Needs: impl, utest, itest
+
 # Design Decisions
 
 ## How to Interpret Entries in `Bucket`?
@@ -340,6 +372,44 @@ Covers:
 * `const~log-based-synchronization-check-has-a-minimum-resolution-of-one-second~1`
 
 Needs: impl, itest
+
+## How do we Handle Self-Signed TLS Certificates?
+
+Exasol Docker DB by default generates a new self-signed TLS certificate at startup. That's why certificate validation will fail when connecting using Java's default keystore.
+
+### Alternatives considered
+
+* Allow specifying a certificate
+* Allow specifying a certificate fingerprint
+
+### Decision
+
+Specifying a fingerprint is more convenient for the user and already a well established practice when connecting to the database using a database driver like JDBC. However specifying a certificate also verifies the hostname and is more secure.
+
+See [`dsn~custom-tls-certificate~1`](#specifying-custom-tls-certificate)
+
+## How to Handle Invalid Subject Names in Certificate
+
+The Exasol Docker DB uses a self-signed certificate that is valid only for `CN=*.exacluster.local`. This certificate is not valid when connecting using hostname `localhost` or IP address `127.0.0.1`. That's why connections fail with exception `CertificateException: No subject alternative DNS name matching localhost found.`.
+
+### Alternatives Considered
+
+* Completely ignoring the the host name during certificate validation is insecure.
+* We allow the user to specify one or more host names or IP addresses that are also considered valid during certificate validation.
+
+### Decisions
+
+#### Specifying Additional Subject Alternative Names (SAN)
+
+`dsn~custom-tls-certificate.additional-subject-alternative-names~1`
+
+If the user has specified additional Subject Alternative Names (SAN), the [HttpClientBuilder](#httpclientbuilder) creates and uses a custom `TrustManager` that additionally accepts the given DNS names or IP addresses during certificate validation.
+
+Covers:
+
+* [`req~tls-support.custom-certificate~1`](system_requirements.md#custom-tls-certificates)
+
+Needs: impl, utest, itest
 
 # Quality Scenarios
 
