@@ -16,7 +16,7 @@ Code name:
 
 ### Runtime Dependency Updates
 
-* Updated `org.eclipse.parsson:parsson:1.1.5` to `1.1.6`
+* Updated `org.eclipse.parsson:parsson:1.1.5` to `1.1.7`
 
 ### Test Dependency Updates
 
