@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.logging.Logger;
 
 import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
@@ -18,6 +19,7 @@ import com.exasol.containers.ExasolContainer;
 import com.exasol.containers.ExasolDockerImageReference;
 
 public class BucketCreator {
+    private static final Logger LOGGER = Logger.getLogger(BucketCreator.class.getName());
     private static final String READ_PASSWORD = "READ_PASSWORD";
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
 
@@ -63,14 +65,20 @@ public class BucketCreator {
         final SyncAwareBucket bucket = getSyncAwareBucket();
         final Instant start = Instant.now();
         final Duration timeout = Duration.ofSeconds(5);
-        while (!bucketExists(bucket)) {
+        LOGGER.fine(
+                () -> "Waiting " + timeout + " until bucket " + bucket.getFullyQualifiedBucketName() + " exists...");
+        BucketAccessException exception = null;
+        do {
+            exception = bucketExists(bucket);
             delayNextCheck();
             final Duration waitingTime = Duration.between(start, Instant.now());
             if (timeout.minus(waitingTime).isNegative()) {
                 fail("Time out trying to verify that Bucket '" + bucket.getBucketName() + "' exists after waiting "
-                        + waitingTime);
+                        + waitingTime, exception);
             }
-        }
+        } while (exception != null);
+        LOGGER.fine(() -> "Bucket " + bucket.getFullyQualifiedBucketName() + " exists after "
+                + Duration.between(start, Instant.now()));
         return bucket;
     }
 
@@ -95,13 +103,13 @@ public class BucketCreator {
         Thread.sleep(300);
     }
 
-    private boolean bucketExists(final SyncAwareBucket bucket) {
+    private BucketAccessException bucketExists(final SyncAwareBucket bucket) {
         try {
             bucket.listContents();
         } catch (final BucketAccessException exception) {
-            return false;
+            return exception;
         }
-        return true;
+        return null;
     }
 
     private Integer getMappedDefaultBucketFsPort() {
