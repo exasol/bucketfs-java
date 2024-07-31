@@ -138,7 +138,7 @@ public class HttpClientBuilder {
             trustManagerFactory.init(keyStore);
             final TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
             LOGGER.finest(() -> "Created " + trustManagers.length + " trust managers for certificate with subject '"
-                    + this.certificate.getSubjectDN() + "': " + Arrays.toString(trustManagers));
+                    + this.certificate.getSubjectX500Principal() + "': " + Arrays.toString(trustManagers));
             return trustManagers;
         } catch (final KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException exception) {
             throw new IllegalStateException(messageBuilder("E-BFSJ-25")

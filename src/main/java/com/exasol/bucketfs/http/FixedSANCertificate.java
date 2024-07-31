@@ -67,11 +67,13 @@ class FixedSANCertificate extends X509Certificate {
     }
 
     @Override
+    @SuppressWarnings("deprecation") // Deprecated in Java 17 but required to implement the interface
     public Principal getIssuerDN() {
         return delegate.getIssuerDN();
     }
 
     @Override
+    @SuppressWarnings("deprecation") // Deprecated in Java 17 but required to implement the interface
     public Principal getSubjectDN() {
         return delegate.getSubjectDN();
     }
