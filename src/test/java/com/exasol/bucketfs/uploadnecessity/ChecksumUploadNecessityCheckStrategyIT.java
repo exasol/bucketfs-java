@@ -23,7 +23,7 @@ import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 
 @Tag("slow")
-class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
+class ChecksumUploadNecessityCheckStrategyIT extends AbstractBucketIT {
     private static Connection connection;
     private static ChecksumUploadNecessityCheckStrategy uploadCheck;
     private Bucket bucket;
