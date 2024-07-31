@@ -83,12 +83,14 @@ class FixedSANCertificateTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // Deprecated in Java 17 but required in unit test
     void getIssuerDN(@Mock final Principal issuerDn) {
         when(delegateMock.getIssuerDN()).thenReturn(issuerDn);
         assertThat(testee().getIssuerDN(), sameInstance(issuerDn));
     }
 
     @Test
+    @SuppressWarnings("deprecation") // Deprecated in Java 17 but required in unit test
     void getSubjectDN(@Mock final Principal subjectDn) {
         when(delegateMock.getSubjectDN()).thenReturn(subjectDn);
         assertThat(testee().getSubjectDN(), sameInstance(subjectDn));
