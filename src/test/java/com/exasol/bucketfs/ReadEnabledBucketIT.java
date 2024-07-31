@@ -9,8 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.nio.file.Path;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,6 +20,17 @@ import com.exasol.bucketfs.testutil.ExceptionAssertions;
 
 @Tag("slow")
 class ReadEnabledBucketIT extends AbstractBucketIT {
+
+    private static String uniqueFolderName;
+    private static final String FOLDER_NAME = "folder.txt";
+    private static final String FILE_NAME = "file.txt";
+
+    @BeforeAll
+    static void createTestFiles() throws InterruptedException, BucketAccessException, TimeoutException {
+        uniqueFolderName = "ReadEnabledBucketIT-" + System.currentTimeMillis();
+        final String fileName = uniqueFolderName + "/" + FOLDER_NAME + "/" + FILE_NAME;
+        AbstractBucketIT.EXASOL.getDefaultBucket().uploadStringContent("content", fileName);
+    }
 
     @Test
     void testGetDefaultBucket() {
@@ -55,20 +65,22 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     // [itest->dsn~bucket-lists-its-contents~2]
     @Test
     void testListBucketContentsWithRootPath() throws BucketAccessException {
-        assertThat(getDefaultBucket().listContents(), hasItem("EXAClusterOS/"));
+        assertThat(getDefaultBucket().listContents(), hasItem(uniqueFolderName + "/"));
     }
 
     // [itest->dsn~bucket-lists-its-contents-recursively~1]
     @Test
     void testListBucketContentsRecursivelyWithRootPath() throws BucketAccessException {
-        assertThat(getDefaultBucket().listContentsRecursively(), hasItem(startsWith("EXAClusterOS/ScriptLanguages")));
+        assertThat(getDefaultBucket().listContentsRecursively(),
+                hasItem(startsWith(uniqueFolderName + "/" + FOLDER_NAME)));
     }
 
     // [itest->dsn~bucket-lists-its-contents~2]
-    @ValueSource(strings = { "/EXAClusterOS/", "EXAClusterOS/", "EXAClusterOS" })
+    @ValueSource(strings = { "/{folder}/", "{folder}/", "{folder}" })
     @ParameterizedTest
     void testListContents(final String pathInBucket) throws BucketAccessException {
-        assertThat(getDefaultBucket().listContents(pathInBucket), hasItem(startsWith("ScriptLanguages")));
+        assertThat(getDefaultBucket().listContents(pathInBucket.replace("{folder}", uniqueFolderName)),
+                hasItem(startsWith(FOLDER_NAME)));
     }
 
     // [itest->dsn~bucket-lists-its-contents-recursively~1]
@@ -95,7 +107,7 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final CommandFactory factory = bucketCreator.createCommandFactory(false);
         bucketCreator.createBucket(false, factory);
         final SyncAwareBucket bucket = bucketCreator.waitUntilBucketExists();
-        bucket.uploadStringContent("protected content", "dir/file.txt");
+        bucket.uploadStringContent(content, pathInBucket);
         return bucketCreator.getBucketName();
     }
 
@@ -112,9 +124,10 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     @Test
     void testListingBucketContentsOfIllegalPathThrowsException() {
         final var nonExistentPath = "illegal%path";
+        final String protocol = dbUsesTls() ? "https" : "http";
         final String expected = String.format("E-BFSJ-11: Unable to list contents" //
-                + " of '%s' in bucket 'http://%s:%s/%s/': No such file or directory.", //
-                nonExistentPath, getHost(), getMappedDefaultBucketFsPort(), "default");
+                + " of '%s' in bucket '%s://%s:%s/%s/': No such file or directory.", //
+                nonExistentPath, protocol, getHost(), getMappedDefaultBucketFsPort(), "default");
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
                 () -> getDefaultBucket().listContents(nonExistentPath), //
                 expected);
@@ -127,8 +140,8 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
         final var bucket = getDefaultBucket();
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile), //
-                matchesPattern(
-                        "E-BFSJ-2: File or directory not found trying to download 'http://.*/" + pathInBucket + "'."));
+                matchesPattern("E-BFSJ-2: File or directory not found trying to download 'https?://.*/" + pathInBucket
+                        + "'."));
     }
 
     @Test
@@ -146,6 +159,6 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .name(DEFAULT_BUCKET) //
                 .readPassword(getDefaultBucketConfiguration().getReadPassword()) //
                 .build();
-        assertThat(bucket.listContents(), hasItem("EXAClusterOS/"));
+        assertThat(bucket.listContents(), hasItem(uniqueFolderName + "/"));
     }
 }

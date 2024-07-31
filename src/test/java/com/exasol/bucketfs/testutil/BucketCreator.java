@@ -2,6 +2,7 @@ package com.exasol.bucketfs.testutil;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
@@ -48,6 +49,8 @@ public class BucketCreator {
         final ExasolDockerImageReference version = this.container.getDockerImageReference();
         assumeTrue(version.getMajor() >= 7,
                 "JSON RPC only available with Exasol version 7 or later, " + version + " is not supported.");
+        assumeFalse(version.getMajor() == 8 && version.getMinor() == 29 && version.getFixVersion() == 1,
+                "Support for creating buckets with Exasol 8 will be added in https://github.com/exasol/bucketfs-java/issues/66");
         return this;
     }
 
