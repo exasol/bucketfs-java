@@ -29,7 +29,7 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
     private Bucket bucket;
 
     @BeforeAll
-    static void beforeAll() throws SQLException {
+    static void beforeAll() {
         connection = EXASOL.createConnection();
         uploadCheck = new ChecksumUploadNecessityCheckStrategy(connection);
     }
@@ -44,6 +44,9 @@ class ChecksumUploadNecessityCheckStrategyTest extends AbstractBucketIT {
         return SyncAwareBucket.builder()//
                 .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(getDbCertificate()) //
+                .allowAlternativeHostName(getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //

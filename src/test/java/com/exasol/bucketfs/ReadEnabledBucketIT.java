@@ -43,6 +43,9 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .useTls(false) //
                 .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(getDbCertificate()) //
+                .allowAlternativeHostName(getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(bucketName) //
                 .readPassword(readPassword) //
@@ -136,6 +139,9 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
                 .useTls(false) //
                 .host(getHost()) //
                 .httpPort(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(getDbCertificate()) //
+                .allowAlternativeHostName(getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(getDefaultBucketConfiguration().getReadPassword()) //

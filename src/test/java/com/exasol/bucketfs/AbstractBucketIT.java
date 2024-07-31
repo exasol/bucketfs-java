@@ -3,6 +3,8 @@ package com.exasol.bucketfs;
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 
+import java.security.cert.X509Certificate;
+
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -19,6 +21,8 @@ import com.exasol.containers.ExasolContainer;
  */
 @Testcontainers
 public abstract class AbstractBucketIT {
+
+    public static final int BUCKETFS_TLS_PORT = 2581;
 
     /**
      * ExasolContainer
@@ -39,10 +43,32 @@ public abstract class AbstractBucketIT {
     /**
      * Get the Mapped Default Bucket Fs Port.
      *
-     * @return Integer
+     * @return mapped port number
      */
-    protected Integer getMappedDefaultBucketFsPort() {
-        return EXASOL.getMappedPort(EXASOL.getDefaultInternalBucketfsPort());
+    protected int getMappedDefaultBucketFsPort() {
+        final Integer port = EXASOL.getMappedPort(EXASOL.getDefaultInternalBucketfsPort());
+        if (port == null) {
+            throw new IllegalStateException("Port " + EXASOL.getDefaultInternalBucketfsPort() + " is not mapped");
+        }
+        return port.intValue();
+    }
+
+    /**
+     * Check if the current Exasol container uses TLS for BucketFS.
+     * 
+     * @return {@code true} if the current Exasol container uses TLS for BucketFS
+     */
+    protected boolean dbUsesTls() {
+        return EXASOL.getDefaultInternalBucketfsPort() == BUCKETFS_TLS_PORT;
+    }
+
+    /**
+     * Get the current Exasol container's TLS certificate.
+     * 
+     * @return the current Exasol container's TLS certificate
+     */
+    protected X509Certificate getDbCertificate() {
+        return EXASOL.getTlsCertificate().orElse(null);
     }
 
     /**
@@ -87,6 +113,9 @@ public abstract class AbstractBucketIT {
         return SyncAwareBucket.builder()//
                 .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(getDbCertificate()) //
+                .allowAlternativeHostName(getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(readPassword) //

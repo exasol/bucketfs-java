@@ -26,28 +26,29 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final String BUCKET_ROOT = "";
 
     /**
-     * bucketFs name
+     * BucketFs name
      */
     protected final String serviceName;
     /**
-     * bucket name
+     * Bucket name
      */
     protected final String bucketName;
-    private final String protocol;
+    /** Protocol for accessing the bucket ({@code http} or {@code https}). */
+    protected final String protocol;
     /**
      * Host or IP address
      */
     protected final String host;
     /**
-     * port
+     * Port
      */
     protected final int port;
     /**
-     * read password
+     * Read password
      */
     protected final String readPassword;
     /**
-     * upload history
+     * Upload history
      */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
     private final HttpClient client;
@@ -360,6 +361,34 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          */
         public T certificate(final X509Certificate certificate) {
             this.httpClientBuilder.certificate(certificate);
+            return self();
+        }
+
+        /**
+         * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional host name,
+         * e.g. {@code localhost}.
+         * <p>
+         * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+         * 
+         * @param hostName additional hostname to allow
+         * @return this instance for method chaining
+         */
+        public T allowAlternativeHostName(final String hostName) {
+            this.httpClientBuilder.allowAlternativeHostName(hostName);
+            return self();
+        }
+
+        /**
+         * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional IP address,
+         * e.g. {@code 127.0.0.1}.
+         * <p>
+         * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+         * 
+         * @param ipAddress additional IP address to allow
+         * @return this instance for method chaining
+         */
+        public T allowAlternativeIpAddress(final String ipAddress) {
+            this.httpClientBuilder.allowAlternativeIPAddress(ipAddress);
             return self();
         }
 

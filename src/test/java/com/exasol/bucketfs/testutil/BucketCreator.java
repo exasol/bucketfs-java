@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.time.Duration;
 import java.time.Instant;
 
-import com.exasol.bucketfs.BucketAccessException;
-import com.exasol.bucketfs.SyncAwareBucket;
+import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 import com.exasol.bucketfs.monitor.TimestampRetriever;
@@ -75,10 +74,13 @@ public class BucketCreator {
         return bucket;
     }
 
-    private SyncAwareBucket getSyncAwareBucket() throws InterruptedException {
+    private SyncAwareBucket getSyncAwareBucket() {
         return SyncAwareBucket.builder() //
                 .host(this.container.getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(container.getTlsCertificate().orElse(null)) //
+                .allowAlternativeHostName(this.container.getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(this.bucketName) //
                 .readPassword(READ_PASSWORD) //
@@ -104,6 +106,10 @@ public class BucketCreator {
 
     private Integer getMappedDefaultBucketFsPort() {
         return this.container.getMappedPort(this.container.getDefaultInternalBucketfsPort());
+    }
+
+    private boolean dbUsesTls() {
+        return this.container.getDefaultInternalBucketfsPort() == AbstractBucketIT.BUCKETFS_TLS_PORT;
     }
 
     private LogBasedBucketFsMonitor createBucketMonitor() {
