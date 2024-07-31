@@ -395,7 +395,8 @@ The Exasol Docker DB uses a self-signed certificate that is valid only for `CN=*
 ### Alternatives Considered
 
 * Completely ignoring the the host name during certificate validation is insecure.
-* We allow the user to specify one or more host names or IP addresses that are also considered valid during certificate validation.
+* We allow the user to specify one or more host names or IP addresses (Subject Alternative Names (SAN)) that are also considered valid during certificate validation.
+* We could automatically add the hostname used for connecting as an additional SANs. This would be more convenient, but is less secure and unexpected for the user. It is better to explicitly configure the additional SAN.
 
 ### Decisions
 

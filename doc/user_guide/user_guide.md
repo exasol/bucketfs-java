@@ -84,7 +84,7 @@ final ReadOnlyBucket bucket = ReadEnabledBucket.builder()
         .useTls(useTls)
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
-        .ipAddress(ipAddress)
+        .host(host)
         .port(port)
         .serviceName(serviceName)
         .name(bucketName)
@@ -102,7 +102,9 @@ The builder for the `ReadEnabledBucket` has the following parameter setters:
     * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
-* `ipAddress`: IP address of the cluster node to which you want to connect
+    * `allowAlternativeHostName`: if the certificate does not contain the correct host name, you can allow additional host names for connecting, e.g. `localhost`.
+    * `allowAlternativeIpAddress`: if the certificate does not contain the correct host name, you can allow additional host names for connecting, e.g. `127.0.0.1`.
+* `host`: Host name or IP address of the cluster node to which you want to connect
 * `port`: number of the port the BucketFS service listens on
 * `serviceName`: name of the service that hosts the bucket
 * `name`: name of the bucket
@@ -115,7 +117,8 @@ final UnsynchronizedBucket bucket = WriteEnabledBucket.builder()
         .useTls(useTls)
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
-        .ipAddress(ipAddress())
+        .allowAlternativeHostName(host())
+        .host(host())
         .port(port)
         .serviceName(serviceName)
         .name(bucketName)
@@ -135,7 +138,7 @@ final Bucket bucket = SyncAwareBucket.builder()
         .useTls(useTls)
         .raiseTlsErrors(raiseTlsErrors)
         .certificate(certificate)
-        .ipAddress(ipAddress())
+        .host(host())
         .port(port)
         .serviceName(serviceName)
         .name(bucketName)
