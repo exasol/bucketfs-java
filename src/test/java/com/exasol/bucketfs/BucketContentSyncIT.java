@@ -19,13 +19,16 @@ import com.exasol.bucketfs.monitor.TimestampRetriever;
 
 @Tag("slow")
 class BucketContentSyncIT extends AbstractBucketIT {
-    private static RandomFileGenerator GENERATOR = new RandomFileGenerator();
+    private static final RandomFileGenerator GENERATOR = new RandomFileGenerator();
 
     private Bucket getDefaultBucket() {
         final var bucketConfiguration = getDefaultBucketConfiguration();
         return SyncAwareBucket.builder()//
                 .host(getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(getDbCertificate()) //
+                .allowAlternativeHostName(getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(DEFAULT_BUCKET) //
                 .readPassword(bucketConfiguration.getReadPassword()) //
@@ -39,7 +42,7 @@ class BucketContentSyncIT extends AbstractBucketIT {
     // [itest->dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1]
     @Test
     void testWaitForFileToAppear(@TempDir final Path tempDir)
-            throws BucketAccessException, InterruptedException, IOException, TimeoutException {
+            throws BucketAccessException, IOException, TimeoutException {
         final var filename = "large-file.txt";
         final var tempFile = tempDir.resolve(filename);
         GENERATOR.createRandomFile(tempFile, 10000);
@@ -47,7 +50,7 @@ class BucketContentSyncIT extends AbstractBucketIT {
     }
 
     private void assertObjectSynchronized(final Path tempFile, final Bucket bucket, final String pathInBucket)
-            throws BucketAccessException, InterruptedException, TimeoutException, FileNotFoundException {
+            throws BucketAccessException, TimeoutException, FileNotFoundException {
         final var now = new TimestampRetriever().getState();
         assertThat(bucket.isObjectSynchronized(pathInBucket, now), equalTo(false));
         bucket.uploadFile(tempFile, pathInBucket);
@@ -58,14 +61,14 @@ class BucketContentSyncIT extends AbstractBucketIT {
     // [itest->dsn~validating-bucketfs-object-synchronization-via-monitoring-api~1]
     @Test
     void testWaitForArchiveToBeExtracted(@TempDir final Path tempDir)
-            throws IOException, BucketAccessException, InterruptedException, TimeoutException {
+            throws IOException, BucketAccessException, TimeoutException {
         final String filename = "archive.zip";
         final Path tempFile = tempDir.resolve(filename);
         createArchive(tempFile);
         assertObjectSynchronized(tempFile, getDefaultBucket(), filename);
     }
 
-    private void createArchive(final Path file) throws FileNotFoundException, IOException {
+    private void createArchive(final Path file) throws IOException {
         final var zip = new ZipOutputStream(new FileOutputStream(file.toFile()));
         final var entry = new ZipEntry("random.txt");
         zip.putNextEntry(entry);

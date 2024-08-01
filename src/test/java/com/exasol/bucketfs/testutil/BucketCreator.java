@@ -2,13 +2,14 @@ package com.exasol.bucketfs.testutil;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.logging.Logger;
 
-import com.exasol.bucketfs.BucketAccessException;
-import com.exasol.bucketfs.SyncAwareBucket;
+import com.exasol.bucketfs.*;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
 import com.exasol.bucketfs.jsonrpc.CreateBucketCommand.CreateBucketCommandBuilder;
 import com.exasol.bucketfs.monitor.TimestampRetriever;
@@ -19,6 +20,7 @@ import com.exasol.containers.ExasolContainer;
 import com.exasol.containers.ExasolDockerImageReference;
 
 public class BucketCreator {
+    private static final Logger LOGGER = Logger.getLogger(BucketCreator.class.getName());
     private static final String READ_PASSWORD = "READ_PASSWORD";
     private static final String WRITE_PASSWORD = "WRITE_PASSWORD";
 
@@ -47,6 +49,8 @@ public class BucketCreator {
         final ExasolDockerImageReference version = this.container.getDockerImageReference();
         assumeTrue(version.getMajor() >= 7,
                 "JSON RPC only available with Exasol version 7 or later, " + version + " is not supported.");
+        assumeFalse(version.getMajor() == 8 && version.getMinor() == 29 && version.getFixVersion() == 1,
+                "Support for creating buckets with Exasol 8 will be added in https://github.com/exasol/bucketfs-java/issues/66");
         return this;
     }
 
@@ -64,21 +68,30 @@ public class BucketCreator {
         final SyncAwareBucket bucket = getSyncAwareBucket();
         final Instant start = Instant.now();
         final Duration timeout = Duration.ofSeconds(5);
-        while (!bucketExists(bucket)) {
+        LOGGER.fine(
+                () -> "Waiting " + timeout + " until bucket " + bucket.getFullyQualifiedBucketName() + " exists...");
+        BucketAccessException exception = null;
+        do {
+            exception = bucketExists(bucket);
             delayNextCheck();
             final Duration waitingTime = Duration.between(start, Instant.now());
             if (timeout.minus(waitingTime).isNegative()) {
                 fail("Time out trying to verify that Bucket '" + bucket.getBucketName() + "' exists after waiting "
-                        + waitingTime);
+                        + waitingTime, exception);
             }
-        }
+        } while (exception != null);
+        LOGGER.fine(() -> "Bucket " + bucket.getFullyQualifiedBucketName() + " exists after "
+                + Duration.between(start, Instant.now()));
         return bucket;
     }
 
-    private SyncAwareBucket getSyncAwareBucket() throws InterruptedException {
+    private SyncAwareBucket getSyncAwareBucket() {
         return SyncAwareBucket.builder() //
                 .host(this.container.getHost()) //
                 .port(getMappedDefaultBucketFsPort()) //
+                .useTls(dbUsesTls()) //
+                .certificate(container.getTlsCertificate().orElse(null)) //
+                .allowAlternativeHostName(this.container.getHost()) //
                 .serviceName(DEFAULT_BUCKETFS) //
                 .name(this.bucketName) //
                 .readPassword(READ_PASSWORD) //
@@ -93,17 +106,21 @@ public class BucketCreator {
         Thread.sleep(300);
     }
 
-    private boolean bucketExists(final SyncAwareBucket bucket) {
+    private BucketAccessException bucketExists(final SyncAwareBucket bucket) {
         try {
             bucket.listContents();
         } catch (final BucketAccessException exception) {
-            return false;
+            return exception;
         }
-        return true;
+        return null;
     }
 
     private Integer getMappedDefaultBucketFsPort() {
         return this.container.getMappedPort(this.container.getDefaultInternalBucketfsPort());
+    }
+
+    private boolean dbUsesTls() {
+        return this.container.getDefaultInternalBucketfsPort() == AbstractBucketIT.BUCKETFS_TLS_PORT;
     }
 
     private LogBasedBucketFsMonitor createBucketMonitor() {

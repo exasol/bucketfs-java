@@ -34,10 +34,51 @@ class HttpClientBuilderTest {
     }
 
     @Test
+    // [utest->dsn~custom-tls-certificate~1]
     void testBuildWithCertificate() {
         final HttpClientBuilder builder = new HttpClientBuilder() //
                 .raiseTlsErrors(true) //
                 .certificate(mock(X509Certificate.class));
         assertThat(builder.build(), notNullValue());
+    }
+
+    @Test
+    // [utest->dsn~custom-tls-certificate.additional-subject-alternative-names~1]
+    void testBuildWithAltHostName() {
+        final HttpClientBuilder builder = new HttpClientBuilder() //
+                .raiseTlsErrors(true) //
+                .certificate(mock(X509Certificate.class)) //
+                .allowAlternativeHostName("altHost");
+        assertThat(builder.build(), notNullValue());
+    }
+
+    @Test
+    // [utest->dsn~custom-tls-certificate.additional-subject-alternative-names~1]
+    void testBuildWithAltIpAddress() {
+        final HttpClientBuilder builder = new HttpClientBuilder() //
+                .raiseTlsErrors(true) //
+                .certificate(mock(X509Certificate.class)) //
+                .allowAlternativeIPAddress("altIpAddr");
+        assertThat(builder.build(), notNullValue());
+    }
+
+    @Test
+    void testBuildWithAltHostNameWithoutCertificateFails() {
+        final HttpClientBuilder builder = new HttpClientBuilder() //
+                .raiseTlsErrors(true) //
+                .certificate(null) //
+                .allowAlternativeHostName("altHost");
+        ExceptionAssertions.assertThrowsWithMessage(IllegalStateException.class, builder::build,
+                "E-BFSJ-31: Using alternative subject names requires configuring a certificate. Either specify a certificate or remove the alternative subject names.");
+    }
+
+    @Test
+    void testBuildWithAltIpAddressWithoutCertificateFails() {
+        final HttpClientBuilder builder = new HttpClientBuilder() //
+                .raiseTlsErrors(true) //
+                .certificate(null) //
+                .allowAlternativeIPAddress("altIpAddr");
+        ExceptionAssertions.assertThrowsWithMessage(IllegalStateException.class, builder::build,
+                "E-BFSJ-31: Using alternative subject names requires configuring a certificate. Either specify a certificate or remove the alternative subject names.");
     }
 }

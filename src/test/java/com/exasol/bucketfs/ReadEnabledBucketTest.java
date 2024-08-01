@@ -2,6 +2,7 @@ package com.exasol.bucketfs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,18 +41,14 @@ class ReadEnabledBucketTest {
     @Mock
     private HttpResponse<Object> httpResponseMock;
 
-    @CsvSource({ //
-            "1234, service, bucket, service/bucket", //
-            "1234,        , bucket, 1234:bucket" //
-    })
-    @ParameterizedTest
-    void toString(final int port, final String serviceName, final String bucketName, final String expectedOutput) {
+    @Test
+    void testToString() {
         final var bucket = bucketBuilder() //
                 .host(IP_ADDRESS) //
-                .port(port) //
-                .serviceName(serviceName) //
-                .name(bucketName).build();
-        assertThat(bucket.toString(), equalTo(expectedOutput));
+                .port(1234) //
+                .serviceName("service") //
+                .name("bucket").build();
+        assertThat(bucket.toString(), equalTo("service/bucket"));
     }
 
     private ReadEnabledBucket.Builder<? extends Builder<?>> bucketBuilder() {
@@ -118,7 +115,7 @@ class ReadEnabledBucketTest {
             "500, E-BFSJ-1: Unable to perform list 'http://101.102.103.104:1234/bucket/'. HTTP status 500." })
     @ParameterizedTest
     void testRequestListingThrowsException(final int responseStatus, final String expectedExceptionMessage)
-            throws BucketAccessException, IOException, InterruptedException {
+            throws IOException, InterruptedException {
         simulateResponse(null, responseStatus);
         final ReadOnlyBucket bucket = createBucket();
         ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
@@ -126,7 +123,7 @@ class ReadEnabledBucketTest {
     }
 
     @Test
-    void testRequestListingFailsWithIOException() throws BucketAccessException, IOException, InterruptedException {
+    void testRequestListingFailsWithIOException() throws IOException, InterruptedException {
         when(this.httpClientBuilderMock.build()).thenReturn(this.httpClientMock);
         when(this.httpClientMock.send(any(), any())).thenThrow(new IOException("expected"));
 
@@ -136,8 +133,7 @@ class ReadEnabledBucketTest {
     }
 
     @Test
-    void testRequestListingFailsWithInterruptedException()
-            throws BucketAccessException, IOException, InterruptedException {
+    void testRequestListingFailsWithInterruptedException() throws IOException, InterruptedException {
         when(this.httpClientBuilderMock.build()).thenReturn(this.httpClientMock);
         when(this.httpClientMock.send(any(), any())).thenThrow(new InterruptedException("expected"));
 
@@ -151,6 +147,7 @@ class ReadEnabledBucketTest {
             "false, http" //
     })
     @ParameterizedTest
+    // [utest->dsn~tls-configuration~1]
     void testUseTlsUsesCorrectProtocol(final boolean useTls, final String protocol)
             throws BucketAccessException, IOException, InterruptedException {
         simulateResponse("", 200);
@@ -175,5 +172,29 @@ class ReadEnabledBucketTest {
         bucketBuilder().raiseTlsErrors(raiseTlsErrors);
 
         verify(this.httpClientBuilderMock).raiseTlsErrors(raiseTlsErrors);
+    }
+
+    @Test
+    void buildSucceedsWithMinimalConfiguration() {
+        assertThat(ReadEnabledBucket.builder().host("host").serviceName("service").name("bucket").build(),
+                notNullValue());
+    }
+
+    @Test
+    void buildFailsWithoutHost() {
+        final Builder<?> builder = ReadEnabledBucket.builder().serviceName("service").name("bucket");
+        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
+    }
+
+    @Test
+    void buildFailsWithoutService() {
+        final Builder<?> builder = ReadEnabledBucket.builder().host("host").name("bucket");
+        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "serviceName");
+    }
+
+    @Test
+    void buildFailsWithoutBucketName() {
+        final Builder<?> builder = ReadEnabledBucket.builder().host("host").serviceName("service");
+        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "bucketName");
     }
 }

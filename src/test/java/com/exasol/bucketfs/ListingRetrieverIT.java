@@ -18,8 +18,8 @@ import com.exasol.bucketfs.testutil.BucketCreator;
 @Tag("slow")
 class ListingRetrieverIT extends AbstractBucketIT {
 
-    private static HttpClient HTTP_CLIENT = new HttpClientBuilder().build();
-    private static ListingRetriever CONTENT_LISTER = new ListingRetriever(HTTP_CLIENT);
+    private static final HttpClient HTTP_CLIENT = new HttpClientBuilder().build();
+    private static final ListingRetriever CONTENT_LISTER = new ListingRetriever(HTTP_CLIENT);
 
     @Test
     void testListBuckets() throws Exception {
@@ -34,7 +34,8 @@ class ListingRetrieverIT extends AbstractBucketIT {
     }
 
     private URI uri(final String suffix) {
-        return ListingRetriever.publicReadUri("http", getHost(), getMappedDefaultBucketFsPort(), suffix);
+        final String protocol = dbUsesTls() ? "https" : "http";
+        return ListingRetriever.publicReadUri(protocol, getHost(), getMappedDefaultBucketFsPort(), suffix);
     }
 
     @Test

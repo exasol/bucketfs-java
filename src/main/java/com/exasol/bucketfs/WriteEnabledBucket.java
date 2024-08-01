@@ -74,12 +74,13 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
         LOGGER.fine(() -> "Successfully uploaded " + what + " to '" + uri + "'");
     }
 
+    // [impl->dsn~tls-configuration~1]
     private URI createWriteUri(final String pathInBucket) throws BucketAccessException {
         try {
-            return new URI("http", null, this.host, this.port, "/" + this.bucketName + "/" + pathInBucket, null, null)
-                    .normalize();
+            return new URI(this.protocol, null, this.host, this.port, "/" + this.bucketName + "/" + pathInBucket, null,
+                    null).normalize();
         } catch (final URISyntaxException exception) {
-            throw new BucketAccessException("Unable to create write URI.", exception);
+            throw new BucketAccessException("Unable to create write URI for path '" + pathInBucket + "'.", exception);
         }
     }
 
@@ -134,7 +135,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
      */
     protected void recordUploadInHistory(final String pathInBucket) {
         final var now = Instant.now();
-        LOGGER.fine(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
+        LOGGER.finest(() -> "Recorded upload to '" + pathInBucket + "' at " + now + " in upload history");
         this.uploadHistory.put(pathInBucket, now);
     }
 
