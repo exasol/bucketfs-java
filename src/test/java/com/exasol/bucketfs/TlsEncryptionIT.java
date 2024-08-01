@@ -21,7 +21,7 @@ class TlsEncryptionIT extends AbstractBucketIT {
     }
 
     @Nested
-    class WithCertificate {
+    class CertificateAddedToClient {
         @Test
         // [itest->dsn~custom-tls-certificate~1]
         // [itest->dsn~custom-tls-certificate.additional-subject-alternative-names~1]
@@ -92,7 +92,7 @@ class TlsEncryptionIT extends AbstractBucketIT {
     }
 
     @Nested
-    class WithoutCertificate {
+    class NoCertificateAddedToClient {
 
         @Test
         void unencryptedConnectionFails() {

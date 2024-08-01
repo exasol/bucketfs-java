@@ -227,7 +227,7 @@ Needs: dsn
 
 `req~tls-support~1`
 
-BFSJ allows users to access a bucket via an connection encrypted with TLS.
+BFSJ allows users accessing a bucket via a connection encrypted with TLS.
 
 Rationale:
 

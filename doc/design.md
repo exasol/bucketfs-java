@@ -267,7 +267,7 @@ Needs: impl, itest
 
 `dsn~tls-configuration~1`
 
-The `Bucket` allows the user enable TLS encryption using builder method `useTls(boolean)`.
+The `Bucket` allows the user to enable TLS encryption using builder method `useTls(boolean)`.
 
 Covers:
 
