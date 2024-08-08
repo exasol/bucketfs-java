@@ -8,5 +8,5 @@ linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
 build:
   exasolDbVersions:
-    #- "8.29.1" # Will be added once exasol-testcontainers 7.1.1 is released, see https://github.com/exasol/bucketfs-java/issues/71
+    - "8.29.1"
     - "7.1.29"
