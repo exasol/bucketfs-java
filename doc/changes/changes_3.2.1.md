@@ -12,11 +12,19 @@ This release adds integration tests with Exasol 8.
 
 ## Dependency Updates
 
+### Runtime Dependency Updates
+
+* Updated `org.eclipse:yasson:3.0.3` to `3.0.4`
+
 ### Test Dependency Updates
 
 * Updated `com.exasol:exasol-testcontainers:7.1.0` to `7.1.1`
 * Updated `org.hamcrest:hamcrest:2.2` to `3.0`
-* Updated `org.testcontainers:junit-jupiter:1.20.0` to `1.20.1`
+* Updated `org.junit.jupiter:junit-jupiter-engine:5.10.3` to `5.11.3`
+* Updated `org.junit.jupiter:junit-jupiter-params:5.10.3` to `5.11.3`
+* Updated `org.mockito:mockito-junit-jupiter:5.12.0` to `5.14.2`
+* Updated `org.slf4j:slf4j-jdk14:2.0.13` to `2.0.16`
+* Updated `org.testcontainers:junit-jupiter:1.20.0` to `1.20.3`
 
 ### Plugin Dependency Updates
 
