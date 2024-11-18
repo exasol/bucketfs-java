@@ -62,10 +62,24 @@ class ReadEnabledBucketTest {
         assertThat(bucket.getFullyQualifiedBucketName(), equalTo(BUCKET_FS_NAME + "/" + BUCKET_NAME));
     }
 
+    @Test
+    void testGetFullyQualifiedBucketNameForDefaultServiceName() {
+        final var bucket = createBucketWithDefaultServiceName();
+
+        assertThat(bucket.getFullyQualifiedBucketName(), equalTo(BucketConstants.DEFAULT_BUCKETFS + "/" + BUCKET_NAME));
+    }
+
     private ReadOnlyBucket createBucket() {
         return bucketBuilder().host(IP_ADDRESS) //
                 .port(PORT) //
                 .serviceName(BUCKET_FS_NAME) //
+                .name(BUCKET_NAME) //
+                .build();
+    }
+
+    private ReadOnlyBucket createBucketWithDefaultServiceName() {
+        return bucketBuilder().host(IP_ADDRESS) //
+                .port(PORT) //
                 .name(BUCKET_NAME) //
                 .build();
     }
@@ -184,12 +198,6 @@ class ReadEnabledBucketTest {
     void buildFailsWithoutHost() {
         final Builder<?> builder = ReadEnabledBucket.builder().serviceName("service").name("bucket");
         ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
-    }
-
-    @Test
-    void buildFailsWithoutService() {
-        final Builder<?> builder = ReadEnabledBucket.builder().host("host").name("bucket");
-        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "serviceName");
     }
 
     @Test

@@ -1,14 +1,19 @@
-# BucketFS Java 3.2.1, released 2024-??-??
+# BucketFS Java 3.2.1, released 2024-11-18
 
-Code name: Test with Exasol 8
+Code name: Parameter serviceName should be optional
 
 ## Summary
 
-This release adds integration tests with Exasol 8.
+This release fixes an issue with the parameter `serviceName` that is no longer required, keeping the behaviour of 
+versions <= 3.1.2. It also adds tests for Exasol 8.
 
 ## Features
 
 * #71: Added tests with Exasol 8
+
+## Bugfixes
+
+* #73: Parameter serviceName should be optional
 
 ## Dependency Updates
 
