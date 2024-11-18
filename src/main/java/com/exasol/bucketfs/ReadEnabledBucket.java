@@ -59,7 +59,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @param builder builder from which the bucket should be constructed
      */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
-        this.serviceName = Objects.requireNonNull(builder.serviceName, "serviceName");
+        this.serviceName = builder.serviceName != null ? builder.serviceName : BucketConstants.DEFAULT_BUCKETFS;
         this.bucketName = Objects.requireNonNull(builder.bucketName, "bucketName");
         this.protocol = Objects.requireNonNull(builder.protocol, "protocol");
         this.host = Objects.requireNonNull(builder.host, "host");
