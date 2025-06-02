@@ -256,3 +256,20 @@ Covers:
 * [feat~bucketfs-access~1](#bucketfs-access)
 
 Needs: dsn
+
+##### UDF bucket path
+
+`req~udf-bucket-path~1`
+
+To avoid confusion and to reduce the chance of human error, the bucket API returns the correct path for a bucket from the UDFs perspective.
+
+Rationale:
+
+* BucketFS is the only bit of filesystem a UDF can see, where users can store files.
+* BucketFS in a UDF is a chroot environment, meaning that the paths in the UDF look different from the ones on the host or the ones exposed via the BucketFS web interface.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn

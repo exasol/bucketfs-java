@@ -87,10 +87,43 @@ public interface ReadOnlyBucket {
      */
     String downloadFileAsString(String pathInBucket) throws BucketAccessException;
 
+    /**
+     * Returns the UDF-visible path to the root of this bucket within BucketFS.
+     * <p>
+     * This method ensures consistency and avoids human error by generating the correct chrooted path
+     * as seen from within a User-Defined Function (UDF) environment.
+     * </p>
+     *
+     * <p>
+     * In Exasol, BucketFS is the only accessible filesystem for UDFs and it operates in a chrooted
+     * environment. As such, paths inside UDFs differ from those on the host system or exposed via
+     * the BucketFS web interface. This method abstracts away those differences and provides
+     * the correct UDF-local path.
+     * </p>
+     *
+     * @return the absolute path to the bucket as seen inside the UDF
+     */
+    // [impl->dsn~get-the-udf-bucket-path~1]
     default String getPathInUdf() {
         return PATH_IN_UDF_PREFIX + getBucketFsName() + PATH_SEPARATOR + getBucketName();
     }
 
+    /**
+     * Returns the UDF-visible path to a specific file within this bucket in BucketFS.
+     * <p>
+     * This method ensures that the path to the given file is correctly formed in the context
+     * of a UDF environment, taking into account the chrooted nature of BucketFS.
+     * </p>
+     *
+     * <p>
+     * This is useful for referencing files inside a bucket from UDFs, where the apparent file
+     * paths are isolated from the underlying host filesystem.
+     * </p>
+     *
+     * @param fileInBucketFs the relative path or name of the file inside the bucket
+     * @return the absolute path to the file as seen inside the UDF
+     */
+    // [impl->dsn~get-the-udf-bucket-path~1]
     default String getPathInUdf(String fileInBucketFs) {
         return getPathInUdf() + PATH_SEPARATOR + fileInBucketFs;
     }
