@@ -3,10 +3,14 @@ package com.exasol.bucketfs;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
+
 /**
  * Interface for read-only bucket access.
  */
 public interface ReadOnlyBucket {
+
+    static final String PATH_IN_UDF_PREFIX = PATH_SEPARATOR + "buckets" + PATH_SEPARATOR;
     /**
      * @return name of the BucketFS filesystem this bucket belongs to
      */
@@ -82,4 +86,12 @@ public interface ReadOnlyBucket {
      * @throws BucketAccessException if the local file does not exist or is not accessible or if the download failed
      */
     String downloadFileAsString(String pathInBucket) throws BucketAccessException;
+
+    default String getPathInUdf() {
+        return PATH_IN_UDF_PREFIX + getBucketFsName() + PATH_SEPARATOR + getBucketName();
+    }
+
+    default String getPathInUdf(String fileInBucketFs) {
+        return getPathInUdf() + PATH_SEPARATOR + fileInBucketFs;
+    }
 }
