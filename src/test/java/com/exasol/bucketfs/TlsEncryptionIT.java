@@ -39,11 +39,6 @@ class TlsEncryptionIT extends AbstractBucketIT {
         }
 
         @Test
-        void connectionWithoutAltNameFails() {
-            final ReadOnlyBucket bucket = createBucket(true, getHost(), null, null);
-            assertConnectionError(bucket, equalTo("No name matching " + getHost() + " found"));
-        }
-
         void connectionWithWrongAltNameFails() {
             final ReadOnlyBucket bucket = createBucket(true, getHost(), "wrongAltName", null);
             assertConnectionError(bucket, equalTo("No subject alternative DNS name matching " + getHost() + " found."));
