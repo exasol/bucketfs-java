@@ -111,11 +111,12 @@ class ReadEnabledBucketTest {
 
     @Test
     // [utest->dsn~get-the-udf-bucket-path~1]
-    void getPathInUdf() throws Exception {
+    void getPathInUdf() {
         ReadOnlyBucket bucket = createBucket();
+        assertThat(bucket.getBucketFsName(), equalTo("service"));
+        assertThat(bucket.getBucketName(), equalTo("bucket"));
         final String pathInUdf = bucket.getPathInUdf("child.txt");
-        assertThat(pathInUdf, equalTo(ReadOnlyBucket.PATH_IN_UDF_PREFIX
-                        + bucket.getBucketFsName() + "/" + bucket.getBucketName() + "/child.txt"));
+        assertThat(pathInUdf, equalTo("/buckets/service/bucket/child.txt"));
     }
 
     private String lines(final String... lines) {
