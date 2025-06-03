@@ -32,12 +32,12 @@ jobs:
       fail-fast: false
       matrix:
         exasol_db_version: [
-          8.29.1,
-          7.1.29
+          8.34.0,
+          7.1.30
         ]
         
     env: {
-      DEFAULT_EXASOL_DB_VERSION: 8.29.1
+      DEFAULT_EXASOL_DB_VERSION: 8.34.0
     }
     steps:
       - name: Free Disk Space
@@ -73,6 +73,11 @@ jobs:
         name: Enable testcontainer reuse,
         id: enable-testcontainer-reuse,
         run: echo 'testcontainers.reuse.enable=true' > "$HOME/.testcontainers.properties"
+      }
+      - {
+        name: Fix VM Crash in UDFs,
+        id: fix-vm-crash,
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       }
       - name: Run tests and build with Maven
         id: build-pk-verify
