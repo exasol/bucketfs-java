@@ -1,4 +1,4 @@
-# BucketFS Java 3.0.1, released 2025-06-??
+# BucketFS Java 3.0.1, released 2025-06-03
 
 Code name: Dependency updates on top of 3.0.0
 
@@ -14,10 +14,6 @@ This issue has been fixed quite a while back now, but the OSSIndex unfortunately
 * #76: Updated dependencies on top of 3.0.0
 
 ## Dependency Updates
-
-### Compile Dependency Updates
-
-* Added `org.apache.commons:commons-compress:1.27.1`
 
 ### Test Dependency Updates
 

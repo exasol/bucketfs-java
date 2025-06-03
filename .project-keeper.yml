@@ -8,5 +8,15 @@ linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
 build:
   exasolDbVersions:
-    - "8.29.1"
-    - "7.1.29"
+    - "8.34.0"
+    - "7.1.30"
+  workflows:
+    - name: ci-build.yml
+      stepCustomizations:
+        - action: INSERT_AFTER
+          job: matrix-build
+          stepId: enable-testcontainer-reuse
+          content:
+            name: Fix VM Crash in UDFs
+            id: fix-vm-crash
+            run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
