@@ -49,7 +49,8 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                         containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
                 () -> assertThat(exception.getCause().getMessage(),
                         either(equalTo("No subject alternative names present"))
-                                .or(equalTo("No name matching localhost found"))));
+                                .or(equalTo("No name matching localhost found"))
+                                .or(equalTo("No subject alternative DNS name matching localhost found."))));
     }
 
     @Test
