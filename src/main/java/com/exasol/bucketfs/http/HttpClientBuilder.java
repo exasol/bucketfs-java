@@ -7,19 +7,23 @@ import java.net.http.HttpClient;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Logger;
 
 import javax.net.ssl.*;
 
+import com.exasol.bucketfs.http.SubjectAltName.Type;
 import com.exasol.bucketfs.jsonrpc.CommandFactory;
 
 /**
  * A builder for {@link HttpClient} that provides a convenient way for ignoring TLS errors.
  */
 public class HttpClientBuilder {
+    private static final Logger LOGGER = Logger.getLogger(HttpClientBuilder.class.getName());
 
     private boolean raiseTlsErrors = true;
     private X509Certificate certificate;
+    private final List<SubjectAltName> altNames = new ArrayList<>();
 
     /**
      * Define if TLS errors should raise an error when executing requests or if they should be ignored. Setting this to
@@ -54,6 +58,37 @@ public class HttpClientBuilder {
     }
 
     /**
+     * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional host name, e.g.
+     * {@code localhost}.
+     * <p>
+     * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+     * 
+     * @param hostName additional hostname to allow
+     * @return this instance for method chaining
+     */
+    public HttpClientBuilder allowAlternativeHostName(final String hostName) {
+        return this.allowAltName(new SubjectAltName(Type.HOSTNAME, hostName));
+    }
+
+    /**
+     * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional IP address,
+     * e.g. {@code 127.0.0.1}.
+     * <p>
+     * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+     * 
+     * @param ipAddress additional IP address to allow
+     * @return this instance for method chaining
+     */
+    public HttpClientBuilder allowAlternativeIPAddress(final String ipAddress) {
+        return this.allowAltName(new SubjectAltName(Type.IP, ipAddress));
+    }
+
+    private HttpClientBuilder allowAltName(final SubjectAltName altName) {
+        this.altNames.add(altName);
+        return this;
+    }
+
+    /**
      * Creates a new {@link HttpClient} using the specified configuration.
      *
      * @return a new {@link HttpClient}
@@ -80,36 +115,53 @@ public class HttpClientBuilder {
                     .message("Setting raiseTlsErrors to false and using a certificate is mutually exclusive.")
                     .mitigation("Either set raiseTlsErrors to true or remove the certificate.").toString());
         }
+        if (this.certificate == null && !this.altNames.isEmpty()) {
+            throw new IllegalStateException(messageBuilder("E-BFSJ-31")
+                    .message("Using alternative subject names requires configuring a certificate.")
+                    .mitigation("Either specify a certificate or remove the alternative subject names.").toString());
+        }
         if (!this.raiseTlsErrors) {
             return Optional.of(createDummyTrustManagers());
         } else if (this.certificate != null) {
-            return Optional.of(createTrustManagerForCertificate());
+            return Optional.of(createTrustManagerForCertificate(this.certificate)).map(this::allowAlternativeNames);
         } else {
             return Optional.empty();
         }
-
     }
 
-    private TrustManager[] createDummyTrustManagers() {
+    private static TrustManager[] createDummyTrustManagers() {
         return new TrustManager[] { new DummyTrustManager() };
     }
 
-    private TrustManager[] createTrustManagerForCertificate() {
+    // [impl->dsn~custom-tls-certificate~1]
+    private static TrustManager[] createTrustManagerForCertificate(final X509Certificate certificate) {
         try {
             final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null);
-            keyStore.setCertificateEntry("caCert", this.certificate);
+            keyStore.setCertificateEntry("caCert", certificate);
             final TrustManagerFactory trustManagerFactory = TrustManagerFactory
                     .getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(keyStore);
-            return trustManagerFactory.getTrustManagers();
+            final TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+            LOGGER.finest(() -> "Created " + trustManagers.length + " trust managers for certificate with subject '"
+                    + certificate.getSubjectX500Principal() + "': " + Arrays.toString(trustManagers));
+            return trustManagers;
         } catch (final KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException exception) {
             throw new IllegalStateException(messageBuilder("E-BFSJ-25")
                     .message("Unable to create trust manager for given certificate").toString());
         }
     }
 
-    private SSLContext createSslContext() {
+    // [impl->dsn~custom-tls-certificate.additional-subject-alternative-names~1]
+    private TrustManager[] allowAlternativeNames(final TrustManager[] trustManagers) {
+        return Arrays.stream(trustManagers).map(this::allowAlternativeNames).toArray(TrustManager[]::new);
+    }
+
+    private TrustManager allowAlternativeNames(final TrustManager trustManager) {
+        return SubjectAltNameTrustManager.wrap(trustManager, altNames);
+    }
+
+    private static SSLContext createSslContext() {
         try {
             return SSLContext.getInstance("TLS");
         } catch (final NoSuchAlgorithmException exception) {

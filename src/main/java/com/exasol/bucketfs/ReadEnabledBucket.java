@@ -26,28 +26,29 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final String BUCKET_ROOT = "";
 
     /**
-     * bucketFs name
+     * BucketFs name
      */
     protected final String serviceName;
     /**
-     * bucket name
+     * Bucket name
      */
     protected final String bucketName;
-    private final String protocol;
+    /** Protocol for accessing the bucket ({@code http} or {@code https}). */
+    protected final String protocol;
     /**
      * Host or IP address
      */
     protected final String host;
     /**
-     * port
+     * Port
      */
     protected final int port;
     /**
-     * read password
+     * Read password
      */
     protected final String readPassword;
     /**
-     * upload history
+     * Upload history
      */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
     private final HttpClient client;
@@ -58,10 +59,10 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
      * @param builder builder from which the bucket should be constructed
      */
     protected ReadEnabledBucket(final Builder<? extends Builder<?>> builder) {
-        this.serviceName = builder.serviceName;
-        this.bucketName = builder.bucketName;
-        this.protocol = builder.protocol;
-        this.host = builder.host;
+        this.serviceName = builder.serviceName != null ? builder.serviceName : BucketConstants.DEFAULT_BUCKETFS;
+        this.bucketName = Objects.requireNonNull(builder.bucketName, "bucketName");
+        this.protocol = Objects.requireNonNull(builder.protocol, "protocol");
+        this.host = Objects.requireNonNull(builder.host, "host");
         this.port = builder.port;
         this.readPassword = builder.readPassword;
         this.client = builder.httpClientBuilder.build();
@@ -90,7 +91,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     // [impl->dsn~bucket-lists-its-contents~2]
     public List<String> listContents() throws BucketAccessException {
-        return listContents(BUCKET_ROOT);
+        return listContents(BUCKET_ROOT, false);
+    }
+
+    @Override
+    // [impl->dsn~bucket-lists-its-contents-recursively~1]
+    public List<String> listContentsRecursively() throws BucketAccessException {
+        return listContents(BUCKET_ROOT, true);
     }
 
     @Override
@@ -98,12 +105,23 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     // [impl->dsn~bucket-lists-file-and-directory-with-identical-name~1]
     // [impl->dsn~bucket-lists-directories-with-suffix~1]
     public List<String> listContents(final String path) throws BucketAccessException {
+        return listContents(path, false);
+    }
+
+    @Override
+    // [impl->dsn~bucket-lists-its-contents-recursively~1]
+    public List<String> listContentsRecursively(final String path) throws BucketAccessException {
+        return listContents(path, true);
+    }
+
+    private List<String> listContents(final String path, final boolean recursive) throws BucketAccessException {
         final URI uri = createPublicReadURI("");
         final ListingRetriever contentLister = new ListingRetriever(this.client);
         return new BucketContentLister(uri, contentLister, this.readPassword) //
-                .retrieve(removeLeadingSeparator(path), false);
+                .retrieve(removeLeadingSeparator(path), recursive);
     }
 
+    // [impl->dsn~tls-configuration~1]
     private URI createPublicReadURI(final String pathInBucket) {
         final String suffix = this.bucketName + "/" + removeLeadingSeparator(pathInBucket);
         return ListingRetriever.publicReadUri(this.protocol, this.host, this.port, suffix);
@@ -263,6 +281,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          * @param useTls {@code true} to use the TLS/HTTPS protocol, {@code false} to use plain text HTTP (default)
          * @return Builder instance for fluent programming
          */
+        // [impl->dsn~tls-configuration~1]
         public T useTls(final boolean useTls) {
             this.protocol = useTls ? "https" : "http";
             return self();
@@ -342,8 +361,37 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
          * @param certificate certificate to use
          * @return Builder instance for fluent programming
          */
+        // [impl->dsn~custom-tls-certificate~1]
         public T certificate(final X509Certificate certificate) {
             this.httpClientBuilder.certificate(certificate);
+            return self();
+        }
+
+        /**
+         * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional host name,
+         * e.g. {@code localhost}.
+         * <p>
+         * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+         * 
+         * @param hostName additional hostname to allow
+         * @return this instance for method chaining
+         */
+        public T allowAlternativeHostName(final String hostName) {
+            this.httpClientBuilder.allowAlternativeHostName(hostName);
+            return self();
+        }
+
+        /**
+         * Update the certificate specified via {@link #certificate(X509Certificate)} to allow an additional IP address,
+         * e.g. {@code 127.0.0.1}.
+         * <p>
+         * This is useful when a self-signed certificate does not contain the required subject alternative name (SAN).
+         * 
+         * @param ipAddress additional IP address to allow
+         * @return this instance for method chaining
+         */
+        public T allowAlternativeIpAddress(final String ipAddress) {
+            this.httpClientBuilder.allowAlternativeIPAddress(ipAddress);
             return self();
         }
 

@@ -83,6 +83,22 @@ Covers:
 
 Needs: dsn
 
+#### Recursive Bucket Content Listing
+
+`req~bucket-content-listing-recursive~1`
+
+BFSJ lists the contents of a bucket in BucketFS recursively.
+
+Rationale:
+
+Allows listing all files in a directory hierarchy.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
 #### Uploading a File to BucketFS
 
 `req~uploading-a-file-to-bucketfs~1`
@@ -200,6 +216,40 @@ BFSJ allows users to wait for bucket contents to be synchronized on a single nod
 Rationale:
 
 Files uploaded to BucketFS are not immediately usable due to internal synchronization mechanisms. In case of automated scripts, immediately continuing without waiting until the files are properly synced can lead to race conditions.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
+#### TLS Support
+
+`req~tls-support~1`
+
+BFSJ allows users accessing a bucket via a connection encrypted with TLS.
+
+Rationale:
+
+* Unencrypted connections are insecure.
+* Exasol Docker DB versions 8.29.1 and later only support TLS encrypted connections.
+
+Covers:
+
+* [feat~bucketfs-access~1](#bucketfs-access)
+
+Needs: dsn
+
+##### Custom TLS Certificates
+
+`req~tls-support.custom-certificate~1`
+
+BFSJ allows users to connect to a database that uses a certificate that is not included in the runtime's keystore.
+
+Rationale:
+
+* Exasol databases (e.g. Docker DB) use a self signed certificate by default.
+* Ignoring the certificate completely is not acceptable for security reasons.
 
 Covers:
 

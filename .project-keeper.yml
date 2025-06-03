@@ -6,5 +6,7 @@ sources:
       - integration_tests
 linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
-excludes:
-  - "E-PK-CORE-18: Outdated content: '.github/workflows/ci-build.yml'"
+build:
+  exasolDbVersions:
+    - "8.29.1"
+    - "7.1.29"
