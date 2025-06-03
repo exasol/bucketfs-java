@@ -176,6 +176,38 @@ EXAClusterOS/
 /EXAClusterOS/
 ```
 
+### Get the UDF Bucket Path
+
+In Exasol, BucketFS is the only accessible filesystem for UDFs, and it operates in a **chrooted environment**.  
+This means that paths seen from within a UDF differ from those on the host system or exposed via the BucketFS web interface.
+
+Methods `getPathInUdf()` and `getPathInUdf(String filename)` of the `ReadOnlyBucket` interface:
+
+- Abstract away the differences in file system paths.
+- Provide the correct UDF-local path.
+- Help avoid human error by generating consistent and correct paths. .
+
+#### 1. Get the UDF-visible root path of a bucket
+
+Use this method to retrieve the path to the root of the bucket from within a UDF:
+
+```java
+final String udfBucketPath = bucket.getPathInUdf();
+```
+
+It returns the UDF-visible path to the root of this bucket within BucketFS.
+
+#### 2. Get the UDF-visible path to a file in the bucket
+
+Use this method to get the full path to a specific file inside the bucket:
+
+```java
+final String udfFilePath = bucket.getPathInUdf("my-file.txt");
+```
+
+It returns the UDF-visible path to the file inside the bucket within BucketFS.
+
+
 ### Listing Bucket Contents
 
 The following code lists the contents of a bucket's root:
