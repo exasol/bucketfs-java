@@ -19,7 +19,7 @@
 | [mockito-junit-jupiter][10]                     | [MIT][11]                        |
 | [Test containers for Exasol on Docker][12]      | [MIT License][13]                |
 | [Testcontainers :: JUnit Jupiter Extension][14] | [MIT][15]                        |
-| [SLF4J JDK14 Provider][16]                      | [MIT License][17]                |
+| [SLF4J JDK14 Provider][16]                      | [MIT][17]                        |
 
 ## Runtime Dependencies
 
@@ -76,7 +76,7 @@
 [14]: https://java.testcontainers.org
 [15]: http://opensource.org/licenses/MIT
 [16]: http://www.slf4j.org
-[17]: http://www.opensource.org/licenses/mit-license.php
+[17]: https://opensource.org/license/mit
 [18]: https://github.com/eclipse-ee4j/parsson
 [19]: https://projects.eclipse.org/projects/ee4j.yasson
 [20]: http://www.eclipse.org/legal/epl-v20.html

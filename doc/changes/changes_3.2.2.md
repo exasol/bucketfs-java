@@ -22,6 +22,7 @@ This issue has been fixed quite a while back now, but the OSSIndex unfortunately
 * Removed `org.junit.jupiter:junit-jupiter-engine:5.11.3`
 * Updated `org.junit.jupiter:junit-jupiter-params:5.11.3` to `5.13.0`
 * Updated `org.mockito:mockito-junit-jupiter:5.14.2` to `5.18.0`
+* Updated `org.slf4j:slf4j-jdk14:2.0.16` to `2.0.17`
 * Updated `org.testcontainers:junit-jupiter:1.20.3` to `1.21.1`
 
 ### Plugin Dependency Updates
