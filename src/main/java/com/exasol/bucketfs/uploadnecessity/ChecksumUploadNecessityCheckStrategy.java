@@ -99,8 +99,7 @@ public class ChecksumUploadNecessityCheckStrategy implements UploadNecessityChec
         installChecksumUdf();
         try (final PreparedStatement statement = this.sqlConnection
                 .prepareStatement("SELECT " + UDF_FULL_NAME + "(?)")) {
-            final String pathInUdf = "/buckets/" + bucket.getBucketFsName() + PATH_SEPARATOR + bucket.getBucketName()
-                    + PATH_SEPARATOR + fileInBucketFs;
+            final String pathInUdf = bucket.getPathInUdf(fileInBucketFs);
             statement.setString(1, pathInUdf);
             try (final ResultSet result = statement.executeQuery()) {
                 result.next();

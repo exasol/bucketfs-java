@@ -112,6 +112,26 @@ Covers:
 
 Needs: impl, utest
 
+## Get the UDF bucket path
+
+`dsn~get-the-udf-bucket-path~1`
+
+* The bucket API implements a method that returns the correct path for a bucket from the UDFs perspective.
+* This method returns the UDF-visible path to the root of this bucket within BucketFS.
+* This method ensures consistency and avoids human error by generating the correct chrooted path as seen from within a UDF environment.
+
+Rationale:
+
+* BucketFS is the only accessible filesystem for UDFs and it operates in a chrooted environment. 
+* Paths inside UDFs differ from those on the host system or exposed via the BucketFS web interface. 
+* This method abstracts away those differences and provides the correct UDF-local path.
+
+Covers:
+
+* [`req~udf-bucket-path~1`](system_requirements.md#custom-tls-certificates)
+
+Needs: impl, utest
+
 ### Append Suffix to Directories
 `dsn~bucket-lists-directories-with-suffix~1`
 

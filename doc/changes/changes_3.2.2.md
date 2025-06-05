@@ -1,6 +1,6 @@
-# BucketFS Java 3.0.1, released 2025-06-05
+# BucketFS Java 3.2.2, released 2025-06-05
 
-Code name: Dependency updates on top of 3.0.0
+Code name: Dependency updates on top of 3.2.1
 
 ## Summary
 
@@ -11,7 +11,7 @@ This issue has been fixed quite a while back now, but the OSSIndex unfortunately
 
 ## Features
 
-* #76: Updated dependencies on top of 3.0.0
+* #76: Updated dependencies on top of 3.2.1
 
 ## Dependency Updates
 

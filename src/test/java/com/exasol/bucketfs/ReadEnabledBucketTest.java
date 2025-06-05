@@ -109,6 +109,22 @@ class ReadEnabledBucketTest {
         assertThat(actual, equalTo(List.of("name", "name/")));
     }
 
+    @Test
+    // [utest->dsn~get-the-udf-bucket-path~1]
+    void getBucketPathInUdf() {
+        ReadOnlyBucket bucket = createBucket();
+        final String pathInUdf = bucket.getPathInUdf();
+        assertThat(pathInUdf, equalTo("/buckets/service/bucket"));
+    }
+
+    @Test
+    // [utest->dsn~get-the-udf-bucket-path~1]
+    void getFilePathInUdf() {
+        ReadOnlyBucket bucket = createBucket();
+        final String pathInUdf = bucket.getPathInUdf("my-file.txt");
+        assertThat(pathInUdf, equalTo("/buckets/service/bucket/my-file.txt"));
+    }
+
     private String lines(final String... lines) {
         return Arrays.stream(lines).collect(Collectors.joining("\n"));
     }
