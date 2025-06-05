@@ -185,7 +185,7 @@ Methods `getPathInUdf()` and `getPathInUdf(String filename)` of the `ReadOnlyBuc
 
 - Abstract away the differences in file system paths.
 - Provide the correct UDF-local path.
-- Help avoid human error by generating consistent and correct paths. .
+- Help avoid human error by generating consistent and correct paths.
 
 #### 1. Get the UDF-visible root path of a bucket
 

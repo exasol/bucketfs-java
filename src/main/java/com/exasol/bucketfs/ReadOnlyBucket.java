@@ -98,7 +98,7 @@ public interface ReadOnlyBucket {
     String downloadFileAsString(String pathInBucket) throws BucketAccessException;
 
     /**
-     * Returns the UDF-visible path to the root of this bucket within BucketFS.
+     * Return the UDF-visible path to the root of this bucket within BucketFS.
      * <p>
      * This method ensures consistency and avoids human error by generating the correct chrooted path
      * as seen from within a User-Defined Function (UDF) environment.
@@ -119,7 +119,7 @@ public interface ReadOnlyBucket {
     }
 
     /**
-     * Returns the UDF-visible path to a specific file within this bucket in BucketFS.
+     * Return the UDF-visible path to a specific file within this bucket in BucketFS.
      * <p>
      * This method ensures that the path to the given file is correctly formed in the context
      * of a UDF environment, taking into account the chrooted nature of BucketFS.
@@ -134,7 +134,7 @@ public interface ReadOnlyBucket {
      * @return the absolute path to the file as seen inside the UDF
      */
     // [impl->dsn~get-the-udf-bucket-path~1]
-    default String getPathInUdf(String fileInBucketFs) {
+    default String getPathInUdf(final String fileInBucketFs) {
         return getPathInUdf() + PATH_SEPARATOR + fileInBucketFs;
     }
 }
