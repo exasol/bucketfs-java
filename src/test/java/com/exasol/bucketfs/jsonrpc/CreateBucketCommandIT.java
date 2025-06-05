@@ -57,7 +57,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     void createBucketWithExistingNameFails() throws BucketAccessException, TimeoutException {
         final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
         // try to create bucket with identical name again
-        final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> bucketCreator.createBucket());
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, bucketCreator::createBucket);
         assertThat(exception.getMessage(), containsString(
                 "Given bucket " + bucketCreator.getBucketName() + " already exists in bucketfs " + DEFAULT_BUCKETFS));
     }
