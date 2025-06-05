@@ -1,4 +1,4 @@
-# BucketFS Java 3.0.1, released 2025-06-03
+# BucketFS Java 3.0.1, released 2025-06-05
 
 Code name: Dependency updates on top of 3.0.0
 
