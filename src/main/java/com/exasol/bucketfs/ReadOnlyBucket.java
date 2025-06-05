@@ -10,6 +10,16 @@ import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
  */
 public interface ReadOnlyBucket {
 
+    /**
+     * Prefix for building UDF-visible paths to buckets in BucketFS.
+     * <p>
+     * In Exasol, UDFs see BucketFS under {@code /buckets/}. This constant helps build
+     * correct file paths as seen from within UDFs.
+     * </p>
+     *
+     * @see #getPathInUdf()
+     * @see #getPathInUdf(String)
+     */
     static final String PATH_IN_UDF_PREFIX = PATH_SEPARATOR + "buckets" + PATH_SEPARATOR;
     /**
      * @return name of the BucketFS filesystem this bucket belongs to
