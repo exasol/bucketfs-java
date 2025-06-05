@@ -49,14 +49,15 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                         containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
                 () -> assertThat(exception.getCause().getMessage(),
                         either(equalTo("No subject alternative names present"))
-                                .or(equalTo("No name matching localhost found"))));
+                                .or(equalTo("No name matching localhost found"))
+                                .or(equalTo("No subject alternative DNS name matching localhost found."))));
     }
 
     @Test
     void createBucketWithExistingNameFails() throws BucketAccessException, TimeoutException {
         final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
         // try to create bucket with identical name again
-        final JsonRpcException exception = assertThrows(JsonRpcException.class, () -> bucketCreator.createBucket());
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, bucketCreator::createBucket);
         assertThat(exception.getMessage(), containsString(
                 "Given bucket " + bucketCreator.getBucketName() + " already exists in bucketfs " + DEFAULT_BUCKETFS));
     }

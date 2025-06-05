@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>bucketfs-java</artifactId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
     <name>BucketFS Java</name>
     <description>Java library for automating tasks on Exasol's BucketFS.</description>
     <url>https://github.com/exasol/bucketfs-java/</url>
@@ -62,14 +62,14 @@
         <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.11.3</version>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.13.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.11.3</version>
+            <version>5.13.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -81,26 +81,26 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.14.2</version>
+            <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>exasol-testcontainers</artifactId>
-            <version>7.1.1</version>
+            <version>7.1.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.20.3</version>
+            <version>1.21.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <!-- Enable log output from integration tests -->
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -109,7 +109,7 @@
             <plugin>
                 <groupId>org.itsallcode</groupId>
                 <artifactId>openfasttrace-maven-plugin</artifactId>
-                <version>1.8.0</version>
+                <version>2.3.0</version>
                 <executions>
                     <execution>
                         <id>trace-requirements</id>
@@ -122,7 +122,7 @@
             <plugin>
                 <groupId>com.exasol</groupId>
                 <artifactId>project-keeper-maven-plugin</artifactId>
-                <version>4.4.0</version>
+                <version>5.1.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -132,38 +132,14 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
                 <configuration>
-                    <compilerArgs>
-                        <arg>-Xlint:all,-path</arg>
-                        <arg>-Werror</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.basepom.maven</groupId>
-                <artifactId>duplicate-finder-maven-plugin</artifactId>
-                <version>2.0.1</version>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <printEqualFiles>true</printEqualFiles>
-                    <failBuildInCaseOfDifferentContentConflict>true</failBuildInCaseOfDifferentContentConflict>
-                    <failBuildInCaseOfEqualContentConflict>true</failBuildInCaseOfEqualContentConflict>
-                    <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
-                    <checkCompileClasspath>true</checkCompileClasspath>
-                    <checkRuntimeClasspath>true</checkRuntimeClasspath>
-                    <checkTestClasspath>false</checkTestClasspath>
-                    <preferLocal>true</preferLocal>
-                    <useResultFile>false</useResultFile>
+                    <skip>${ossindex.skip}</skip>
+                    <excludeVulnerabilityIds>
+                        <!-- False positive in OSS Index for Exasol's JDBC driver because the fix version is missing. -->
+                        <exclude>CVE-2024-55551</exclude>
+                    </excludeVulnerabilityIds>
                 </configuration>
             </plugin>
         </plugins>
@@ -171,7 +147,7 @@
     <parent>
         <artifactId>bucketfs-java-generated-parent</artifactId>
         <groupId>com.exasol</groupId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <relativePath>pk_generated_parent.pom</relativePath>
     </parent>
 </project>

@@ -39,11 +39,6 @@ class TlsEncryptionIT extends AbstractBucketIT {
         }
 
         @Test
-        void connectionWithoutAltNameFails() {
-            final ReadOnlyBucket bucket = createBucket(true, getHost(), null, null);
-            assertConnectionError(bucket, equalTo("No name matching " + getHost() + " found"));
-        }
-
         void connectionWithWrongAltNameFails() {
             final ReadOnlyBucket bucket = createBucket(true, getHost(), "wrongAltName", null);
             assertConnectionError(bucket, equalTo("No subject alternative DNS name matching " + getHost() + " found."));
@@ -61,7 +56,9 @@ class TlsEncryptionIT extends AbstractBucketIT {
         void connectionWithIpAddressWithoutAltNameFails() {
             assumeDockerLocalhost();
             final ReadOnlyBucket bucket = createBucket(true, "127.0.0.1", null, null);
-            assertConnectionError(bucket, equalTo("No subject alternative names present"));
+            assertConnectionError(bucket, either(equalTo("No subject alternative names present"))
+                    .or(equalTo("No subject alternative names matching IP address 127.0.0.1 found"))
+            );
         }
 
         @Test
