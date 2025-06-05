@@ -1,6 +1,6 @@
 # BucketFS Java 3.2.2, released 2025-06-05
 
-Code name: Dependency updates on top of 3.0.0 and Get the UDF bucket path feature
+Code name: Dependency updates on top of 3.0.0
 
 ## Summary
 
@@ -9,12 +9,9 @@ This release is a security update. We updated the dependencies of the project to
 We also added an exception for the OSSIndex for CVE-2024-55551, which is a false positive in Exasol's JDBC driver.
 This issue has been fixed quite a while back now, but the OSSIndex unfortunately does not contain the fix version of 24.2.1 (2024-12-10) set.
 
-We also implemented a method that returns the correct path for a bucket from the UDFs perspective
-
 ## Features
 
 * #76: Updated dependencies on top of 3.0.0
-* #77: Get the UDF bucket path
 
 ## Dependency Updates
 
