@@ -35,21 +35,13 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String bucketName;
     /** Protocol for accessing the bucket ({@code http} or {@code https}). */
     protected final String protocol;
-    /**
-     * Host or IP address
-     */
+    /** Host or IP address */
     protected final String host;
-    /**
-     * Port
-     */
+    /** Port the BucketFS service hosting this bucket runs on */
     protected final int port;
-    /**
-     * Read password
-     */
+    /** Read password */
     protected final String readPassword;
-    /**
-     * Upload history
-     */
+    /** Upload history */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
     private final HttpClient client;
 
@@ -76,6 +68,16 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public String getBucketName() {
         return this.bucketName;
+    }
+
+    @Override
+    public String getHost() {
+        return this.host;
+    }
+
+    @Override
+    public int getPort() {
+        return this.port;
     }
 
     @Override
@@ -308,19 +310,6 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         public T port(final int port) {
             this.port = port;
             return self();
-        }
-
-        /**
-         * Set the port the BucketFS service listens on. Make sure to also call {@link #useTls(boolean)} with argument
-         * {@code false} if this is an HTTP port or {@code true} if this is an HTTPS port.
-         *
-         * @param port HTTP or HTTPS port the BucketFS service listens on
-         * @return Builder instance for fluent programming
-         * @deprecated use {@link #port(int)} instead.
-         */
-        @Deprecated
-        public T httpPort(final int port) {
-            return this.port(port);
         }
 
         /**

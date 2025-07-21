@@ -32,6 +32,16 @@ public interface ReadOnlyBucket {
     String getBucketName();
 
     /**
+     * @return host the BucketFS service hosting this bucket runs on
+     */
+    String getHost();
+
+    /**
+     * @return port the BucketFS service hosting this bucket runs on
+     */
+    int getPort();
+
+    /**
      * Get the fully qualified name of the bucket.
      *
      * @return fully qualified name consisting of service name and bucket name

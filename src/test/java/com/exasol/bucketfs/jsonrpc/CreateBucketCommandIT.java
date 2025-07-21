@@ -5,25 +5,43 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.security.cert.X509Certificate;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import com.exasol.bucketfs.monitor.TimestampRetriever;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.*;
-import com.exasol.bucketfs.testutil.BucketCreator;
 
 @Tag("slow")
 // [itest->dsn~creating-new-bucket~1]
 class CreateBucketCommandIT extends AbstractBucketIT {
+    private static X509Certificate tlsCertificate;
+
+    @BeforeAll
+    static void beforeAll() {
+        final Optional<X509Certificate> optionalX509Certificate = EXASOL.getTlsCertificate();
+        if (optionalX509Certificate.isPresent()) {
+            tlsCertificate = optionalX509Certificate.get();
+        } else  {
+            fail("This test requires a TLS certificate to be set up in the Exasol database.");
+        }
+    }
 
     @Test
-    void testCreatingBucketWithCheckingCertificateThrowsException() throws BucketAccessException, TimeoutException {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable();
-        final CommandFactory commandFactory = bucketCreator.createCommandFactory(true);
-        final JsonRpcException exception = assertThrows(JsonRpcException.class,
-                () -> bucketCreator.createBucket(true, commandFactory));
-
+    void testCreatingBucketWithCheckingCertificateThrowsException() {
+        final CommandFactory commandFactory = createCommandFactory()
+                .raiseTlsErrors(true)
+                .build();
+        final CreateBucketCommand.CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketCommand()
+                .bucketFsName(DEFAULT_BUCKETFS)
+                .bucketName("CertCheckFailingBucket_" + UUID.randomUUID())
+                .isPublic(true);
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, commandBuilder::execute);
         assertAll(
                 () -> assertThat(exception.getMessage(),
                         containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
@@ -32,18 +50,23 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                                 + " unable to find valid certification path to requested target")));
     }
 
+    private static CommandFactory.Builder createCommandFactory() {
+        return CommandFactory.builder()
+                .serverUrl(EXASOL.getRpcUrl())
+                .bearerTokenAuthentication(EXASOL.getClusterConfiguration().getAuthenticationToken());
+    }
+
     @Test
-    void testCreatingBucketWithCertificateFailsHostnameValidation() throws BucketAccessException, TimeoutException {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable();
-        final String authenticationToken = EXASOL.getClusterConfiguration().getAuthenticationToken();
-        final CommandFactory commandFactory = CommandFactory.builder() //
-                .serverUrl(EXASOL.getRpcUrl()) //
-                .bearerTokenAuthentication(authenticationToken) //
-                .raiseTlsErrors(true) //
-                .certificate(EXASOL.getTlsCertificate().get()) //
+    void testCreatingBucketWithCertificateFailsHostnameValidation() {
+        final CommandFactory commandFactory = createCommandFactory()
+                .raiseTlsErrors(true)
+                .certificate(tlsCertificate)
                 .build();
-        final JsonRpcException exception = assertThrows(JsonRpcException.class,
-                () -> bucketCreator.createBucket(true, commandFactory));
+        final CreateBucketCommand.CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketCommand()
+                .bucketFsName(DEFAULT_BUCKETFS)
+                .bucketName("HostNameValidationFailingBucket_" + UUID.randomUUID())
+                .isPublic(true);
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, commandBuilder::execute);
         assertAll(
                 () -> assertThat(exception.getMessage(),
                         containsString("E-BFSJ-23: Unable to execute RPC request https://")), //
@@ -54,34 +77,59 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     }
 
     @Test
-    void createBucketWithExistingNameFails() throws BucketAccessException, TimeoutException {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
-        // try to create bucket with identical name again
-        final JsonRpcException exception = assertThrows(JsonRpcException.class, bucketCreator::createBucket);
+    void createBucketWithExistingNameFails() {
+        final TemporaryBucketFactory bucketFactory = new TemporaryBucketFactory(EXASOL);
+        final Bucket bucket = bucketFactory.createPublicBucket();
+        final CommandFactory commandFactory = createCommandFactory()
+                .raiseTlsErrors(true)
+                .certificate(tlsCertificate)
+                .build();
+        final CreateBucketCommand.CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketCommand()
+                .bucketFsName(bucket.getBucketFsName())
+                .bucketName(bucket.getBucketName())
+                .isPublic(true);
+        final JsonRpcException exception = assertThrows(JsonRpcException.class, commandBuilder::execute);
         assertThat(exception.getMessage(), containsString(
-                "Given bucket " + bucketCreator.getBucketName() + " already exists in bucketfs " + DEFAULT_BUCKETFS));
+                "Given bucket " + bucket.getBucketName() + " already exists in bucketfs " + DEFAULT_BUCKETFS));
     }
 
     @Test
-    void createBucketSuccess() throws BucketAccessException, TimeoutException, InterruptedException {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable().createBucket();
-        assertBucketWritable(bucketCreator.waitUntilBucketExists());
+    void createBucketWithoutCertificateCheckSucceeds() {
+        final String bucketName = "WriteTestBucket_" + UUID.randomUUID();
+        final String writeTestPassword = "Write me!";
+        final CommandFactory commandFactory = createCommandFactory()
+                .raiseTlsErrors(false)
+                .build();
+        commandFactory.makeCreateBucketCommand()
+                .bucketFsName(DEFAULT_BUCKETFS)
+                .bucketName(bucketName)
+                .isPublic(true)
+                .writePassword(writeTestPassword)
+                .execute();
+        final SyncAwareBucket bucket = (SyncAwareBucket) SyncAwareBucket.builder()
+                .monitor(createBucketMonitor())
+                .stateRetriever(new TimestampRetriever())
+                .name(bucketName)
+                .host(getHost())
+                .port(getMappedDefaultBucketFsPort())
+                .writePassword(writeTestPassword)
+                .raiseTlsErrors(false)
+                .build();
+        assertBucketWritable(bucket);
     }
 
-    @Test
-    void testCreatedBucketWithDefaultValues() throws BucketAccessException, TimeoutException, InterruptedException {
-        final BucketCreator bucketCreator = bucketCreator().assumeJsonRpcAvailable();
-        assertDoesNotThrow(() -> bucketCreator.commandWithDefaultValues().execute());
-    }
-
-    private BucketCreator bucketCreator() {
-        return new BucketCreator(CreateBucketCommandIT.class, EXASOL);
-    }
-
-    private void assertBucketWritable(final SyncAwareBucket bucket)
-            throws BucketAccessException, TimeoutException, InterruptedException {
-        final var fileName = "test-uploaded.txt";
-        bucket.uploadStringContent("file content", fileName);
-        assertThat(bucket.listContents(), hasItem(fileName));
+    private void assertBucketWritable(final SyncAwareBucket bucket) {
+        final String fileName = "test-uploaded.txt";
+        try {
+            bucket.uploadStringContent("file content", fileName);
+            assertThat(bucket.listContents(), hasItem(fileName));
+        } catch (final BucketAccessException exception) {
+            fail("Unable to upload test file to bucket '" + bucket.getBucketName() + "'", exception);
+        } catch (final TimeoutException exception) {
+            fail("Timeout while uploading test file to bucket '" + bucket.getBucketName() + "'", exception);
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            fail("Interrupted while uploading test file to bucket '" + bucket.getBucketName() + "'", exception);
+        }
     }
 }

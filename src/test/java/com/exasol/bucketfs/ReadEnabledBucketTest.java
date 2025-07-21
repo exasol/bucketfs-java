@@ -1,5 +1,6 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.bucketfs.testutil.ExceptionAssertions.assertThrowsWithMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.exasol.bucketfs.ReadEnabledBucket.Builder;
 import com.exasol.bucketfs.http.HttpClientBuilder;
-import com.exasol.bucketfs.testutil.ExceptionAssertions;
 
 @ExtendWith(MockitoExtension.class)
 class ReadEnabledBucketTest {
@@ -148,7 +148,7 @@ class ReadEnabledBucketTest {
             throws IOException, InterruptedException {
         simulateResponse(null, responseStatus);
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 expectedExceptionMessage);
     }
 
@@ -158,7 +158,7 @@ class ReadEnabledBucketTest {
         when(this.httpClientMock.send(any(), any())).thenThrow(new IOException("expected"));
 
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 "E-BFSJ-5: I/O error trying to list 'http://101.102.103.104:1234/bucket/'");
     }
 
@@ -168,7 +168,7 @@ class ReadEnabledBucketTest {
         when(this.httpClientMock.send(any(), any())).thenThrow(new InterruptedException("expected"));
 
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 "E-BFSJ-4: Interrupted trying to list 'http://101.102.103.104:1234/bucket/'.");
     }
 
@@ -213,12 +213,12 @@ class ReadEnabledBucketTest {
     @Test
     void buildFailsWithoutHost() {
         final Builder<?> builder = ReadEnabledBucket.builder().serviceName("service").name("bucket");
-        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
+        assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
     }
 
     @Test
     void buildFailsWithoutBucketName() {
         final Builder<?> builder = ReadEnabledBucket.builder().host("host").serviceName("service");
-        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "bucketName");
+        assertThrowsWithMessage(NullPointerException.class, builder::build, "bucketName");
     }
 }
