@@ -205,7 +205,7 @@ public class WriteEnabledBucket extends ReadEnabledBucket implements Unsynchroni
     /**
      * Builder for {@link WriteEnabledBucket} objects.
      *
-     * @param <T> type for self pointer to inheritable builder
+     * @param <T> type for self-pointer to inheritable builder
      */
     public static class Builder<T extends Builder<T>> extends ReadEnabledBucket.Builder<Builder<T>> {
         private String writePassword;

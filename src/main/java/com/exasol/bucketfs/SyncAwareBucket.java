@@ -31,7 +31,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
      *
      * @param builder builder
      */
-    protected SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
+    public SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
         Objects.requireNonNull(builder.monitor);
         Objects.requireNonNull(builder.stateRetriever);
@@ -148,7 +148,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     /**
      * Builder for {@link SyncAwareBucket} objects.
      *
-     * @param <T> type for self pointer to inheritable builder
+     * @param <T> type for self-pointer to inheritable builder
      */
     public static class Builder<T extends Builder<T>> extends WriteEnabledBucket.Builder<Builder<T>> {
         private BucketFsMonitor monitor;
@@ -161,7 +161,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         }
 
         /**
-         * Set monitor for this bucket.
+         * Set the monitor for this bucket.
          *
          * @param value synchronization monitor
          * @return Builder instance for fluent programming
@@ -172,7 +172,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         }
 
         /**
-         * Set state retriever for this bucket. The bucket uses the state retriever to inquire the current {@link State}
+         * Set the state retriever for this bucket. The bucket uses the state retriever to inquire the current {@link State}
          * as observed by the monitor. The bucket can pass the state to the monitor to make the monitor accept only
          * events that happened after the state.
          *

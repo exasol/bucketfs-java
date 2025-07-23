@@ -13,7 +13,7 @@ public interface BucketFsMonitor {
      *
      * @param bucket       bucket
      * @param pathInBucket path to the object located in the bucket
-     * @param state        state in order to detect synchronization more precisely
+     * @param state        state to detect synchronization more precisely
      * @return {@code true} if the object exists in the bucket and is synchronized
      * @throws BucketAccessException if the object in the bucket is inaccessible
      */
@@ -21,7 +21,7 @@ public interface BucketFsMonitor {
             throws BucketAccessException;
 
     /**
-     * A {@link State} allows to detect events more precisely. For instance the state could define a point in time and
+     * A {@link State} allows to detect events more precisely. For instance, the state could define a point in time and
      * reject events that happened before.
      */
     public interface State {
