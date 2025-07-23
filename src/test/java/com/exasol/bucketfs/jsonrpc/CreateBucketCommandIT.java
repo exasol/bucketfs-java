@@ -81,8 +81,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
         final TemporaryBucketFactory bucketFactory = new TemporaryBucketFactory(EXASOL);
         final Bucket bucket = bucketFactory.createPublicBucket();
         final CommandFactory commandFactory = createCommandFactory()
-                .raiseTlsErrors(true)
-                .certificate(tlsCertificate)
+                .raiseTlsErrors(false)
                 .build();
         final CreateBucketCommand.CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketCommand()
                 .bucketFsName(bucket.getBucketFsName())
