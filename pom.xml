@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>bucketfs-java</artifactId>
-    <version>3.2.3</version>
+    <version>3.2.4</version>
     <name>BucketFS Java</name>
     <description>Java library for automating tasks on Exasol's BucketFS.</description>
     <url>https://github.com/exasol/bucketfs-java/</url>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>exasol-testcontainers</artifactId>
-            <version>7.1.5</version>
+            <version>7.1.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,7 +122,7 @@
             <plugin>
                 <groupId>com.exasol</groupId>
                 <artifactId>project-keeper-maven-plugin</artifactId>
-                <version>5.1.0</version>
+                <version>5.2.3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -147,7 +147,7 @@
     <parent>
         <artifactId>bucketfs-java-generated-parent</artifactId>
         <groupId>com.exasol</groupId>
-        <version>3.2.3</version>
+        <version>3.2.4</version>
         <relativePath>pk_generated_parent.pom</relativePath>
     </parent>
 </project>
