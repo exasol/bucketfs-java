@@ -1,6 +1,6 @@
-# BucketFS Java 4.0.0, released 2025-10-??
+# BucketFS Java 4.0.0, released 2025-10-13
 
-Code name: Exasol 8.29.1 and later compatibility
+Code name: Post-Exasol 8.29.1 compatibility
 
 ## Summary
 
