@@ -4,12 +4,14 @@ import com.exasol.bucketfs.jsonrpc.CommandFactory;
 import com.exasol.bucketfs.monitor.BucketFsMonitor;
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor;
+import com.exasol.bucketfs.uploadnecessity.JsonRpcReadyWaitStrategy;
 import com.exasol.clusterlogs.LogPatternDetectorFactory;
 import com.exasol.config.BucketFsServiceConfiguration;
 import com.exasol.containers.ExasolContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
@@ -21,8 +23,8 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
  * created in the scope of the default BucketFS service.
  * </p>
  * <p>
- * Note that unlike in the production factory the bucket objects are <em>not</em> cashed! You get the bucket
- * object with a {@code create…} method and need to keep the reference.
+ * Note that unlike in the production factory the bucket objects are <em>not</em> cashed! You get the bucket object with
+ * a {@code create…} method and need to keep the reference.
  * </p>
  */
 public class TemporaryBucketFactory {
@@ -34,15 +36,18 @@ public class TemporaryBucketFactory {
     private final BucketFsMonitor monitor;
     private final BucketFsServiceConfiguration serviceConfiguration;
     private final BucketReadyWaitStrategy bucketReadyWaitStrategy;
+    private final JsonRpcReadyWaitStrategy jsonRpcReayWaitStrategy;
 
     public TemporaryBucketFactory(final ExasolContainer<? extends ExasolContainer<?>> container) {
         this.container = container;
         this.serviceConfiguration = getBucketFsServiceConfiguration(container);
         this.monitor = getBucketFsMonitor(container);
         this.bucketReadyWaitStrategy = new BucketReadyToListWaitStrategy();
+        this.jsonRpcReayWaitStrategy = new JsonRpcReadyWaitStrategy();
     }
 
-    private static BucketFsServiceConfiguration getBucketFsServiceConfiguration(final ExasolContainer<? extends ExasolContainer<?>> container) {
+    private static BucketFsServiceConfiguration getBucketFsServiceConfiguration(
+            final ExasolContainer<? extends ExasolContainer<?>> container) {
         return container.getClusterConfiguration().getBucketFsServiceConfiguration(DEFAULT_BUCKETFS);
     }
 
@@ -59,38 +64,57 @@ public class TemporaryBucketFactory {
     private Bucket createBucket(final boolean isPublic, final String readPassword, final String writePassword) {
         final String uniqueBucketName = "bucket_" + UUID.randomUUID();
         LOGGER.info("Creating temporary bucket {}", uniqueBucketName);
+        this.jsonRpcReayWaitStrategy.waitUntilXmlRpcReady();
+        createBucketInBucketFs(uniqueBucketName, isPublic, readPassword, writePassword);
+        final Bucket bucket = creatBucketObject(readPassword, writePassword, uniqueBucketName);
+        this.bucketReadyWaitStrategy.waitUntilBucketIsReady(bucket);
+        return bucket;
+    }
+
+    private void createBucketInBucketFs(final String uniqueBucketName, final boolean isPublic,
+            final String readPassword, final String writePassword) {
         final CommandFactory commandFactory = createCommandFactory();
+        final ExasolVersionCapabilities capabilities = ExasolVersionCapabilities.of(container);
         commandFactory.makeCreateBucketCommand()
+                .useBase64EncodedPasswords(capabilities.requiresBase64EncodingBucketFsPasswordsOnClientSide())
                 .bucketFsName(DEFAULT_BUCKETFS)
                 .bucketName(uniqueBucketName)
                 .readPassword(readPassword)
                 .writePassword(writePassword)
                 .isPublic(isPublic)
                 .execute();
-        final Integer mappedPort = this.container.getMappedPort(detectPort());
-        final Bucket bucket = (Bucket) SyncAwareBucket.builder()
+    }
+
+    private Bucket creatBucketObject(final String readPassword, final String writePassword,
+            final String uniqueBucketName) {
+        final var bucketBuilder = SyncAwareBucket.builder()
                 .monitor(this.monitor)
                 .stateRetriever(TIMESTAMP_RETRIEVER)
                 .host("localhost")
-                .port(mappedPort)
                 .readPassword(readPassword)
                 .writePassword(writePassword)
                 .serviceName(DEFAULT_BUCKETFS)
-                .name(uniqueBucketName)
-                .build();
-        this.bucketReadyWaitStrategy.waitUntilBucketIsReady(bucket);
+                .name(uniqueBucketName);
+        if (useTls()) {
+            bucketBuilder.certificate(extractTlsCertificateFromRunningContainer())
+                    .port(this.container.getMappedPort(this.serviceConfiguration.getHttpsPort()))
+                    .useTls(true)
+                    .allowAlternativeHostName("localhost");
+        } else {
+            bucketBuilder.port(this.container.getMappedPort(this.serviceConfiguration.getHttpPort()));
+        }
+        final Bucket bucket = (Bucket) bucketBuilder.build();
         return bucket;
     }
 
-    /**
-     * Prefer using the HTTP port if available. Fall back to HTTPS otherwise.
-     *
-     * @return a configured port on which the BucketFS service is reachable.
-     */
-    private int detectPort() {
-        return (this.serviceConfiguration.getHttpPort() == 0)
-                ? this.serviceConfiguration.getHttpsPort()
-                : this.serviceConfiguration.getHttpPort();
+    private boolean useTls() {
+        return ExasolVersionCapabilities.of(this.container)
+                .requiresTlsForBucketFs();
+    }
+
+    private X509Certificate extractTlsCertificateFromRunningContainer() {
+        return this.container.getTlsCertificate().orElseThrow(
+                () -> new IllegalStateException("The container does not have a TLS certificate."));
     }
 
     public Bucket createPrivateBucket() {

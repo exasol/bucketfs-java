@@ -3,8 +3,7 @@ package com.exasol.bucketfs.jsonrpc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -129,5 +128,21 @@ class CreateBucketCommandTest {
             command.processResult(responsePayload);
             return null;
         });
+    }
+
+    @Test
+    void testSwitchOffBase64EncodingOfPasswords() {
+        builder()
+                .useBase64EncodedPasswords(false)
+                .bucketFsName("bfs")
+                .bucketName("bucket")
+                .writePassword("write_cleartext")
+                .readPassword("read_cleartext")
+                .execute();
+        final Request request = getRpcRequest();
+        assertAll(
+                ()->assertThat(request.getReadPassword(), equalTo("read_cleartext")),
+                ()->assertThat(request.getWritePassword(), equalTo("write_cleartext"))
+        );
     }
 }

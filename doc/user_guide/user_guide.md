@@ -375,3 +375,17 @@ If a self-signed certificate specified via `certificate(<certificate>)` does not
 * `allowAlternativeIpAddress(<ip-address>)`
 
 Please note that this only works when you specify a custom certificate with `certificate()`.
+
+## Troubleshooting
+
+## Unable to Create Bucket With Exasol 8 and Later
+
+In Exasol 8 the way the RCP interface used to create buckets expects the passwords changed in a breaking way from version 7. Previously, the interface expected the client to encode the password with Base64. That is now done on the server side — as it should be.
+
+As a consequence, for Exasol 8 and later you need to switch off client side UTF-8 encoding.
+
+```java
+final CreateBucketCommandBuilder builder =
+        new CreateBucketCommandBuilder
+                .useuseBase64EncodedPasswords(false);
+```

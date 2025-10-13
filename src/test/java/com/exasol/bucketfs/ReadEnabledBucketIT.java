@@ -69,7 +69,9 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     void testListContentsWithWrongReadPasswordFails() {
         final Bucket bucket = temporaryBucketFactory.createPrivateBucket();
         uploadFileWithContentToPath(bucket, "protected content", "dir/file.txt");
-        final ReadOnlyBucket misconfiguredBucket = copyBucket(bucket).readPassword("wrong password").build();
+        final ReadOnlyBucket misconfiguredBucket = copyBucket(bucket)
+                .readPassword("wrong password")
+                .build();
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> misconfiguredBucket.listContents("dir/"));
         assertThat(exception.getMessage(), startsWith("E-BFSJ-3: Access denied trying to list "));
@@ -79,7 +81,9 @@ class ReadEnabledBucketIT extends AbstractBucketIT {
     void testDownloadWithWrongReadPasswordFails() {
         final Bucket bucket = temporaryBucketFactory.createPrivateBucket();
         uploadFileWithContentToPath(bucket, "protected content", "dir/file.txt");
-        final ReadOnlyBucket misconfiguredBucket = copyBucket(bucket).readPassword("wrong password").build();
+        final ReadOnlyBucket misconfiguredBucket = copyBucket(bucket)
+                .readPassword("wrong password")
+                .build();
         final BucketAccessException exception = assertThrows(BucketAccessException.class,
                 () -> misconfiguredBucket.downloadFileAsString("dir/file.txt"));
         assertThat(exception.getMessage(), startsWith("E-BFSJ-3: Access denied trying to download "));

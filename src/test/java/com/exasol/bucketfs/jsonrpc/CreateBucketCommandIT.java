@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import com.exasol.bucketfs.monitor.TimestampRetriever;
+import com.exasol.bucketfs.uploadnecessity.JsonRpcReadyWaitStrategy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -96,14 +97,19 @@ class CreateBucketCommandIT extends AbstractBucketIT {
     void createBucketWithoutCertificateCheckSucceeds() {
         final String bucketName = "WriteTestBucket_" + UUID.randomUUID();
         final String writeTestPassword = "Write me!";
+        final String readTestPassword = "Read me!";
+        final ExasolVersionCapabilities capabilities = ExasolVersionCapabilities.of(EXASOL);
         final CommandFactory commandFactory = createCommandFactory()
                 .raiseTlsErrors(false)
                 .build();
+        new JsonRpcReadyWaitStrategy().waitUntilXmlRpcReady();
         commandFactory.makeCreateBucketCommand()
+                .useBase64EncodedPasswords(capabilities.requiresBase64EncodingBucketFsPasswordsOnClientSide())
                 .bucketFsName(DEFAULT_BUCKETFS)
                 .bucketName(bucketName)
                 .isPublic(true)
                 .writePassword(writeTestPassword)
+                .readPassword(readTestPassword)
                 .execute();
         final SyncAwareBucket bucket = (SyncAwareBucket) SyncAwareBucket.builder()
                 .monitor(createBucketMonitor())
@@ -112,8 +118,11 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                 .host(getHost())
                 .port(getMappedDefaultBucketFsPort())
                 .writePassword(writeTestPassword)
+                .readPassword(readTestPassword)
                 .raiseTlsErrors(false)
                 .build();
+        final BucketReadyWaitStrategy waitStrategy = new BucketReadyToListWaitStrategy();
+        waitStrategy.waitUntilBucketIsReady(bucket);
         assertBucketWritable(bucket);
     }
 

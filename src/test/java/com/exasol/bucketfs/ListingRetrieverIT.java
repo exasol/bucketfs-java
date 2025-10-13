@@ -12,23 +12,26 @@ import org.junit.jupiter.api.Test;
 
 import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.list.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Tag("slow")
 class ListingRetrieverIT extends AbstractBucketIT {
-    private static final HttpClient HTTP_CLIENT = new HttpClientBuilder().build();
-    private static final ListingRetriever CONTENT_LISTER = new ListingRetriever(HTTP_CLIENT);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListingRetrieverIT.class);
 
     @Test
     void testListBuckets() throws Exception {
         final TemporaryBucketFactory bucketFactory = new TemporaryBucketFactory(EXASOL);
         final Bucket temporaryBucket = bucketFactory.createPublicBucket();
-        final BucketService service = new BucketService(uri(""), CONTENT_LISTER);
+        final ListingRetriever contentLister = new ListingRetriever(temporaryBucket.getHttpClient());
+        final BucketService service = new BucketService(uri(""), contentLister);
         final List<String> bucketListing = service.retrieve();
         assertThat(bucketListing, hasItems(temporaryBucket.getBucketName(), "default"));
     }
 
     private URI uri(final String suffix) {
         final String protocol = dbUsesTls() ? "https" : "http";
+        LOGGER.info("Using protocol {} for listing URI", protocol);
         return ListingRetriever.publicReadUri(protocol, getHost(), getMappedDefaultBucketFsPort(), suffix);
     }
 
@@ -37,8 +40,9 @@ class ListingRetrieverIT extends AbstractBucketIT {
         final TemporaryBucketFactory bucketFactory = new TemporaryBucketFactory(EXASOL);
         final Bucket temporaryBucket = bucketFactory.createPublicBucket();
         temporaryBucket.uploadStringContent("file content", "folder/file.txt");
+        final ListingRetriever contentLister = new ListingRetriever(temporaryBucket.getHttpClient());
         final String bucketName = temporaryBucket.getBucketName();
-        final List<String> listing = new BucketContentLister(uri(bucketName), CONTENT_LISTER, "")
+        final List<String> listing = new BucketContentLister(uri(bucketName), contentLister, "")
                 .retrieve("folder", false);
         assertThat(listing, hasItem("file.txt"));
     }

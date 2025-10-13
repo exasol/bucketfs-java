@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -17,8 +18,10 @@ import static org.junit.jupiter.api.Assertions.fail;
  * </p>
  */
 public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
+    @SuppressWarnings("java:S2925") // Suppressing Sonar warning about Thread.sleep
     private static final Logger LOGGER = LoggerFactory.getLogger(BucketReadyToListWaitStrategy.class);
-    private static final int DELAY_BETWEEN_RETRIES_MS = 300;
+    public static final Duration WAIT_TIMEOUT = Duration.ofSeconds(60);
+    private static final int DELAY_BETWEEN_RETRIES_NANOS = 300000;
 
     /**
      * Creates a new instance of the {@code BucketReadyToListWaitStrategy}.
@@ -29,27 +32,23 @@ public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
 
     @Override
     public void waitUntilBucketIsReady(final Bucket bucket) {
-        LOGGER.info("Waiting until bucket {} is ready...", bucket.getFullyQualifiedBucketName());
-        final Duration timeout = Duration.ofSeconds(5);
-        final Instant end = Instant.now().plus(timeout);
+        LOGGER.info("Waiting until bucket {} is ready for max {}." , bucket.getFullyQualifiedBucketName(), WAIT_TIMEOUT);
+        final Instant end = Instant.now().plus(WAIT_TIMEOUT);
         do {
             try {
                 bucket.listContents();
+                LOGGER.info("Succeeded to list bucket contents: {}. Assuming bucket ready.", bucket);
                 return;
             } catch (final BucketAccessException exception) {
                 delayPollingRetry();
             }
         } while (Instant.now().isBefore(end));
-        fail("Timout after " + timeout + " waiting for bucket to be ready.");
+        fail("Timeout after " + WAIT_TIMEOUT + " waiting for bucket " + bucket + " to be ready.");
     }
 
-
-    @SuppressWarnings("java:S2925") // Sleep used to rate limit polling retries
     private static void delayPollingRetry() {
-        try {
-            
-            Thread.sleep(DELAY_BETWEEN_RETRIES_MS);
-        } catch (final InterruptedException interruptedException) {
+        LockSupport.parkNanos(DELAY_BETWEEN_RETRIES_NANOS);
+        if (Thread.interrupted()) {
             Thread.currentThread().interrupt();
         }
     }

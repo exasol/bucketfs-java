@@ -26,6 +26,8 @@ public final class BucketObjectReplicator {
                 .port(bucket.getPort())
                 .serviceName(bucket.getBucketFsName())
                 .name(bucket.getBucketName())
-                .readPassword(bucket.getReadPassword());
+                .readPassword(bucket.getReadPassword())
+                .useTls(bucket.getProtocol() == "https")
+                .raiseTlsErrors(false);
     }
 }

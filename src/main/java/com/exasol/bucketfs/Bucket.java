@@ -2,6 +2,7 @@ package com.exasol.bucketfs;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;

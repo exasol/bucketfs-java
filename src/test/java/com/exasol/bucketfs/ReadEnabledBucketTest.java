@@ -4,6 +4,7 @@ import static com.exasol.bucketfs.testutil.ExceptionAssertions.assertThrowsWithM
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,14 +42,21 @@ class ReadEnabledBucketTest {
     @Mock
     private HttpResponse<Object> httpResponseMock;
 
-    @Test
-    void testToString() {
-        final var bucket = bucketBuilder() //
-                .host(IP_ADDRESS) //
-                .port(1234) //
-                .serviceName("service") //
-                .name("bucket").build();
-        assertThat(bucket.toString(), equalTo("service/bucket"));
+    @CsvSource({
+            "false, localhost, 8888, s1, b1, s1/b1 (http://localhost:8888)",
+            "true, example.org, 1234, s2, b2, s2/b2 (https://example.org:1234)",
+            "false, 127.0.0.1, 4242, , the_bucket, bfsdefault/the_bucket (http://127.0.0.1:4242)"
+    })
+    @ParameterizedTest
+    void testToString(final boolean useTls, final String host, final int port, final String serviceName,
+            final String bucketName, final String expected) {
+        final var bucket = bucketBuilder()
+                .useTls(useTls)
+                .host(host)
+                .port(port)
+                .serviceName(serviceName)
+                .name(bucketName).build();
+        assertThat(bucket.toString(), equalTo(expected));
     }
 
     private ReadEnabledBucket.Builder<? extends Builder<?>> bucketBuilder() {
@@ -112,15 +120,15 @@ class ReadEnabledBucketTest {
     @Test
     // [utest->dsn~get-the-udf-bucket-path~1]
     void getBucketPathInUdf() {
-        ReadOnlyBucket bucket = createBucket();
+        final ReadOnlyBucket bucket = createBucket();
         final String pathInUdf = bucket.getPathInUdf();
         assertThat(pathInUdf, equalTo("/buckets/service/bucket"));
     }
 
     @Test
     // [utest->dsn~get-the-udf-bucket-path~1]
-    void getFilePathInUdf() {
-        ReadOnlyBucket bucket = createBucket();
+    void testGetFilePathInUdf() {
+        final ReadOnlyBucket bucket = createBucket();
         final String pathInUdf = bucket.getPathInUdf("my-file.txt");
         assertThat(pathInUdf, equalTo("/buckets/service/bucket/my-file.txt"));
     }

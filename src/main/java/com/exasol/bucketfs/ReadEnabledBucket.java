@@ -25,13 +25,9 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
 
-    /**
-     * BucketFs name
-     */
+    /** BucketFs name  */
     protected final String serviceName;
-    /**
-     * Bucket name
-     */
+    /** Bucket name  */
     protected final String bucketName;
     /** Protocol for accessing the bucket ({@code http} or {@code https}). */
     protected final String protocol;
@@ -43,10 +39,11 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     protected final String readPassword;
     /** Upload history */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
-    private final HttpClient client;
+    /** HTTP client that executes the underlying commands */
+    protected final HttpClient client;
 
     /**
-     * Create a new instance of a bucket that support reading.
+     * Create a new instance of a bucket that supports reading.
      *
      * @param builder builder from which the bucket should be constructed
      */
@@ -71,6 +68,11 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
+    public String getProtocol() {
+        return this.protocol;
+    }
+
+    @Override
     public String getHost() {
         return this.host;
     }
@@ -88,6 +90,11 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public String getReadPassword() {
         return this.readPassword;
+    }
+
+    @Override
+    public HttpClient getHttpClient() {
+        return this.client;
     }
 
     @Override
@@ -207,7 +214,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     @Override
     public String toString() {
-        return (this.serviceName == null ? (this.port + ":") : (this.serviceName + "/")) + this.bucketName;
+        return (this.serviceName == null ? (this.port + ":") : (this.serviceName + "/")) + this.bucketName
+                + " (" + this.protocol + "://" + this.host + ":" + this.port + ")";
     }
 
     /**
