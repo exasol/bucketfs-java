@@ -114,11 +114,13 @@ class CreateBucketCommandIT extends AbstractBucketIT {
         final SyncAwareBucket bucket = (SyncAwareBucket) SyncAwareBucket.builder()
                 .monitor(createBucketMonitor())
                 .stateRetriever(new TimestampRetriever())
+                .serviceName(DEFAULT_BUCKETFS)
                 .name(bucketName)
                 .host(getHost())
                 .port(getMappedDefaultBucketFsPort())
                 .writePassword(writeTestPassword)
                 .readPassword(readTestPassword)
+                .useTls(true)
                 .raiseTlsErrors(false)
                 .build();
         final BucketReadyWaitStrategy waitStrategy = new BucketReadyToListWaitStrategy();
