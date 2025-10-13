@@ -40,7 +40,7 @@
 | [Apache Maven Toolchains Plugin][29]                    | [Apache-2.0][23]                            |
 | [Apache Maven Compiler Plugin][30]                      | [Apache-2.0][23]                            |
 | [Apache Maven Enforcer Plugin][31]                      | [Apache-2.0][23]                            |
-| [Maven Flatten Plugin][32]                              | [Apache Software Licenese][23]              |
+| [Maven Flatten Plugin][32]                              | [Apache Software License][23]               |
 | [OpenFastTrace Maven Plugin][33]                        | [GNU General Public License v3.0][34]       |
 | [Project Keeper Maven plugin][35]                       | [The MIT License][36]                       |
 | [org.sonatype.ossindex.maven:ossindex-maven-plugin][37] | [ASL2][38]                                  |
