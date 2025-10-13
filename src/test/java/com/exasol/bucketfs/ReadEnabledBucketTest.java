@@ -4,16 +4,13 @@ import static com.exasol.bucketfs.testutil.ExceptionAssertions.assertThrowsWithM
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.http.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,7 +131,7 @@ class ReadEnabledBucketTest {
     }
 
     private String lines(final String... lines) {
-        return Arrays.stream(lines).collect(Collectors.joining("\n"));
+        return String.join("\n", lines);
     }
 
     private void simulateResponse(final String responseBody, final int responseStatus)

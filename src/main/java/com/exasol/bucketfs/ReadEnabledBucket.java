@@ -19,7 +19,7 @@ import com.exasol.bucketfs.list.BucketContentLister;
 import com.exasol.bucketfs.list.ListingRetriever;
 
 /**
- * Bucket that support read access like listing contents and downloading files.
+ * Bucket that supports read access like listing contents and downloading files.
  */
 public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
@@ -231,7 +231,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     /**
      * Builder for {@link ReadEnabledBucket} objects.
      *
-     * @param <T> type for self pointer to inheritable builder
+     * @param <T> type for self-pointer to inheritable builder
      */
     public static class Builder<T extends Builder<T>> {
         private String protocol = "http";
@@ -333,13 +333,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
         /**
          * Define if TLS errors should raise an error when executing requests or if they should be ignored. Setting this
-         * to <code>false</code> is required as the docker-db uses a self-signed certificate.
-         * <p>
-         * Defaults to raise TLS errors.
-         * <p>
-         * Mutually exclusive with setting {@link #raiseTlsErrors} to {@code false}.
-         *
-         * @param raise <code>true</code> if the {@link CommandFactory} should fail for TLS errors, <code>false</code>
+         * to {@code false} is required as the docker-db uses a self-signed certificate.
+         * @param raise {@code true} if the {@link CommandFactory} should fail for TLS errors, {@code false}
          *              if it should ignore TLS errors.
          * @return Builder instance for fluent programming
          */

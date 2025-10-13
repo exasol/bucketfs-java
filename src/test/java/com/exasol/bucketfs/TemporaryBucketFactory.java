@@ -103,8 +103,7 @@ public class TemporaryBucketFactory {
         } else {
             bucketBuilder.port(this.container.getMappedPort(this.serviceConfiguration.getHttpPort()));
         }
-        final Bucket bucket = (Bucket) bucketBuilder.build();
-        return bucket;
+        return (Bucket) bucketBuilder.build();
     }
 
     private boolean useTls() {

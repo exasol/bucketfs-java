@@ -14,7 +14,7 @@ public class JsonRpcReadyWaitStrategy {
     }
 
     // This is a workaround until a proper readiness check for the XML RPC is implemented.
-    @SuppressWarnings("sonar:S2925")
+    @SuppressWarnings("java:S2925")
     public void waitUntilXmlRpcReady() {
         if(!isReady) {
             try {

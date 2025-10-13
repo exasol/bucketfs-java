@@ -4,13 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.util.List;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.exasol.bucketfs.http.HttpClientBuilder;
 import com.exasol.bucketfs.list.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
