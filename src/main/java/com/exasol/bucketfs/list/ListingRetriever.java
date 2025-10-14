@@ -20,7 +20,7 @@ import com.exasol.bucketfs.*;
  */
 public class ListingRetriever {
     /** Maximum time to wait for a list request */
-    public static final int LIST_TIMEOUT_SECONDS = 20;
+    public static final int LIST_TIMEOUT_SECONDS = 90;
 
     /**
      * @param protocol protocol

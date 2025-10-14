@@ -4,7 +4,7 @@ Code name: Post-Exasol 8.29.1 compatibility
 
 ## Summary
 
-In Exasol versions after 8.29.1, the behavior of the BuckteFS interface changed subtly, causing some integration tests in this project to fail. We updated the tests for compatibility with 8.34.0, which was the latest version 8.x available at this time and additionally with 2025.1.3.
+In Exasol versions after 8.29.1, the behavior of the BuckteFS interface changed subtly, causing some integration tests in this project to fail. We updated the tests for compatibility with 8.29.12, which was the latest version 8.x available at this time and additionally with 2025.1.3.
 
 ## Breaking Changes
 
