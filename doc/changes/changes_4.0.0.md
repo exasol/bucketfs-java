@@ -1,4 +1,4 @@
-# BucketFS Java 4.0.0, released 2025-10-13
+# BucketFS Java 4.0.0, released 2025-10-14
 
 Code name: Post-Exasol 8.29.1 compatibility
 
@@ -6,9 +6,9 @@ Code name: Post-Exasol 8.29.1 compatibility
 
 In Exasol versions after 8.29.1, the behavior of the BuckteFS interface changed subtly, causing some integration tests in this project to fail. We updated the tests for compatibility with 8.34.0, which was the latest version available at this time.
 
-We also fixed the way the password encoding works in the `CreateBucketCommand` class for current versions of Exasol 8, since that was changed on the server side. Use the method `useBase64EncodedPasswords(boolean)` in the builder to control whether (until Exasol 7) or not (Exasol 8 and later) passwords send via the create command are Base64 encoded on the client side.
-
 ## Breaking Changes
+
+We fixed the way the password encoding works in the `CreateBucketCommand` class for current versions of Exasol 8, since that was changed on the server side. Use the method `useBase64EncodedPasswords(boolean)` in the builder to control whether (until Exasol 7) or not (Exasol 8 and later) passwords send via the create command are Base64 encoded on the client side. This is a breaking change for Exasol 7.
 
 We also removed the method `ReadEnabledBucket.httpPort` which was deprecated in favor of `ReadEnabledBucket.port` in 2.2.0 (2021).
 

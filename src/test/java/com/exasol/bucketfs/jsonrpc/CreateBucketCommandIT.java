@@ -12,6 +12,7 @@ import java.util.concurrent.TimeoutException;
 
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.bucketfs.uploadnecessity.JsonRpcReadyWaitStrategy;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     @Test
     void testCreatingBucketWithCertificateFailsHostnameValidation() {
+        Assumptions.assumeTrue(EXASOL.getDockerImageReference().getMajor() >= 8);
         final CommandFactory commandFactory = createCommandFactory()
                 .raiseTlsErrors(true)
                 .certificate(tlsCertificate)
