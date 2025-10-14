@@ -1,8 +1,5 @@
 package com.exasol.bucketfs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.locks.LockSupport;
@@ -19,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
     @SuppressWarnings("java:S2925") // Suppressing Sonar warning about Thread.sleep
-    private static final Logger LOGGER = LoggerFactory.getLogger(BucketReadyToListWaitStrategy.class);
     public static final Duration WAIT_TIMEOUT = Duration.ofSeconds(60);
     private static final int DELAY_BETWEEN_RETRIES_NANOS = 300000;
 
@@ -32,12 +28,10 @@ public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
 
     @Override
     public void waitUntilBucketIsReady(final Bucket bucket) {
-        LOGGER.info("Waiting until bucket {} is ready for max {}." , bucket.getFullyQualifiedBucketName(), WAIT_TIMEOUT);
         final Instant end = Instant.now().plus(WAIT_TIMEOUT);
         do {
             try {
                 bucket.listContents();
-                LOGGER.info("Succeeded to list bucket contents: {}. Assuming bucket ready.", bucket);
                 return;
             } catch (final BucketAccessException exception) {
                 delayPollingRetry();
