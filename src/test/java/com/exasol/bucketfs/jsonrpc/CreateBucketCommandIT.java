@@ -4,6 +4,7 @@ import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.security.cert.X509Certificate;
 import java.util.Optional;
@@ -12,7 +13,6 @@ import java.util.concurrent.TimeoutException;
 
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.bucketfs.uploadnecessity.JsonRpcReadyWaitStrategy;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     @Test
     void testCreatingBucketWithCertificateFailsHostnameValidation() {
-        Assumptions.assumeTrue(EXASOL.getDockerImageReference().getMajor() >= 8);
+        assumeExasol8OrLater();
         final CommandFactory commandFactory = createCommandFactory()
                 .raiseTlsErrors(true)
                 .certificate(tlsCertificate)
@@ -77,6 +77,10 @@ class CreateBucketCommandIT extends AbstractBucketIT {
                         either(equalTo("No subject alternative names present"))
                                 .or(equalTo("No name matching localhost found"))
                                 .or(equalTo("No subject alternative DNS name matching localhost found."))));
+    }
+
+    private static void assumeExasol8OrLater() {
+        assumeTrue(EXASOL.getDockerImageReference().getMajor() >= 8);
     }
 
     @Test
@@ -97,6 +101,7 @@ class CreateBucketCommandIT extends AbstractBucketIT {
 
     @Test
     void createBucketWithoutCertificateCheckSucceeds() {
+        assumeExasol8OrLater();
         final String bucketName = "WriteTestBucket_" + UUID.randomUUID();
         final String writeTestPassword = "Write me!";
         final String readTestPassword = "Read me!";
