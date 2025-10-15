@@ -3,8 +3,8 @@ package com.exasol.bucketfs;
 /**
  * This class takes bucket objects as prototypes and copies them.
  * <p>
- * This is useful in case tests need to modify settings before accessing the buckets. A typical example would be a
- * bad-weather case where you intentionally inject the wrong password to check whether the resulting error is handled
+ * This is useful when tests need to modify settings before accessing the buckets. A typical example would be a
+ * bad-weather scenario, where you intentionally inject the wrong password to verify that the resulting error is handled
  * correctly.
  * </p>
  */
@@ -27,7 +27,7 @@ public final class BucketObjectReplicator {
                 .serviceName(bucket.getBucketFsName())
                 .name(bucket.getBucketName())
                 .readPassword(bucket.getReadPassword())
-                .useTls(bucket.getProtocol() == "https")
+                .useTls("https".equals(bucket.getProtocol()))
                 .raiseTlsErrors(false);
     }
 }

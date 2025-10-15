@@ -9,13 +9,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Implementation of the {@link BucketReadyWaitStrategy} that waits until a bucket is ready by attempting
  * to list its contents. This strategy periodically retries listing the bucket's contents until the operation
- * succeeds or a timeout is reached.
+ * succeeds or a configured timeout is reached.
  * <p>
  * If the timeout is reached before the bucket becomes ready, the operation fails.
  * </p>
  */
 public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
-    @SuppressWarnings("java:S2925") // Suppressing Sonar warning about Thread.sleep
     public static final Duration WAIT_TIMEOUT = Duration.ofSeconds(60);
     private static final int DELAY_BETWEEN_RETRIES_NANOS = 300000;
 
@@ -23,7 +22,7 @@ public class BucketReadyToListWaitStrategy implements BucketReadyWaitStrategy {
      * Creates a new instance of the {@code BucketReadyToListWaitStrategy}.
      */
     public BucketReadyToListWaitStrategy() {
-        // Added to make required JavaDoc available.
+        // Added to make the required Javadoc available.
     }
 
     @Override

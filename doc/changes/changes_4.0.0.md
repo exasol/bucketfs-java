@@ -8,7 +8,7 @@ In Exasol versions after 8.29.1, the behavior of the BuckteFS interface changed 
 
 ## Breaking Changes
 
-We fixed the way the password encoding works in the `CreateBucketCommand` class for current versions of Exasol 8, since that was changed on the server side. Use the method `useBase64EncodedPasswords(boolean)` in the builder to control whether (until Exasol 7) or not (Exasol 8 and later) passwords send via the create command are Base64 encoded on the client side. This is a breaking change for Exasol 7.
+We fixed the way the password encoding works in the `CreateBucketCommand` class for current versions of Exasol 8, since that was changed on the server side. Use the method `useBase64EncodedPasswords(boolean)` in the builder to control whether (until Exasol 7) or not (Exasol 8 and later) passwords sent via the create command are Base64 encoded on the client side. This is a breaking change for Exasol 7.
 
 We also removed the method `ReadEnabledBucket.httpPort` which was deprecated in favor of `ReadEnabledBucket.port` in 2.2.0 (2021).
 
