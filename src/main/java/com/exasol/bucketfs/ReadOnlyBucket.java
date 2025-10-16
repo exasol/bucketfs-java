@@ -1,5 +1,6 @@
 package com.exasol.bucketfs;
 
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -9,7 +10,6 @@ import static com.exasol.bucketfs.BucketConstants.PATH_SEPARATOR;
  * Interface for read-only bucket access.
  */
 public interface ReadOnlyBucket {
-
     /**
      * Prefix for building UDF-visible paths to buckets in BucketFS.
      * <p>
@@ -30,6 +30,21 @@ public interface ReadOnlyBucket {
      * @return name of the bucket
      */
     String getBucketName();
+
+    /**
+     * @return protocol used to access the bucket
+     */
+    String getProtocol();
+
+    /**
+     * @return host the BucketFS service hosting this bucket runs on
+     */
+    String getHost();
+
+    /**
+     * @return port the BucketFS service hosting this bucket runs on
+     */
+    int getPort();
 
     /**
      * Get the fully qualified name of the bucket.
@@ -137,4 +152,13 @@ public interface ReadOnlyBucket {
     default String getPathInUdf(final String fileInBucketFs) {
         return getPathInUdf() + PATH_SEPARATOR + fileInBucketFs;
     }
+
+    /**
+     * Get the HTTP client the bucket uses to issue its commands.
+     * <p>
+     * This is necessary for better observability and testability.
+     * </p>
+     * @return HTTP client the bucket uses.
+     */
+    HttpClient getHttpClient();
 }

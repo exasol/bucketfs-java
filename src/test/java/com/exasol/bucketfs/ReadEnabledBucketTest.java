@@ -1,5 +1,6 @@
 package com.exasol.bucketfs;
 
+import static com.exasol.bucketfs.testutil.ExceptionAssertions.assertThrowsWithMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -9,9 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.http.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.exasol.bucketfs.ReadEnabledBucket.Builder;
 import com.exasol.bucketfs.http.HttpClientBuilder;
-import com.exasol.bucketfs.testutil.ExceptionAssertions;
 
 @ExtendWith(MockitoExtension.class)
 class ReadEnabledBucketTest {
@@ -41,14 +39,21 @@ class ReadEnabledBucketTest {
     @Mock
     private HttpResponse<Object> httpResponseMock;
 
-    @Test
-    void testToString() {
-        final var bucket = bucketBuilder() //
-                .host(IP_ADDRESS) //
-                .port(1234) //
-                .serviceName("service") //
-                .name("bucket").build();
-        assertThat(bucket.toString(), equalTo("service/bucket"));
+    @CsvSource({
+            "false, localhost, 8888, s1, b1, s1/b1 (http://localhost:8888)",
+            "true, example.org, 1234, s2, b2, s2/b2 (https://example.org:1234)",
+            "false, 127.0.0.1, 4242, , the_bucket, bfsdefault/the_bucket (http://127.0.0.1:4242)"
+    })
+    @ParameterizedTest
+    void testToString(final boolean useTls, final String host, final int port, final String serviceName,
+            final String bucketName, final String expected) {
+        final var bucket = bucketBuilder()
+                .useTls(useTls)
+                .host(host)
+                .port(port)
+                .serviceName(serviceName)
+                .name(bucketName).build();
+        assertThat(bucket.toString(), equalTo(expected));
     }
 
     private ReadEnabledBucket.Builder<? extends Builder<?>> bucketBuilder() {
@@ -112,21 +117,21 @@ class ReadEnabledBucketTest {
     @Test
     // [utest->dsn~get-the-udf-bucket-path~1]
     void getBucketPathInUdf() {
-        ReadOnlyBucket bucket = createBucket();
+        final ReadOnlyBucket bucket = createBucket();
         final String pathInUdf = bucket.getPathInUdf();
         assertThat(pathInUdf, equalTo("/buckets/service/bucket"));
     }
 
     @Test
     // [utest->dsn~get-the-udf-bucket-path~1]
-    void getFilePathInUdf() {
-        ReadOnlyBucket bucket = createBucket();
+    void testGetFilePathInUdf() {
+        final ReadOnlyBucket bucket = createBucket();
         final String pathInUdf = bucket.getPathInUdf("my-file.txt");
         assertThat(pathInUdf, equalTo("/buckets/service/bucket/my-file.txt"));
     }
 
     private String lines(final String... lines) {
-        return Arrays.stream(lines).collect(Collectors.joining("\n"));
+        return String.join("\n", lines);
     }
 
     private void simulateResponse(final String responseBody, final int responseStatus)
@@ -148,7 +153,7 @@ class ReadEnabledBucketTest {
             throws IOException, InterruptedException {
         simulateResponse(null, responseStatus);
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 expectedExceptionMessage);
     }
 
@@ -158,7 +163,7 @@ class ReadEnabledBucketTest {
         when(this.httpClientMock.send(any(), any())).thenThrow(new IOException("expected"));
 
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 "E-BFSJ-5: I/O error trying to list 'http://101.102.103.104:1234/bucket/'");
     }
 
@@ -168,7 +173,7 @@ class ReadEnabledBucketTest {
         when(this.httpClientMock.send(any(), any())).thenThrow(new InterruptedException("expected"));
 
         final ReadOnlyBucket bucket = createBucket();
-        ExceptionAssertions.assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
+        assertThrowsWithMessage(BucketAccessException.class, bucket::listContents,
                 "E-BFSJ-4: Interrupted trying to list 'http://101.102.103.104:1234/bucket/'.");
     }
 
@@ -213,12 +218,12 @@ class ReadEnabledBucketTest {
     @Test
     void buildFailsWithoutHost() {
         final Builder<?> builder = ReadEnabledBucket.builder().serviceName("service").name("bucket");
-        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
+        assertThrowsWithMessage(NullPointerException.class, builder::build, "host");
     }
 
     @Test
     void buildFailsWithoutBucketName() {
         final Builder<?> builder = ReadEnabledBucket.builder().host("host").serviceName("service");
-        ExceptionAssertions.assertThrowsWithMessage(NullPointerException.class, builder::build, "bucketName");
+        assertThrowsWithMessage(NullPointerException.class, builder::build, "bucketName");
     }
 }

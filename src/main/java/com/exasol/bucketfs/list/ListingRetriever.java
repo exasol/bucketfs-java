@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Logger;
@@ -18,11 +19,14 @@ import com.exasol.bucketfs.*;
  * This class retrieves the list of buckets or of objects inside a bucket.
  */
 public class ListingRetriever {
+    /** Maximum time to wait for a list request */
+    public static final int LIST_TIMEOUT_SECONDS = 90;
+
     /**
      * @param protocol protocol
      * @param host     host name or IP address for the URI
      * @param port     port
-     * @param suffix   e.g. name of the bucket
+     * @param suffix   e.g., name of the bucket
      * @return {@link URI} made up from the specified elements
      */
     public static URI publicReadUri(final String protocol, final String host, final int port, final String suffix) {
@@ -65,6 +69,7 @@ public class ListingRetriever {
         LOGGER.finest(() -> "Listing contents of URI '" + uri + "'");
         try {
             final HttpRequest request = HttpRequest.newBuilder(uri) //
+                    .timeout(Duration.ofSeconds(LIST_TIMEOUT_SECONDS))
                     .header("Authorization", encodeBasicAuth(readPassword)) //
                     .build();
             final HttpResponse<String> response = this.httpClient.send(request, BodyHandlers.ofString());

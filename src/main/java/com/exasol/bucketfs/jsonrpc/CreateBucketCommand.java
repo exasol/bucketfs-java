@@ -59,8 +59,12 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
             this.bucketFsName = Objects.requireNonNull(builder.bucketFsName, "bucketFsName");
             this.bucketName = Objects.requireNonNull(builder.bucketName, "bucketName");
             this.isPublic = builder.isPublic;
-            this.readPassword = base64Encode(builder.readPassword);
-            this.writePassword = base64Encode(builder.writePassword);
+            this.readPassword = builder.useBase64EncodedPasswords
+                    ? base64Encode(builder.readPassword)
+                    : builder.readPassword;
+            this.writePassword = builder.useBase64EncodedPasswords
+                    ? base64Encode(builder.writePassword)
+                    : builder.writePassword;
         }
 
         private static String base64Encode(final String value) {
@@ -134,6 +138,7 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         private boolean isPublic = false;
         private String readPassword = null;
         private String writePassword = null;
+        private boolean useBase64EncodedPasswords = true;
 
         private CreateBucketCommandBuilder(final JsonRpcCommandExecutor executor, final JsonMapper jsonMapper) {
             this.executor = executor;
@@ -196,6 +201,17 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         }
 
         /**
+         * Switch Base64 encoding for read / write passwords on or off.
+         *
+         * @param useBase64EncodedPasswords set to {@code true} if passwords should be encoded with Base64
+         * @return this instance for method chaining
+         */
+        public CreateBucketCommandBuilder useBase64EncodedPasswords(final boolean useBase64EncodedPasswords) {
+            this.useBase64EncodedPasswords = useBase64EncodedPasswords;
+            return this;
+        }
+
+        /**
          * Create a new bucket using the configured values.
          *
          * @throws NullPointerException in case mandatory fields are not defined
@@ -203,5 +219,6 @@ public class CreateBucketCommand extends AbstractJsonResponseCommand<Void> {
         public void execute() {
             this.executor.execute(new CreateBucketCommand(this.jsonMapper, new Request(this)));
         }
+
     }
 }

@@ -40,7 +40,7 @@
 | [Apache Maven Toolchains Plugin][29]                    | [Apache-2.0][23]                            |
 | [Apache Maven Compiler Plugin][30]                      | [Apache-2.0][23]                            |
 | [Apache Maven Enforcer Plugin][31]                      | [Apache-2.0][23]                            |
-| [Maven Flatten Plugin][32]                              | [Apache Software Licenese][23]              |
+| [Maven Flatten Plugin][32]                              | [Apache Software License][23]               |
 | [OpenFastTrace Maven Plugin][33]                        | [GNU General Public License v3.0][34]       |
 | [Project Keeper Maven plugin][35]                       | [The MIT License][36]                       |
 | [org.sonatype.ossindex.maven:ossindex-maven-plugin][37] | [ASL2][38]                                  |
@@ -65,7 +65,7 @@
 [3]: https://projects.eclipse.org/license/epl-2.0
 [4]: https://projects.eclipse.org/license/secondary-gpl-2.0-cp
 [5]: https://jakartaee.github.io/jsonb-api
-[6]: https://junit.org/junit5/
+[6]: https://junit.org/
 [7]: https://www.eclipse.org/legal/epl-v20.html
 [8]: http://hamcrest.org/JavaHamcrest/
 [9]: https://raw.githubusercontent.com/hamcrest/JavaHamcrest/master/LICENSE

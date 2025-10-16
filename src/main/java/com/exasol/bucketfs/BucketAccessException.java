@@ -11,6 +11,9 @@ import java.net.URI;
  * @serial exclude
  */
 public class BucketAccessException extends Exception {
+    private static final long serialVersionUID = -1002852289020779835L;
+    private final URI uri;
+    private final int statusCode;
 
     /**
      * @param uri       URI of the request
@@ -23,8 +26,8 @@ public class BucketAccessException extends Exception {
     }
 
     /**
-     * @param uri       URI of the request
-     * @param operation operation initially requested {@link BucketOperation}
+     * @param uri        URI of the request
+     * @param operation  operation initially requested {@link BucketOperation}
      * @param exception cause of the current exception
      * @return new instance of {@link BucketAccessException} indicating an IO failure during download
      */
@@ -33,10 +36,6 @@ public class BucketAccessException extends Exception {
         return new BucketAccessException(messageBuilder("E-BFSJ-5")
                 .message("I/O error trying to {{operation|uq}} {{URI}}", operation, uri).toString(), exception);
     }
-
-    private static final long serialVersionUID = -1002852289020779835L;
-    private final URI uri;
-    private final int statusCode;
 
     /**
      * Create a new instance of a {@link BucketAccessException}.

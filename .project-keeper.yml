@@ -8,7 +8,7 @@ linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
 build:
   exasolDbVersions:
-    - "8.29.1" # Pinned, see https://github.com/exasol/bucketfs-java/issues/80
+    - "8.29.12"
     - "7.1.30"
   workflows:
     - name: ci-build.yml

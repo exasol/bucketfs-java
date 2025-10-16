@@ -19,42 +19,31 @@ import com.exasol.bucketfs.list.BucketContentLister;
 import com.exasol.bucketfs.list.ListingRetriever;
 
 /**
- * Bucket that support read access like listing contents and downloading files.
+ * Bucket that supports read access like listing contents and downloading files.
  */
 public class ReadEnabledBucket implements ReadOnlyBucket {
     private static final Logger LOGGER = Logger.getLogger(ReadEnabledBucket.class.getName());
     private static final String BUCKET_ROOT = "";
 
-    /**
-     * BucketFs name
-     */
+    /** BucketFs name  */
     protected final String serviceName;
-    /**
-     * Bucket name
-     */
+    /** Bucket name  */
     protected final String bucketName;
     /** Protocol for accessing the bucket ({@code http} or {@code https}). */
     protected final String protocol;
-    /**
-     * Host or IP address
-     */
+    /** Host or IP address */
     protected final String host;
-    /**
-     * Port
-     */
+    /** Port the BucketFS service hosting this bucket runs on */
     protected final int port;
-    /**
-     * Read password
-     */
+    /** Read password */
     protected final String readPassword;
-    /**
-     * Upload history
-     */
+    /** Upload history */
     protected final Map<String, Instant> uploadHistory = new HashMap<>();
-    private final HttpClient client;
+    /** HTTP client that executes the underlying commands */
+    protected final HttpClient client;
 
     /**
-     * Create a new instance of a bucket that support reading.
+     * Create a new instance of a bucket that supports reading.
      *
      * @param builder builder from which the bucket should be constructed
      */
@@ -79,6 +68,21 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     }
 
     @Override
+    public String getProtocol() {
+        return this.protocol;
+    }
+
+    @Override
+    public String getHost() {
+        return this.host;
+    }
+
+    @Override
+    public int getPort() {
+        return this.port;
+    }
+
+    @Override
     public String getFullyQualifiedBucketName() {
         return this.serviceName + BucketConstants.PATH_SEPARATOR + this.bucketName;
     }
@@ -86,6 +90,11 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     @Override
     public String getReadPassword() {
         return this.readPassword;
+    }
+
+    @Override
+    public HttpClient getHttpClient() {
+        return this.client;
     }
 
     @Override
@@ -205,7 +214,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
     @Override
     public String toString() {
-        return (this.serviceName == null ? (this.port + ":") : (this.serviceName + "/")) + this.bucketName;
+        return (this.serviceName == null ? (this.port + ":") : (this.serviceName + "/")) + this.bucketName
+                + " (" + this.protocol + "://" + this.host + ":" + this.port + ")";
     }
 
     /**
@@ -221,7 +231,7 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
     /**
      * Builder for {@link ReadEnabledBucket} objects.
      *
-     * @param <T> type for self pointer to inheritable builder
+     * @param <T> type for self-pointer to inheritable builder
      */
     public static class Builder<T extends Builder<T>> {
         private String protocol = "http";
@@ -311,19 +321,6 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
         }
 
         /**
-         * Set the port the BucketFS service listens on. Make sure to also call {@link #useTls(boolean)} with argument
-         * {@code false} if this is an HTTP port or {@code true} if this is an HTTPS port.
-         *
-         * @param port HTTP or HTTPS port the BucketFS service listens on
-         * @return Builder instance for fluent programming
-         * @deprecated use {@link #port(int)} instead.
-         */
-        @Deprecated
-        public T httpPort(final int port) {
-            return this.port(port);
-        }
-
-        /**
          * Set the read password.
          *
          * @param readPassword read password to set
@@ -336,13 +333,8 @@ public class ReadEnabledBucket implements ReadOnlyBucket {
 
         /**
          * Define if TLS errors should raise an error when executing requests or if they should be ignored. Setting this
-         * to <code>false</code> is required as the docker-db uses a self-signed certificate.
-         * <p>
-         * Defaults to raise TLS errors.
-         * <p>
-         * Mutually exclusive with setting {@link #raiseTlsErrors} to {@code false}.
-         *
-         * @param raise <code>true</code> if the {@link CommandFactory} should fail for TLS errors, <code>false</code>
+         * to {@code false} is required as the docker-db uses a self-signed certificate.
+         * @param raise {@code true} if the {@link CommandFactory} should fail for TLS errors, {@code false}
          *              if it should ignore TLS errors.
          * @return Builder instance for fluent programming
          */

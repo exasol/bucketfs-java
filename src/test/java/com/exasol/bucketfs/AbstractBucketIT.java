@@ -2,8 +2,10 @@ package com.exasol.bucketfs;
 
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKET;
 import static com.exasol.bucketfs.BucketConstants.DEFAULT_BUCKETFS;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeoutException;
 
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -30,6 +32,18 @@ public abstract class AbstractBucketIT {
     @Container
     protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>() //
             .withReuse(true);
+
+    protected static void uploadFileWithContentToPath(final Bucket bucket, final String content,
+                                                      final String pathInBucket) {
+        try {
+            bucket.uploadStringContent(content, pathInBucket);
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            fail("Interrupted while uploading file to bucket");
+        } catch (final BucketAccessException | TimeoutException exception) {
+            fail("Unable to upload test file to bucket", exception);
+        }
+    }
 
     /**
      * Get the container Ip Address.
