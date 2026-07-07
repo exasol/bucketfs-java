@@ -7,7 +7,7 @@
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | [error-reporting-java][0]        | [MIT License][1]                                                                                             |
 | [Jakarta JSON Processing API][2] | [Eclipse Public License 2.0][3]; [GNU General Public License, version 2 with the GNU Classpath Exception][4] |
-| [JSON-B API][5]                  | [Eclipse Public License 2.0][3]; [GNU General Public License, version 2 with the GNU Classpath Exception][4] |
+| [Jakarta JSON Binding API][5]    | [Eclipse Public License 2.0][3]; [GNU General Public License, version 2 with the GNU Classpath Exception][4] |
 
 ## Test Dependencies
 
@@ -64,7 +64,7 @@
 [2]: https://github.com/eclipse-ee4j/jsonp
 [3]: https://projects.eclipse.org/license/epl-2.0
 [4]: https://projects.eclipse.org/license/secondary-gpl-2.0-cp
-[5]: https://jakartaee.github.io/jsonb-api
+[5]: https://projects.eclipse.org/projects/ee4j.jsonb/jakarta.json.bind-api
 [6]: https://junit.org/
 [7]: https://www.eclipse.org/legal/epl-v20.html
 [8]: http://hamcrest.org/JavaHamcrest/
