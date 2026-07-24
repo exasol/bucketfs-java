@@ -4,6 +4,8 @@ Code name: Fixed vulnerability CVE-2026-9563 in org.eclipse.parsson:parsson:jar:
 
 ## Summary
 
+Starting with this release, Exasol version 7.1 is no longer supported. We only test against the latest version and the latest LTS version.
+
 This release fixes the following vulnerability:
 
 ### CVE-2026-9563 (CWE-400) in dependency `org.eclipse.parsson:parsson:jar:1.1.7:runtime`
