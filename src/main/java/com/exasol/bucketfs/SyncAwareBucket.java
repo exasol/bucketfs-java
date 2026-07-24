@@ -21,7 +21,7 @@ import com.exasol.bucketfs.monitor.BucketFsMonitor.StateRetriever;
  */
 public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
     private static final Logger LOGGER = Logger.getLogger(SyncAwareBucket.class.getName());
-    private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 2 * 60000L;
+    private static final long BUCKET_SYNC_TIMEOUT_IN_MILLISECONDS = 5_000L;
     private static final long FILE_SYNC_POLLING_DELAY_IN_MILLISECONDS = 200;
     private final BucketFsMonitor monitor;
     private final StateRetriever stateRetriever;
@@ -131,7 +131,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         final String message = String.format(
                 "Timeout waiting for object '%s' to be synchronized in bucket '%s' after %s.", //
                 pathInBucket, getFullyQualifiedBucketName(), state.toString());
-        LOGGER.severe(() -> message);
+        LOGGER.severe(message);
         throw new TimeoutException(message);
     }
 

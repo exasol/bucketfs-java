@@ -80,7 +80,8 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     void testUploadStringContentWrongWritePasswordFails() throws Exception {
         final String readPassword = getDefaultBucketConfiguration().getReadPassword();
         final var bucket = getDefaultBucketForWriting(readPassword, "wrong write password");
-        assertThrows(BucketAccessException.class, () -> bucket.uploadStringContent("any content", "any-filename.txt"));
+        final BucketAccessException thrown = assertThrows(BucketAccessException.class, () -> bucket.uploadStringContent("any content", "any-filename.txt"));
+        assertThat(thrown.getMessage(), Matchers.startsWith("E-BFSJ-3: Access denied trying to upload"));
     }
 
     // [itest->dsn~uploading-input-stream-to-bucket~1]
@@ -96,20 +97,23 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     @Test
     void testUploadNonExistentFileThrowsException() {
         final var file = Path.of("/this/path/does/not/exist");
-        assertThrows(FileNotFoundException.class, () -> getDefaultBucketForWriting().uploadFile(file, "nowhere.txt"));
+        final FileNotFoundException thrown = assertThrows(FileNotFoundException.class, () -> getDefaultBucketForWriting().uploadFile(file, "nowhere.txt"));
+        assertThat(thrown.getMessage(), equalTo("/this/path/does/not/exist not found"));
     }
 
     @Test
     void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException {
         final var file = createTestFile(tempDir, "irrelevant.txt", 1);
-        assertThrows(BucketAccessException.class,
+        final BucketAccessException thrown = assertThrows(BucketAccessException.class,
                 () -> getDefaultBucketForWriting().uploadFile(file, "this\\is\\an\\illegal\\URL"));
+        assertThat(thrown.getMessage(), equalTo("blubb"));
     }
 
     @Test
     void testUploadContentToIllegalUrlThrowsException() {
-        assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
+        final BucketAccessException thrown = assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
                 .uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
+        assertThat(thrown.getMessage(), equalTo("blubb"));
     }
 
     // [itest->dsn~downloading-a-file-from-a-bucket~1]
@@ -143,6 +147,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         bucket.uploadStringContent("some content", pathInBucket);
         final var exception = assertThrows(BucketAccessException.class,
                 () -> bucket.downloadFile(pathInBucket, pathToFile));
+        assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-5: I/O error trying to download"));
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }
 
@@ -217,7 +222,7 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     @Test
     void testInterruptedDuringUploadFile() throws Exception {
         final BucketAccessException exception = assertUploadThrowsExceptionWhenClientThrows(new InterruptedException());
-        assertAll(//
+        assertAll(
                 () -> assertThat(exception.getMessage(), Matchers.startsWith("E-BFSJ-6: Interrupted trying to upload")),
                 () -> assertTrue(Thread.currentThread().isInterrupted())//
         );
