@@ -8,8 +8,8 @@ linkReplacements:
   - "https://eclipse-ee4j.github.io/jsonb-api|https://github.com/eclipse-ee4j/jsonb-api"
 build:
   exasolDbVersions:
-    - "8.29.12"
-    - "7.1.30"
+    - "2026.1.0"
+    - "2025.1.13"
   workflows:
     - name: ci-build.yml
       stepCustomizations:
