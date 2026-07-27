@@ -102,18 +102,20 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException {
+    void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException, TimeoutException, BucketAccessException {
         final var file = createTestFile(tempDir, "irrelevant.txt", 1);
-        final BucketAccessException thrown = assertThrows(BucketAccessException.class,
-                () -> getDefaultBucketForWriting().uploadFile(file, "this\\is\\an\\illegal\\URL"));
-        assertThat(thrown.getMessage(), Matchers.startsWith("E-BFSJ-1: Unable to perform upload")); // With 7.1.: HTTP error 400
+        final SyncAwareBucket bucket = getDefaultBucketForWriting();
+        final String pathInBucket = "this\\is\\an\\illegal\\URL";
+        bucket.uploadFile(file, pathInBucket);
+        assertThat(bucket.listContents(), hasItem(pathInBucket));
     }
 
     @Test
-    void testUploadContentToIllegalUrlThrowsException() {
-        final BucketAccessException thrown = assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
-                .uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
-        assertThat(thrown.getMessage(), Matchers.startsWith("E-BFSJ-1: Unable to perform upload")); // With 7.1.: HTTP error 400
+    void testUploadContentWithBackslashInPath() throws InterruptedException, BucketAccessException, TimeoutException {
+        final SyncAwareBucket bucket = getDefaultBucketForWriting();
+        final String pathInBucket = "this\\is\\an\\illegal\\URL";
+        bucket.uploadStringContent("irrelevant content", pathInBucket);
+        assertThat(bucket.listContents(), hasItem(pathInBucket));
     }
 
     // [itest->dsn~downloading-a-file-from-a-bucket~1]

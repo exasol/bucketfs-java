@@ -81,8 +81,15 @@
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>exasol-testcontainers</artifactId>
-            <version>7.3.0</version>
+            <version>8.0.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Avoid transitive dependency on itself -->
+                    <groupId>com.exasol</groupId>
+                    <artifactId>bucketfs-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
