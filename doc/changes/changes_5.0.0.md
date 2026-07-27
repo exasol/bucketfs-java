@@ -1,4 +1,4 @@
-# BucketFS Java 4.0.1, released 2026-07-27
+# BucketFS Java 5.0.0, released 2026-07-27
 
 Code name: Fixed vulnerability CVE-2026-9563 in org.eclipse.parsson:parsson:jar:1.1.7:runtime
 
