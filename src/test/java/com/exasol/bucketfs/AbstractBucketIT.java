@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeoutException;
 
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.exasol.bucketfs.monitor.TimestampRetriever;
 import com.exasol.bucketfs.testcontainers.LogBasedBucketFsMonitor;
@@ -21,7 +21,6 @@ import com.exasol.containers.ExasolContainer;
 /**
  * Abstract base for bucket integration tests.
  */
-@Testcontainers
 public abstract class AbstractBucketIT {
 
     public static final int BUCKETFS_TLS_PORT = 2581;
@@ -29,12 +28,22 @@ public abstract class AbstractBucketIT {
     /**
      * ExasolContainer
      */
-    @Container
-    protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>() //
+    @SuppressWarnings("resource") // Will be closed in stopExasolContainer()
+    protected static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>()
             .withReuse(true);
 
+    @BeforeAll
+    static void startExasolContainer() {
+        EXASOL.start();
+    }
+
+    @AfterAll
+    static void stopExasolContainer() {
+        EXASOL.stop();
+    }
+
     protected static void uploadFileWithContentToPath(final Bucket bucket, final String content,
-                                                      final String pathInBucket) {
+            final String pathInBucket) {
         try {
             bucket.uploadStringContent(content, pathInBucket);
         } catch (final InterruptedException exception) {
@@ -69,7 +78,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Check if the current Exasol container uses TLS for BucketFS.
-     * 
+     *
      * @return {@code true} if the current Exasol container uses TLS for BucketFS
      */
     protected boolean dbUsesTls() {
@@ -78,7 +87,7 @@ public abstract class AbstractBucketIT {
 
     /**
      * Get the current Exasol container's TLS certificate.
-     * 
+     *
      * @return the current Exasol container's TLS certificate
      */
     protected X509Certificate getDbCertificate() {
