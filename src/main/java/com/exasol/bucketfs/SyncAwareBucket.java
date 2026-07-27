@@ -30,7 +30,9 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
      * Sync aware bucket.
      *
      * @param builder builder
+     * @deprecated Use {@link #builder()} and {@link Builder#build()} instead.
      */
+    @Deprecated(since = "5.0.0", forRemoval = true)
     public SyncAwareBucket(final Builder<? extends Builder<?>> builder) {
         super(builder);
         Objects.requireNonNull(builder.monitor);
@@ -131,7 +133,7 @@ public class SyncAwareBucket extends WriteEnabledBucket implements Bucket {
         final String message = String.format(
                 "Timeout waiting for object '%s' to be synchronized in bucket '%s' after %s.", //
                 pathInBucket, getFullyQualifiedBucketName(), state.toString());
-        LOGGER.severe(() -> message);
+        LOGGER.severe(message);
         throw new TimeoutException(message);
     }
 
