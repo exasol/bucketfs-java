@@ -106,14 +106,14 @@ class SyncAwareBucketIT extends AbstractBucketIT {
         final var file = createTestFile(tempDir, "irrelevant.txt", 1);
         final BucketAccessException thrown = assertThrows(BucketAccessException.class,
                 () -> getDefaultBucketForWriting().uploadFile(file, "this\\is\\an\\illegal\\URL"));
-        assertThat(thrown.getMessage(), equalTo("blubb"));
+        assertThat(thrown.getMessage(), Matchers.startsWith("E-BFSJ-1: Unable to perform upload")); // With 7.1.: HTTP error 400
     }
 
     @Test
     void testUploadContentToIllegalUrlThrowsException() {
         final BucketAccessException thrown = assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
                 .uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
-        assertThat(thrown.getMessage(), equalTo("blubb"));
+        assertThat(thrown.getMessage(), Matchers.startsWith("E-BFSJ-1: Unable to perform upload")); // With 7.1.: HTTP error 400
     }
 
     // [itest->dsn~downloading-a-file-from-a-bucket~1]
