@@ -2,7 +2,7 @@
 
 ## Change Management
 
-Changes are planned via GitHub issues. Except for very small changes, we require and issue ticket before accepting pull requests.
+Changes are planned via GitHub issues. Except for very small changes, we require an issue ticket before accepting pull requests.
 
 Changes must be put on a new branch that follows this naming convention:
 
@@ -16,7 +16,7 @@ The API is documented inline in the code using [JavaDoc](https://www.oracle.com/
 
 ## Testing
 
-This project uses JUnit 5 as a testing framework. Run tests and valiations with the following command.
+This project uses JUnit 5 as a testing framework. Run tests and valiations with the following command:
 
 ```shell
 mvn clean verify
@@ -46,7 +46,7 @@ Dependabot is globally activated and managed for all Exasol repositories.
 
 ## Releases
 
-Releases are done via GHA in the [release workflow](../../.github/workflows/release.yml) and published  [in the project repository on GitHub](https://github.com/exasol/bucketfs-java/releases) and in the [Central Repository](https://repo1.maven.org/maven2/com/exasol/bucketfs-java/).
+Releases are done via [Project Keeper](https://github.com/exasol/project-keeper) in the [release workflow](../../.github/workflows/release.yml) and published  [in the project repository on GitHub](https://github.com/exasol/bucketfs-java/releases) and in the [Central Repository](https://repo1.maven.org/maven2/com/exasol/bucketfs-java/).
 
 Before publishing, the release workflow verifies that CI succeeded for the release commit and verifies the release preconditions.
 
