@@ -1,5 +1,7 @@
 # BucketFS Java User Guide
 
+## Introduction
+
 Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm) is a distributed file system that automatically synchronizes files uploaded on one cluster node to all other nodes. It is intended for providing shared configuration, scripts and libraries used in [User Defined Functions](https://docs.exasol.com/database_concepts/udf_scripts.htm) (UDF) mainly.
 
 This project provides a library that abstracts access to Exasol's [BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/bucketfs.htm). That allows using BucketFS features programmatically without having to deal with the underlying protocol.
@@ -8,7 +10,7 @@ This project provides a library that abstracts access to Exasol's [BucketFS](htt
 
 Syntax definitions in this document are written in [Augmented Backus-Naur Form (ABNF)](https://www.rfc-editor.org/rfc/rfc5234).
 
-## Getting BucketFS Java Into Your Project
+## Installation and Updates
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.exasol/bucketfs-java)](https://search.maven.org/artifact/com.exasol/bucketfs-java)
 
@@ -18,9 +20,17 @@ Please check out ["Introduction to the Dependency Mechanism"](http://maven.apach
 
 We assume here that you are familiar with the basics.
 
+All updates, including security updates are distributed via Maven and GitHub releases.
+
+Update to a new version only after reviewing and testing the release.
+
+### Automatic Updates
+
+BucketFS Java does not automatically install updates. You choose when to update by changing the version in your Maven configuration.
+
 ### BucketFS Java as Maven Dependency
 
-Just add the following dependency to add the Exasol test containers to your project.
+Just add the following dependency to your project.
 
 ```xml
 <dependency>
@@ -31,6 +41,24 @@ Just add the following dependency to add the Exasol test containers to your proj
 ```
 
 As always, check for the latest version of the dependencies.
+
+## Integration into Your Product
+
+When you include BucketFS Java in a product, follow the [security](#security) and [update](#installation-and-updates) instructions in this guide. For your product's security information, use BucketFS Java's [security policy](../../SECURITY.md), [changelog](../changes/changelog.md), and release [software bill of materials](https://github.com/exasol/bucketfs-java/releases).
+
+## Uninstallation
+
+You remove the library from your dependencies by removing the `dependency` section in your Maven POM.
+
+If you also want to remove the local copies from your machine, use:
+
+```shell
+mvn dependency:purge-local-repository -DmanualInclude=com.exasol:bucketfs-java -DreResolve=false
+```
+
+The library itself does not store any data, confidential or otherwise; no passwords, tokens, user data or bucket payload. All of that resides on your Exasol installation.
+
+Removing the local Maven cache has no effect on BucketFS contents.
 
 ## Services, Buckets, Objects and Paths
 
@@ -53,7 +81,7 @@ As mentioned before, BucketFS is a distributed file system. Due to that fact, it
 
 Note that to safely use the objects, you need to wait until that synchronization is done.
 
-Additionally BucketFS automatically expands a limited number of archive formats. While this is a very convenient feature, it again takes some time. The expanded contents can only be safely used after extraction from the archive finished.
+Additionally, BucketFS automatically expands a limited number of archive formats. While this is a very convenient feature, it again takes some time. The expanded contents can only be safely used after extraction from the archive finished.
 
 BucketFS Java can help in both situation, provided that a synchronization monitor is available. Check section [Blocking vs. Non-Blocking Upload](#blocking-vs-non-blocking-upload) for details.
 
@@ -382,10 +410,53 @@ Please note that this only works when you specify a custom certificate with `cer
 
 In Exasol 8 the way the RCP interface used to create buckets expects the passwords changed in a breaking way from version 7. Previously, the interface expected the client to encode the password with Base64. That is now done on the server side — as it should be.
 
-As a consequence, for Exasol 8 and later you need to switch off client side UTF-8 encoding.
+As a consequence, for Exasol 8 and later you need to switch off client-side UTF-8 encoding.
 
 ```java
 final CreateBucketCommandBuilder builder =
         new CreateBucketCommandBuilder
                 .useuseBase64EncodedPasswords(false);
 ```
+
+## Security
+
+This library is cleared for production use.
+
+BucketFS Java is an object access layer. BucketFS itself is protected by being a chroot environment on the Exasol cluster nodes.
+
+## Risks
+
+### Unintended Information Disclosure
+
+The main risk of using BucketFS the wrong way is to disclose confidential data. To prevent this:
+
+1. Only make buckets public if they contain actual public data
+2. Protect all other buckets with a secure read password.
+3. Store your passwords securely
+4. Enable TLS to prevent interception of data in transit
+
+## Data Corruption
+
+To prevent data corruption,
+
+1. Protect your buckets with a secure write password
+2. Store your passwords securely
+3. Enable TLS to prevent manipulation of data in transit
+4. Check the result status of the upload commands
+
+## Man-in-the-Middle Attacks
+
+To prevent man-in-the-middle attacks,
+
+1. Enable TLS
+2. Enable verification of the server's TLS certificate
+
+## Vulnerable Code
+
+Check the [changelog](../changes/changelog.md) regularly and install all security updates in a timely manner. See ["Installation and Updates"](#installation-and-updates).
+
+## Security-relevant Changes
+
+Check the [changelog](../changes/changelog.md) for information about added or changed security controls, newer TLS versions or any other security-relevant changes.
+
+This user-guide will also be kept up-to-date with any such changes.
