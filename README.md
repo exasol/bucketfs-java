@@ -34,6 +34,7 @@ For more details see the [System Requirement Specification](doc/system_requireme
 * [User Guide](doc/user_guide/user_guide.md)
 * [Product Lifecycle](doc/user_guide/project_lifecycle.md)
 * [Changelog](doc/changes/changelog.md)
+* [CRA technical file](CRA_technical_file.md)
 
 ### Information for Contributors
 
