@@ -32,7 +32,7 @@ For more details see the [System Requirement Specification](doc/system_requireme
 "Users" from the perspective of this project are software developers integrating BucketFS into their applications, not database end users.
 
 * [User Guide](doc/user_guide/user_guide.md)
-* [Product Lifecycle](doc/user_guide/project_lifecycle.md)
+* [Project Lifecycle](doc/user_guide/project_lifecycle.md)
 * [Changelog](doc/changes/changelog.md)
 * [CRA technical file](CRA_technical_file.md)
 
