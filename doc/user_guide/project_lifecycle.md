@@ -7,7 +7,7 @@ Feature, documentation, bugfix and security updates are always provided as lates
 The latest version gets tested for the compatibility with at least
 
 * Latest Exasol Innovation Release
-* Latest Exasol LTS
+* Latest Exasol LTS Release
 
 at the time of the release of this project version.
 
@@ -25,7 +25,7 @@ This library is easy to update with your application, so five years of support i
 
 ## Security Updates
 
-Users need to check the [changelog](../changes/changelog.md) to stay informed about security updates. You need to install the provided security updates in a timely manner to keep your setup secure. This is also true for any dependencies of this software that do not come bundled. An example is the Java runtime environment.
+Users need to check the [changelog](../changes/changelog.md) to stay informed about security updates. You need to install the provided security updates in a timely manner to keep your setup secure. This is also true for any dependencies of this software that do not come bundled. An example is the Java Runtime Environment.
 
 Exasol provides security updates until the EoL listed above.
 
