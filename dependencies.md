@@ -21,10 +21,10 @@
 
 ## Runtime Dependencies
 
-| Dependency            | License                                                                                                           |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| [Eclipse Parsson][16] | [Eclipse Public License 2.0][3]; [GNU General Public License, version 2 with the GNU Classpath Exception][4]      |
-| [Yasson][17]          | [Eclipse Public License v. 2.0][18]; [GNU General Public License, version 2 with the GNU Classpath Exception][19] |
+| Dependency            | License                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [Eclipse Parsson][16] | [Eclipse Public License 2.0][3]; [GNU General Public License, version 2 with the GNU Classpath Exception][4] |
+| [Yasson][17]          | [Eclipse Public License v. 2.0][18]; [Eclipse Distribution License v. 1.0][19]                               |
 
 ## Plugin Dependencies
 
@@ -75,9 +75,9 @@
 [14]: http://www.slf4j.org
 [15]: https://opensource.org/license/mit
 [16]: https://github.com/eclipse-ee4j/parsson
-[17]: https://projects.eclipse.org/projects/ee4j/yasson
-[18]: https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt
-[19]: https://www.gnu.org/software/classpath/license.html
+[17]: https://projects.eclipse.org/projects/ee4j.yasson
+[18]: http://www.eclipse.org/legal/epl-v20.html
+[19]: http://www.eclipse.org/org/documents/edl-v10.php
 [20]: https://docs.sonarsource.com/sonarqube-server/latest/extension-guide/developing-a-plugin/plugin-basics/sonar-scanner-maven/sonar-maven-plugin/
 [21]: http://www.gnu.org/licenses/lgpl.txt
 [22]: https://maven.apache.org/plugins/maven-toolchains-plugin/
