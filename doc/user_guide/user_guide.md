@@ -176,7 +176,7 @@ EXAClusterOS/
 /EXAClusterOS/
 ```
 
-Compatibility note: Exasol 8 rejects upload destinations containing a backslash (`\`) with HTTP status 400. Avoid backslashes in paths when your application must support Exasol 8. Newer Exasol major versions accept them.
+**Compatibility note:** Exasol 8 rejects upload destinations containing a backslash (`\`) with HTTP status 400. Avoid backslashes in paths when your application must support Exasol 8. Newer Exasol major versions accept them.
 
 ### Get the UDF Bucket Path
 
