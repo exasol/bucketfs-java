@@ -3,6 +3,7 @@ package com.exasol.bucketfs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -102,7 +103,27 @@ class SyncAwareBucketIT extends AbstractBucketIT {
     }
 
     @Test
-    void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException, TimeoutException, BucketAccessException {
+    void testUploadFileToIllegalUrlThrowsException(@TempDir final Path tempDir) throws IOException {
+        assumeExasol8();
+        final var file = createTestFile(tempDir, "irrelevant.txt", 1);
+        final BucketAccessException thrown = assertThrows(BucketAccessException.class,
+                () -> getDefaultBucketForWriting().uploadFile(file, "this\\is\\an\\illegal\\URL"));
+        assertThat(thrown.getMessage(),
+                allOf(Matchers.startsWith("E-BFSJ-1: Unable to perform upload"), containsString("HTTP status 400")));
+    }
+
+    @Test
+    void testUploadContentToIllegalUrlThrowsException() {
+        assumeExasol8();
+        final BucketAccessException thrown = assertThrows(BucketAccessException.class, () -> getDefaultBucketForWriting()
+                .uploadStringContent("irrelevant content", "this\\is\\an\\illegal\\URL"));
+        assertThat(thrown.getMessage(), allOf(Matchers.startsWith("E-BFSJ-1: Unable to perform upload"), containsString("HTTP status 400")));
+    }
+
+    @Test
+    void testUploadFileWithBackslashInPath(@TempDir final Path tempDir)
+            throws IOException, TimeoutException, BucketAccessException {
+        assumeExasolAfter8();
         final var file = createTestFile(tempDir, "irrelevant.txt", 1);
         final SyncAwareBucket bucket = getDefaultBucketForWriting();
         final String pathInBucket = "this\\is\\an\\illegal\\URL";
@@ -112,10 +133,19 @@ class SyncAwareBucketIT extends AbstractBucketIT {
 
     @Test
     void testUploadContentWithBackslashInPath() throws InterruptedException, BucketAccessException, TimeoutException {
+        assumeExasolAfter8();
         final SyncAwareBucket bucket = getDefaultBucketForWriting();
         final String pathInBucket = "this\\is\\an\\illegal\\URL";
         bucket.uploadStringContent("irrelevant content", pathInBucket);
         assertThat(bucket.listContents(), hasItem(pathInBucket));
+    }
+
+    private static void assumeExasol8() {
+        assumeTrue(EXASOL.getDockerImageReference().getMajor() == 8, "This test requires Exasol 8.");
+    }
+
+    private static void assumeExasolAfter8() {
+        assumeTrue(EXASOL.getDockerImageReference().getMajor() > 8, "This test requires an Exasol version newer than 8.");
     }
 
     // [itest->dsn~downloading-a-file-from-a-bucket~1]

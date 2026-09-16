@@ -99,7 +99,7 @@ Each bucket implementation comes with a builder that you create by calling the s
 The builder for the `ReadEnabledBucket` has the following parameter setters:
 
 * Configure TLS behavior. See [below](#configuring-tls) for details.
-    * `useTls`: `true` to use HTTPS, `false` to use HTTP (default). 
+    * `useTls`: `true` to use HTTPS, `false` to use HTTP (default).
     * `raiseTlsErrors`: `true` to throw exceptions for errors verifying the TLS certificate of the server (default), `false` to ignore certificate errors (useful when using self-signed certificates)
     * `certificate`: `X509Certificate` to use when connecting via TLS
     * If the certificate does not contain the correct host name, you can allow additional host names or IP addresses as Subject Alternative Names (SAN) for connecting, e.g. `localhost` or `127.0.0.1` using the following methods:
@@ -176,9 +176,11 @@ EXAClusterOS/
 /EXAClusterOS/
 ```
 
+Compatibility note: Exasol 8 rejects upload destinations containing a backslash (`\`) with HTTP status 400. Avoid backslashes in paths when your application must support Exasol 8. Newer Exasol major versions accept them.
+
 ### Get the UDF Bucket Path
 
-In Exasol, BucketFS is the only accessible filesystem for UDFs, and it operates in a **chrooted environment**.  
+In Exasol, BucketFS is the only accessible filesystem for UDFs, and it operates in a **chrooted environment**.
 This means that paths seen from within a UDF differ from those on the host system or exposed via the BucketFS web interface.
 
 Methods `getPathInUdf()` and `getPathInUdf(String filename)` of the `ReadOnlyBucket` interface:
@@ -267,7 +269,7 @@ It's a common use-case test scenarios to create small files of well-defined cont
 Use the following convenience method to write a string directly to a file in a bucket:
 
 ```java
-bucket.uploadStringContent(content, destination); 
+bucket.uploadStringContent(content, destination);
 ```
 
 Here `content` is the `String` that you want to write an destination is again the path inside the bucket.
@@ -352,7 +354,7 @@ CreateBucketCommandBuilder commandBuilder = commandFactory.makeCreateBucketComma
         .isPublic(true)
         .readPassword("readPassword")
         .writePassword("writePassword");
-        
+
 commandBuilder.execute();
 ```
 

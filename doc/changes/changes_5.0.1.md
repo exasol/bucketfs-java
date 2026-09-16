@@ -4,7 +4,7 @@ Code name: Fixed vulnerability CVE-2026-86231 in com.github.mwiede:jsch:jar:2.28
 
 ## Summary
 
-This release fixes the following vulnerability:
+This release fixes the following vulnerability and documents version-specific BucketFS behavior. Exasol 8 rejects object paths containing backslashes; newer Exasol major versions accept them.
 
 ### CVE-2026-86231 (CWE-298) in dependency `com.github.mwiede:jsch:jar:2.28.5:test`
 A security flaw has been discovered in mwiede jsch up to 2.28.5. Affected is the function getRevokedKeys of the file src/main/java/com/jcraft/jsch/KnownHosts.java. Performing a manipulation of the argument known_hosts results in improper check for certificate revocation. The attack is possible to be carried out remotely. The attack is considered to have high complexity. The exploitability is told to be difficult. The exploit has been released to the public and may be used for attacks. Upgrading to version 2.28.6 is able to address this issue.
